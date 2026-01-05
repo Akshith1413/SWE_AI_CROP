@@ -363,6 +363,7 @@ const EnhancedCompleteCameraCapture = ({
   const streamRef = useRef(null);
   const animationRef = useRef(null);
   const voiceTimeoutRef = useRef(null);
+  const warningSoundRef = useRef(null);
   
   const [stream, setStream] = useState(null);
   const [capturedPhoto, setCapturedPhoto] = useState(null);
@@ -399,6 +400,8 @@ const EnhancedCompleteCameraCapture = ({
   const [photoTipsShown, setPhotoTipsShown] = useState(false);
   const [qualityHistory, setQualityHistory] = useState([]);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [showWarningAlert, setShowWarningAlert] = useState(false);
+  const [warningMessage, setWarningMessage] = useState('');
 
   // Initialize camera immediately
   useEffect(() => {
@@ -460,6 +463,23 @@ const EnhancedCompleteCameraCapture = ({
       if (voiceTimeoutRef.current) clearTimeout(voiceTimeoutRef.current);
     };
   }, [liveQuality.message, voiceInstructions, isSpeaking]);
+
+  // NEW: Check for quality issues and show warnings separately
+  useEffect(() => {
+    if (cameraReady && liveQuality.status !== 'good' && liveQuality.score < 70) {
+      // Show warning alert
+      setShowWarningAlert(true);
+      setWarningMessage(liveQuality.message);
+      
+      // Speak warning if voice is enabled
+      if (voiceInstructions && !isSpeaking) {
+        const warningText = `Warning: ${liveQuality.message}`;
+        speakWarning(warningText);
+      }
+    } else {
+      setShowWarningAlert(false);
+    }
+  }, [liveQuality.status, liveQuality.message, liveQuality.score, cameraReady]);
 
   // Track quality history for improvement validation
   useEffect(() => {
@@ -776,62 +796,32 @@ const EnhancedCompleteCameraCapture = ({
     return issues;
   };
 
-  const capturePhoto = () => {
-    // Check quality before capture
-    const qualityIssues = validateImageQuality();
-    
-    if (qualityIssues.length > 0) {
-      const severeIssues = qualityIssues.filter(issue => issue.severity === 'severe');
-      const warningIssues = qualityIssues.filter(issue => issue.severity === 'warning');
+  // NEW: Separate function to speak warnings
+  const speakWarning = (message) => {
+    if ('speechSynthesis' in window && voiceInstructions && !isSpeaking) {
+      speechSynthesis.cancel();
+      setIsSpeaking(true);
       
-      if (severeIssues.length > 0) {
-        // Show severe quality warning
-        setQualityWarning({
-          type: 'severe',
-          issues: severeIssues.map(issue => ({
-            icon: issue.type === 'darkness' ? Moon : 
-                  issue.type === 'blur' ? Focus : 
-                  issue.type === 'brightness' ? Sun : AlertCircle,
-            text: issue.message,
-            color: 'red',
-            suggestion: issue.suggestion
-          })),
-          message: 'Photo quality is too poor. Please fix issues before capturing.',
-          score: liveQuality.score
-        });
-        
-        if (voiceInstructions) {
-          const severeMessage = severeIssues.map(issue => issue.message).join('. ');
-          speakGuidance(`Warning: ${severeMessage}. Please fix these issues before capturing.`);
-        }
-        
-        return;
-      } else if (warningIssues.length > 0) {
-        // Show warning but allow capture
-        setQualityWarning({
-          type: 'warning',
-          issues: warningIssues.map(issue => ({
-            icon: issue.type === 'darkness' ? Moon : 
-                  issue.type === 'blur' ? Focus : 
-                  issue.type === 'brightness' ? Sun : AlertCircle,
-            text: issue.message,
-            color: 'yellow',
-            suggestion: issue.suggestion
-          })),
-          message: 'Photo quality could be better. Do you want to proceed anyway?',
-          score: liveQuality.score
-        });
-        
-        if (voiceInstructions) {
-          const warningMessage = warningIssues.map(issue => issue.message).join('. ');
-          speakGuidance(`Note: ${warningMessage}. You may proceed or improve conditions.`);
-        }
-        
-        return;
-      }
+      const utterance = new SpeechSynthesisUtterance(message);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.9;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      
+      utterance.onend = () => {
+        setIsSpeaking(false);
+      };
+      
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+      };
+      
+      speechSynthesis.speak(utterance);
     }
-    
-    // If quality is good, start countdown
+  };
+
+  const capturePhoto = () => {
+    // Start countdown immediately - no blocking quality checks
     setCaptureCountdown(3);
     
     if (voiceInstructions) {
@@ -1009,6 +999,7 @@ const EnhancedCompleteCameraCapture = ({
     setCapturedPhoto(null);
     setAnalysisResult(null);
     setQualityWarning(null);
+    setShowWarningAlert(false);
     setCurrentStep('camera');
     setCaptureCountdown(null);
     startCamera();
@@ -1016,25 +1007,6 @@ const EnhancedCompleteCameraCapture = ({
     if (voiceInstructions) {
       speakGuidance("Retaking photo. Please position your camera.");
     }
-  };
-
-  const forceCapture = () => {
-    setQualityWarning(null);
-    if (voiceInstructions) {
-      speakGuidance("Proceeding with capture despite quality warnings.");
-    }
-    setCaptureCountdown(3);
-    
-    const countdown = setInterval(() => {
-      setCaptureCountdown(prev => {
-        if (prev <= 1) {
-          clearInterval(countdown);
-          performCapture();
-          return null;
-        }
-        return prev - 1;
-      });
-    }, 1000);
   };
 
   const getQualityColor = () => {
@@ -1101,6 +1073,22 @@ const EnhancedCompleteCameraCapture = ({
     if (voiceInstructions) {
       speakGuidance(`Environmental data collected. Temperature is ${mockData.temperature} degrees, humidity ${mockData.humidity} percent.`);
     }
+  };
+
+  // NEW: Function to show warning button
+  const showWarningButton = () => {
+    if (qualityWarning) {
+      return (
+        <button
+          onClick={() => setQualityWarning(null)}
+          className="absolute top-4 right-4 z-50 bg-red-500 text-white px-3 py-2 rounded-lg font-bold flex items-center gap-2 animate-pulse"
+        >
+          <AlertTriangle className="w-5 h-5" />
+          Quality Issues
+        </button>
+      );
+    }
+    return null;
   };
 
   // Render based on current step
@@ -1217,6 +1205,105 @@ const EnhancedCompleteCameraCapture = ({
             <div className="text-white text-center">
               <div className="text-8xl font-bold animate-pulse mb-4">{captureCountdown}</div>
               <p className="text-xl opacity-80">Get ready...</p>
+            </div>
+          </div>
+        )}
+
+        {/* Warning Alert Button (Separate from capture) */}
+        {showWarningAlert && (
+          <button
+            onClick={() => {
+              // Show detailed warning modal
+              const qualityIssues = validateImageQuality();
+              setQualityWarning({
+                type: 'warning',
+                issues: qualityIssues.map(issue => ({
+                  icon: issue.type === 'darkness' ? Moon : 
+                        issue.type === 'blur' ? Focus : 
+                        issue.type === 'brightness' ? Sun : AlertCircle,
+                  text: issue.message,
+                  color: issue.severity === 'severe' ? 'red' : 'yellow',
+                  suggestion: issue.suggestion
+                })),
+                message: 'Photo quality issues detected',
+                score: liveQuality.score
+              });
+            }}
+            className="absolute top-20 right-4 z-50 bg-red-500 text-white px-4 py-3 rounded-xl font-bold flex items-center gap-2 animate-pulse shadow-2xl"
+          >
+            <AlertTriangle className="w-5 h-5" />
+            Quality Warning
+          </button>
+        )}
+
+        {/* Quality Warning Modal (Only shown when warning button is clicked) */}
+        {qualityWarning && (
+          <div className="absolute inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-6">
+            <div className="bg-white rounded-2xl p-6 max-w-md w-full space-y-4 animate-fade-in">
+              <div className={`flex items-center justify-between ${qualityWarning.type === 'severe' ? 'text-red-600' : 'text-yellow-600'}`}>
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="w-8 h-8" />
+                  <div>
+                    <h3 className="text-xl font-bold">
+                      {qualityWarning.type === 'severe' ? '⚠️ Poor Quality Detected' : '⚠️ Quality Warning'}
+                    </h3>
+                    <div className={`text-sm font-bold ${getQualityScoreColor(qualityWarning.score)}`}>
+                      Quality Score: {qualityWarning.score}%
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setQualityWarning(null)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              
+              <div className="space-y-2">
+                {qualityWarning.issues.map((issue, idx) => (
+                  <div key={idx} className={`flex items-center gap-3 p-3 rounded-lg ${
+                    issue.color === 'red' ? 'bg-red-50' : 'bg-yellow-50'
+                  }`}>
+                    <issue.icon className={`w-5 h-5 ${issue.color === 'red' ? 'text-red-600' : 'text-yellow-600'}`} />
+                    <div>
+                      <span className={`text-sm font-medium ${issue.color === 'red' ? 'text-red-800' : 'text-yellow-800'}`}>
+                        {issue.text}
+                      </span>
+                      {issue.suggestion && (
+                        <p className={`text-xs mt-1 ${issue.color === 'red' ? 'text-red-700' : 'text-yellow-700'}`}>
+                          Suggestion: {issue.suggestion}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <p className="text-gray-700 text-sm">
+                {qualityWarning.message} You can still capture photos, but quality may be affected.
+              </p>
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setQualityWarning(null)}
+                  className="flex-1 bg-gray-600 text-white py-3 rounded-lg font-semibold hover:bg-gray-700 transition"
+                >
+                  Acknowledge
+                </button>
+                <button
+                  onClick={() => {
+                    if (voiceInstructions) {
+                      const warningDetails = qualityWarning.issues.map(issue => issue.text).join('. ');
+                      speakWarning(`Quality warning details: ${warningDetails}. Suggestions: ${qualityWarning.issues.map(issue => issue.suggestion).join('. ')}`);
+                    }
+                  }}
+                  className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center gap-2"
+                >
+                  <Volume2 className="w-5 h-5" />
+                  Hear Details
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -1450,68 +1537,6 @@ const EnhancedCompleteCameraCapture = ({
         </div>
 
         <canvas ref={canvasRef} className="hidden" />
-
-        {/* Quality Warning Modal */}
-        {qualityWarning && (
-          <div className="absolute inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-6">
-            <div className="bg-white rounded-2xl p-6 max-w-md w-full space-y-4 animate-fade-in">
-              <div className={`flex items-center justify-between ${qualityWarning.type === 'severe' ? 'text-red-600' : 'text-yellow-600'}`}>
-                <div className="flex items-center gap-3">
-                  <AlertTriangle className="w-8 h-8" />
-                  <div>
-                    <h3 className="text-xl font-bold">
-                      {qualityWarning.type === 'severe' ? '⚠️ Poor Quality Detected' : '⚠️ Quality Warning'}
-                    </h3>
-                    <div className={`text-sm font-bold ${getQualityScoreColor(qualityWarning.score)}`}>
-                      Quality Score: {qualityWarning.score}%
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                {qualityWarning.issues.map((issue, idx) => (
-                  <div key={idx} className={`flex items-center gap-3 p-3 rounded-lg ${
-                    issue.color === 'red' ? 'bg-red-50' : 'bg-yellow-50'
-                  }`}>
-                    <issue.icon className={`w-5 h-5 ${issue.color === 'red' ? 'text-red-600' : 'text-yellow-600'}`} />
-                    <div>
-                      <span className={`text-sm font-medium ${issue.color === 'red' ? 'text-red-800' : 'text-yellow-800'}`}>
-                        {issue.text}
-                      </span>
-                      {issue.suggestion && (
-                        <p className={`text-xs mt-1 ${issue.color === 'red' ? 'text-red-700' : 'text-yellow-700'}`}>
-                          Suggestion: {issue.suggestion}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              <p className="text-gray-700 text-sm">
-                {qualityWarning.message}
-              </p>
-              
-              <div className="flex gap-3">
-                <button
-                  onClick={retakePhoto}
-                  className="flex-1 bg-gray-600 text-white py-3 rounded-lg font-semibold hover:bg-gray-700 transition"
-                >
-                  Retake Photo
-                </button>
-                {qualityWarning.type !== 'severe' && (
-                  <button
-                    onClick={forceCapture}
-                    className="flex-1 bg-yellow-600 text-white py-3 rounded-lg font-semibold hover:bg-yellow-700 transition"
-                  >
-                    Use Anyway
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Success Confirmation */}
         {showConfirmation && !qualityWarning && (
