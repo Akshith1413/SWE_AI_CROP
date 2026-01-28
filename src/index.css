@@ -1,13 +1,7 @@
-
-
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -53,50 +47,19 @@ button {
 button:hover {
   border-color: #646cff;
 }
-
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
-
-/* =========================
-   AUTH SCREEN OVERRIDES
-========================= */
-
-body.auth-screen {
-  margin: 0 !important;
-  min-height: 100vh !important;
-
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-
-  background: linear-gradient(135deg, #0f5132, #2d6a4f) !important;
-}
-
-/* Remove Vite root box */
-body.auth-screen #root {
-  max-width: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-}
-
-/* =========================
-   LIGHT MODE
-========================= */
 
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
     background-color: #ffffff;
   }
-
   a:hover {
     color: #747bff;
   }
-
   button {
     background-color: #f9f9f9;
   }

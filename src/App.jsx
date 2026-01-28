@@ -1,44 +1,41 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./App.css";
 
 import CAM from "./components/CropDiagnosisApp";
 import LoginScreen from "./components/LoginScreen";
 import LanguageScreen from "./components/LanguageScreen";
+import LandingPage from "./components/LandingPage";
+import ConsentScreen from "./components/ConsentScreen";
 
 function App() {
-
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [view, setView] = useState("landing"); // 'landing', 'consent', 'login', 'main'
   const [language, setLanguage] = useState(null);
 
+  const handleGuestEntry = () => setView("consent");
+  const handleAccountEntry = () => setView("login");
+  const handleConsent = () => setView("main");
 
-  
-  useEffect(() => {
+  // Both login success and skip lead to the main app flow
+  const handleLoginCompletion = () => setView("main");
 
-    const body = document.body;
+  if (view === "landing") {
+    return <LandingPage onGuest={handleGuestEntry} onLogin={handleAccountEntry} />;
+  }
 
-    if (!isLoggedIn || !language) {
-      body.classList.add("auth-mode");
-      body.classList.remove("app-mode");
-    } else {
-      body.classList.add("app-mode");
-      body.classList.remove("auth-mode");
-    }
+  if (view === "consent") {
+    return <ConsentScreen onConsent={handleConsent} />;
+  }
 
-  }, [isLoggedIn, language]);
-
-
-  
-  if (!isLoggedIn) {
+  if (view === "login") {
     return (
       <LoginScreen
-        onLogin={() => setIsLoggedIn(true)}
-        onSkip={() => setIsLoggedIn(true)}
+        onLogin={handleLoginCompletion}
+        onSkip={handleLoginCompletion}
       />
     );
   }
 
-
-  
+  // Main Application Flow
   if (!language) {
     return (
       <LanguageScreen
@@ -47,9 +44,11 @@ function App() {
     );
   }
 
-
- 
-  return <CAM language={language} />;
+  return (
+    <div className="app-container">
+      <CAM language={language} />
+    </div>
+  );
 }
 
 export default App;
