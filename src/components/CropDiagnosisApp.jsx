@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import LandingPage from './LandingPage';
 import ConsentScreen from './ConsentScreen';
+import UserProfile from './UserProfile';
 import { cropService } from '../services/cropService';
 import { consentService } from '../services/consentService';
 
@@ -145,6 +146,11 @@ const CropDiagnosisApp = () => {
           capturedImages={capturedImages}
         />
       )}
+      {view === 'profile' && (
+        <UserProfile
+          onBack={() => setView('home')}
+        />
+      )}
     </div>
   );
 };
@@ -153,7 +159,15 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial }) => {
   return (
     <div className="min-h-screen bg-[#1a1a1a] text-white flex flex-col items-center p-4">
       {/* Header */}
-      <header className="w-full max-w-lg flex flex-col items-center mt-6 mb-8">
+      <header className="w-full max-w-lg flex flex-col items-center mt-6 mb-8 relative">
+        <div className="absolute right-0 top-0">
+          <button
+            onClick={() => setView('profile')}
+            className="p-2 bg-[#242424] rounded-full text-white hover:bg-[#2a2a2a] transition border border-white/5"
+          >
+            <UserCheck className="w-5 h-5" />
+          </button>
+        </div>
         <Camera className="w-8 h-8 text-white mb-4" />
         <h1 className="text-3xl font-bold mb-2">AI Crop Diagnosis</h1>
         <p className="text-gray-400 text-sm">Smart Disease Detection</p>
