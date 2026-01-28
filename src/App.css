@@ -1,40 +1,42 @@
+/* ===============================
+   AUTH MODE (Login + Language)
+================================ */
 
+body.auth-mode {
+  margin: 0;
+  min-height: 100vh;
 
-* {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: linear-gradient(135deg, #0f5132, #2d6a4f);
+}
+
+body.auth-mode #root {
+  width: 100%;
+  height: 100%;
+  max-width: none;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-}
-
-#root {
-  width: 100%;
-  min-height: 100vh;
-}
-
-/* Main App Layout */
-.app-container {
-  width: 100%;
-  min-height: 100vh;
-
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-
-  padding: 20px;
-
-  background: #111212;
 }
 
 
-.app-container {
-  width: 100%;
-  min-height: 100vh;
+/* ===============================
+   APP MODE (Crop Diagnosis)
+================================ */
 
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-
-  padding: 0;  
-  background: #151516;
+body.app-mode {
+  background: inherit;
 }
 
+body.app-mode #root {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+body.app-mode #root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+}
