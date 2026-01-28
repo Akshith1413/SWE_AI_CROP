@@ -7,6 +7,7 @@ import LanguageScreen from "./components/LanguageScreen";
 import LandingPage from "./components/LandingPage";
 import ConsentScreen from "./components/ConsentScreen";
 import { preferencesService } from "./services/preferencesService";
+import { audioService } from "./services/audioService";
 
 function App() {
   const [view, setView] = useState("loading"); // 'loading', 'landing', 'consent', 'login', 'main'
@@ -78,6 +79,10 @@ function App() {
         onSelect={(lang) => {
           setLanguage(lang);
           preferencesService.setLanguage(lang);
+
+          // Audio confirmation
+          audioService.confirmAction('success');
+          audioService.speakLocalized('language_selected', lang);
         }}
       />
     );

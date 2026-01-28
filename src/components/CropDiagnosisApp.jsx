@@ -21,8 +21,10 @@ import {
 import LandingPage from './LandingPage';
 import ConsentScreen from './ConsentScreen';
 import UserProfile from './UserProfile';
+import AudioSettingsPanel from './AudioSettingsPanel';
 import { cropService } from '../services/cropService';
 import { consentService } from '../services/consentService';
+import { audioService } from '../services/audioService';
 
 const CropDiagnosisApp = () => {
   const [appState, setAppState] = useState('loading'); // loading, landing, consent, app
@@ -156,13 +158,27 @@ const CropDiagnosisApp = () => {
 };
 
 const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial }) => {
+  const [showAudioSettings, setShowAudioSettings] = React.useState(false);
+
   return (
     <div className="min-h-screen bg-[#1a1a1a] text-white flex flex-col items-center p-4">
       {/* Header */}
       <header className="w-full max-w-lg flex flex-col items-center mt-6 mb-8 relative">
-        <div className="absolute right-0 top-0">
+        <div className="absolute right-0 top-0 flex gap-2">
           <button
-            onClick={() => setView('profile')}
+            onClick={() => {
+              audioService.playClick();
+              setShowAudioSettings(true);
+            }}
+            className="p-2 bg-[#242424] rounded-full text-white hover:bg-[#2a2a2a] transition border border-white/5"
+          >
+            <Volume2 className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => {
+              audioService.playClick();
+              setView('profile');
+            }}
             className="p-2 bg-[#242424] rounded-full text-white hover:bg-[#2a2a2a] transition border border-white/5"
           >
             <UserCheck className="w-5 h-5" />
@@ -172,6 +188,11 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial }) => {
         <h1 className="text-3xl font-bold mb-2">AI Crop Diagnosis</h1>
         <p className="text-gray-400 text-sm">Smart Disease Detection</p>
       </header>
+
+      {/* Audio Settings Modal */}
+      {showAudioSettings && (
+        <AudioSettingsPanel onClose={() => setShowAudioSettings(false)} />
+      )}
 
       {/* Connection Status */}
       <div className="flex flex-col items-center mb-8">
@@ -188,6 +209,7 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial }) => {
       <div className="grid grid-cols-4 gap-2 w-full max-w-lg mb-12">
         <button
           onClick={() => {
+            audioService.playClick();
             setShowTutorial(true);
             setView('camera');
           }}
@@ -200,7 +222,10 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial }) => {
         </button>
 
         <button
-          onClick={() => setView('upload')}
+          onClick={() => {
+            audioService.playClick();
+            setView('upload');
+          }}
           className="col-span-1 bg-[#1a1a1a] p-4 rounded-xl flex flex-col items-center justify-center gap-2 hover:bg-[#242424] transition"
         >
           <Upload className="w-6 h-6 text-white" />
@@ -209,7 +234,10 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial }) => {
         </button>
 
         <button
-          onClick={() => setView('video')}
+          onClick={() => {
+            audioService.playClick();
+            setView('video');
+          }}
           className="col-span-1 bg-[#1a1a1a] p-4 rounded-xl flex flex-col items-center justify-center gap-2 hover:bg-[#242424] transition"
         >
           <Video className="w-6 h-6 text-white" />
@@ -218,7 +246,10 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial }) => {
         </button>
 
         <button
-          onClick={() => setView('voice')}
+          onClick={() => {
+            audioService.playClick();
+            setView('voice');
+          }}
           className="col-span-1 bg-[#1a1a1a] p-4 rounded-xl flex flex-col items-center justify-center gap-2 hover:bg-[#242424] transition"
         >
           <Mic className="w-6 h-6 text-white" />
@@ -789,6 +820,9 @@ const EnhancedCompleteCameraCapture = ({
 
       const photoData = canvas.toDataURL('image/jpeg', 0.95);
       setCapturedPhoto(photoData);
+
+      // Audio feedback for capture
+      audioService.playCapture();
 
       // Perform analysis
       const analysis = performDetailedAnalysis(ctx, canvas.width, canvas.height);
@@ -2041,6 +2075,10 @@ const MultiImageUpload = ({ setView, setCapturedImages, isOnline, addToOfflineQu
 
     setSelectedImages(prev => [...prev, ...imageFiles]);
     setUploadedPreviewImages(prev => [...prev, ...newPreviews]);
+
+    // Audio feedback for file selection
+    audioService.playNotification();
+    audioService.speak(`${imageFiles.length} image${imageFiles.length > 1 ? 's' : ''} selected`);
   };
 
   const handleDragOver = (e) => {
@@ -2145,9 +2183,17 @@ const MultiImageUpload = ({ setView, setCapturedImages, isOnline, addToOfflineQu
       processedImages.forEach(img => addToOfflineQueue(img));
     }
 
+    // Play click sound when images selected
+    audioService.playClick();
+
     // Wait a moment to show 100% progress
     setTimeout(() => {
       setIsUploading(false);
+
+      // Audio feedback for successful upload
+      audioService.playSuccess();
+      audioService.speak(`Upload complete. ${processedImages.length} images analyzed successfully.`);
+
       setView('analysis');
     }, 500);
   };
@@ -2203,8 +2249,8 @@ const MultiImageUpload = ({ setView, setCapturedImages, isOnline, addToOfflineQu
         {/* Upload Area */}
         <div
           className={`border-4 border-dashed rounded-2xl p-8 mb-6 transition-all ${isDragging
-              ? 'border-blue-600 bg-blue-50 scale-105'
-              : 'border-gray-300 bg-white'
+            ? 'border-blue-600 bg-blue-50 scale-105'
+            : 'border-gray-300 bg-white'
             } ${selectedImages.length > 0 ? 'border-green-300 bg-green-50/30' : ''}`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -2327,8 +2373,8 @@ const MultiImageUpload = ({ setView, setCapturedImages, isOnline, addToOfflineQu
             onClick={handleUpload}
             disabled={selectedImages.length === 0 || isUploading}
             className={`flex-1 text-white py-4 rounded-xl font-bold transition shadow-lg flex items-center justify-center gap-2 ${selectedImages.length === 0 || isUploading
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-gradient-to-r from-green-500 to-emerald-600 hover:shadow-xl transform hover:scale-105'
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-gradient-to-r from-green-500 to-emerald-600 hover:shadow-xl transform hover:scale-105'
               }`}
           >
             <Check className="w-5 h-5" />
