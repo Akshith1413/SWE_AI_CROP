@@ -4,8 +4,6 @@ import "./App.css";
 import CAM from "./components/CropDiagnosisApp";
 import LoginScreen from "./components/LoginScreen";
 import LanguageScreen from "./components/LanguageScreen";
-import LandingPage from "./components/LandingPage";
-import ConsentScreen from "./components/ConsentScreen";
 
 function App() {
   const [view, setView] = useState("landing"); // 'landing', 'consent', 'login', 'main'
@@ -43,6 +41,9 @@ function App() {
       />
     );
   }
+  return (
+    <CropDocApp language={language} />
+  );
 
   return (
     <div className="app-container">
