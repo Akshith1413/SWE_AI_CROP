@@ -4,7 +4,7 @@ import "./App.css";
 import CAM from "./components/CropDiagnosisApp";
 import LoginScreen from "./components/LoginScreen";
 import LanguageScreen from "./components/LanguageScreen";
-
+import cropdocapp from './components/cropdocapp';
 function App() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -46,6 +46,9 @@ function App() {
       />
     );
   }
+  return (
+    <CropDocApp language={language} />
+  );
 
 
  
