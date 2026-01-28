@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 
 import CAM from "./components/CropDiagnosisApp";
@@ -10,6 +10,24 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [language, setLanguage] = useState(null);
 
+
+  
+  useEffect(() => {
+
+    const body = document.body;
+
+    if (!isLoggedIn || !language) {
+      body.classList.add("auth-mode");
+      body.classList.remove("app-mode");
+    } else {
+      body.classList.add("app-mode");
+      body.classList.remove("auth-mode");
+    }
+
+  }, [isLoggedIn, language]);
+
+
+  
   if (!isLoggedIn) {
     return (
       <LoginScreen
@@ -19,6 +37,8 @@ function App() {
     );
   }
 
+
+  
   if (!language) {
     return (
       <LanguageScreen
@@ -27,11 +47,9 @@ function App() {
     );
   }
 
-  return (
-  <div className="app-container">
-    <CAM language={language} />
-  </div>
-);
+
+ 
+  return <CAM language={language} />;
 }
 
 export default App;
