@@ -4,6 +4,8 @@ import "./App.css";
 import CAM from "./components/CropDiagnosisApp";
 import LoginScreen from "./components/LoginScreen";
 import LanguageScreen from "./components/LanguageScreen";
+import LandingPage from "./components/LandingPage";
+import ConsentScreen from "./components/ConsentScreen";
 
 function App() {
   const [view, setView] = useState("landing"); // 'landing', 'consent', 'login', 'main'
@@ -13,7 +15,7 @@ function App() {
   const handleAccountEntry = () => setView("login");
   const handleConsent = () => setView("main");
 
-  // Both login success and skip lead to the main app flow
+  // Both login, skip, and consent lead to the main app flow
   const handleLoginCompletion = () => setView("main");
 
   if (view === "landing") {
@@ -41,15 +43,13 @@ function App() {
       />
     );
   }
-  return (
-    <CropDocApp language={language} />
-  );
 
   return (
     <div className="app-container">
       <CAM language={language} />
     </div>
   );
+
 }
 
 export default App;

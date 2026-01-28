@@ -3,7 +3,7 @@ import { ShieldCheck, Cloud, Database, Check } from 'lucide-react';
 
 const ConsentScreen = ({ onConsent }) => {
     return (
-        <div className="min-h-screen bg-nature-50 flex items-center justify-center p-6 animate-slide-up">
+        <div className="min-h-screen bg-gradient-to-br from-[#0f5132] to-[#2d6a4f] flex items-center justify-center p-6 animate-slide-up">
             <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full border border-nature-100">
 
                 <div className="flex items-center gap-3 mb-6">
