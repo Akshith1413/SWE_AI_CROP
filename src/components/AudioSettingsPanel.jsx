@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, VolumeX, Music, MusicOff, Settings, X } from 'lucide-react';
+import { Volume2, VolumeX, Music, Settings, X } from 'lucide-react';
 import { audioService } from '../services/audioService';
 
 /**
@@ -61,7 +61,7 @@ const AudioSettingsPanel = ({ onClose }) => {
                                 {soundEnabled ? (
                                     <Music className="w-5 h-5 text-blue-600" />
                                 ) : (
-                                    <MusicOff className="w-5 h-5 text-gray-400" />
+                                    <Music className="w-5 h-5 text-gray-400 opacity-50" />
                                 )}
                                 <div>
                                     <h3 className="font-bold text-gray-800">Sound Effects</h3>
@@ -119,8 +119,8 @@ const AudioSettingsPanel = ({ onClose }) => {
                         onClick={testSounds}
                         disabled={!soundEnabled && !voiceEnabled}
                         className={`w-full py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 ${soundEnabled || voiceEnabled
-                                ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white hover:shadow-lg'
-                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white hover:shadow-lg'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                             }`}
                     >
                         <Music className="w-5 h-5" />
