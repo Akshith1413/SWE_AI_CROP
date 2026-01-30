@@ -8,7 +8,6 @@ import LandingPage from "./components/LandingPage";
 import ConsentScreen from "./components/ConsentScreen";
 import { preferencesService } from "./services/preferencesService";
 import { audioService } from "./services/audioService";
-import cropdocapp from './components/cropdocapp';
 
 
 function App() {
@@ -95,10 +94,6 @@ function App() {
       <CAM language={language} userId={userId} />
     </div>
   );
-  return (
-    <cropdocapp language={language} /> // pass language if your component needs it
-  );
-
 }
 
 export default App;
