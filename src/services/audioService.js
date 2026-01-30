@@ -1,3 +1,5 @@
+import { consentService } from './consentService';
+
 /**
  * Audio Service
  * Provides audio feedback for user actions including sound effects and voice confirmation
@@ -34,6 +36,13 @@ class AudioService {
      * Load audio preferences from localStorage
      */
     loadPreferences() {
+        // Guests always start with default settings (true/true)
+        if (consentService.isGuest()) {
+            this.soundEnabled = true;
+            this.voiceEnabled = true;
+            return;
+        }
+
         try {
             const prefs = localStorage.getItem('cropai_audio_preferences');
             if (prefs) {
@@ -50,6 +59,11 @@ class AudioService {
      * Save audio preferences
      */
     savePreferences() {
+        // Don't save for guests
+        if (consentService.isGuest()) {
+            return;
+        }
+
         try {
             const prefs = {
                 soundEnabled: this.soundEnabled,

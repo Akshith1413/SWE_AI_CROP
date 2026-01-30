@@ -1,7 +1,12 @@
+import { consentService } from './consentService';
+
 const STORAGE_KEY = 'crop_diagnosis_user_crops';
 
 export const cropService = {
     getCrops: () => {
+        if (consentService.isGuest()) {
+            return [];
+        }
         try {
             const stored = localStorage.getItem(STORAGE_KEY);
             return stored ? JSON.parse(stored) : [];
@@ -12,6 +17,9 @@ export const cropService = {
     },
 
     saveCrops: (crops) => {
+        if (consentService.isGuest()) {
+            return;
+        }
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(crops));
         } catch (e) {

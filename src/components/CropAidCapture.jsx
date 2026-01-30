@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import CropDiagnosisApp from './CropDiagnosisApp';
 
 // ==================== TRANSLATIONS ====================
 const TRANSLATIONS = {
@@ -29,6 +30,8 @@ const TRANSLATIONS = {
     uploadImages: 'Upload Images',
     imagesSelected: 'image(s) selected',
     removeAll: 'Remove All',
+    smartDiagnosis: 'Smart Diagnosis',
+    scanPlants: 'Scan plants for instant analysis',
   },
   hi: {
     appName: 'क्रॉपडॉक',
@@ -57,6 +60,8 @@ const TRANSLATIONS = {
     uploadImages: 'चित्र अपलोड करें',
     imagesSelected: 'चित्र चुने गए',
     removeAll: 'सभी हटाएं',
+    smartDiagnosis: 'स्मार्ट निदान',
+    scanPlants: 'त्वरित विश्लेषण के लिए पौधों को स्कैन करें',
   },
   ta: {
     appName: 'க்ராப்டாக்',
@@ -85,6 +90,8 @@ const TRANSLATIONS = {
     uploadImages: 'படங்களைப் பதிவேற்றவும்',
     imagesSelected: 'படங்கள் தேர்ந்தெடுக்கப்பட்டன',
     removeAll: 'அனைத்தையும் அகற்று',
+    smartDiagnosis: 'ஸ்மார்ட் நோய் கண்டறிதல்',
+    scanPlants: 'உடனடி பகுப்பாய்விற்கு தாவரங்களை ஸ்கேன் செய்யுங்கள்',
   }
 };
 
@@ -112,6 +119,7 @@ const Icon = ({ name, size = 24, className = "" }) => {
     trash: <><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /></>,
     alert: <><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><path d="M12 9v4" /><path d="M12 17h.01" /></>,
     globe: <><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></>,
+    scan: <path d="M3 7V5a2 2 0 0 1 2-2h2m10 0h2a2 2 0 0 1 2 2v2m0 10v2a2 2 0 0 1-2 2h-2m-10 0H5a2 2 0 0 1-2-2v-2" />,
   };
 
   return (
@@ -1296,6 +1304,14 @@ function CropAidCapture({ language = 'en' }) {
                 <div className="action-title">{t.history}</div>
                 <div className="action-subtitle">View saved captures</div>
               </div>
+
+              <div className="action-card" onClick={() => setView('diagnosis')}>
+                <div className="action-icon" style={{ background: 'rgba(59, 130, 246, 0.1)' }}>
+                  <Icon name="scan" size={28} style={{ color: '#3B82F6' }} />
+                </div>
+                <div className="action-title">{t.smartDiagnosis || 'Smart Diagnosis'}</div>
+                <div className="action-subtitle">{t.scanPlants || 'Scan plants for analysis'}</div>
+              </div>
             </div>
           </div>
         )}
@@ -1342,6 +1358,10 @@ function CropAidCapture({ language = 'en' }) {
             </button>
             <div className="card"><MediaGallery t={t} /></div>
           </div>
+        )}
+
+        {view === 'diagnosis' && (
+          <CropDiagnosisApp onBack={() => setView('home')} />
         )}
       </div>
     </>

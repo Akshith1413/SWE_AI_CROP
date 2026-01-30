@@ -16,7 +16,8 @@ import {
   FileText, BookOpen, ShieldCheck, Wifi as WifiIcon,
   CloudRain, CloudSnow, Wind as WindIcon, Sunrise,
   Droplet, Thermometer as ThermometerIcon, UserCheck,
-  BellRing, BatteryCharging, Layers, Activity
+  BellRing, BatteryCharging, Layers, Activity,
+  History, AlertOctagon, ArrowRight
 } from 'lucide-react';
 import LandingPage from './LandingPage';
 import ConsentScreen from './ConsentScreen';
@@ -25,8 +26,9 @@ import AudioSettingsPanel from './AudioSettingsPanel';
 import { cropService } from '../services/cropService';
 import { consentService } from '../services/consentService';
 import { audioService } from '../services/audioService';
+import { aiService } from '../services/aiService';
 
-const CropDiagnosisApp = () => {
+const CropDiagnosisApp = ({ onBack }) => {
   const [appState, setAppState] = useState('loading'); // loading, landing, consent, app
   const [view, setView] = useState('home');
   const [capturedImages, setCapturedImages] = useState([]);
@@ -108,6 +110,7 @@ const CropDiagnosisApp = () => {
           isOnline={isOnline}
           setShowTutorial={setShowTutorial}
           deviceInfo={deviceInfo}
+          onBack={onBack}
         />
       )}
       {view === 'camera' && (
@@ -157,68 +160,117 @@ const CropDiagnosisApp = () => {
   );
 };
 
-const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial }) => {
+const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceInfo, onBack }) => {
   const [showAudioSettings, setShowAudioSettings] = React.useState(false);
 
   return (
-    <div className="min-h-screen bg-[#1a1a1a] text-white flex flex-col items-center p-4">
-      {/* Header */}
-      <header className="w-full max-w-lg flex flex-col items-center mt-6 mb-8 relative">
-        <div className="absolute right-0 top-0 flex gap-2">
-          <button
-            onClick={() => {
-              audioService.playClick();
-              setShowAudioSettings(true);
-            }}
-            className="p-2 bg-[#242424] rounded-full text-white hover:bg-[#2a2a2a] transition border border-white/5"
-          >
-            <Volume2 className="w-5 h-5" />
-          </button>
-          <button
-            onClick={() => {
-              audioService.playClick();
-              setView('profile');
-            }}
-            className="p-2 bg-[#242424] rounded-full text-white hover:bg-[#2a2a2a] transition border border-white/5"
-          >
-            <UserCheck className="w-5 h-5" />
-          </button>
+    <div className="min-h-screen bg-[#0f172a] text-white flex flex-col items-center p-4 overflow-x-hidden">
+      {/* Premium Header */}
+      <header className="w-full max-w-lg mt-6 mb-8 relative z-10">
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-3">
+            {onBack && (
+              <button
+                onClick={onBack}
+                className="p-2 glass-card rounded-full text-white hover:bg-white/10 transition active:scale-95 mr-2"
+              >
+                <ArrowRight className="w-5 h-5 rotate-180" />
+              </button>
+            )}
+            <div className="p-2 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl shadow-lg shadow-emerald-500/20">
+              <Leaf className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-400 font-medium">Good Morning,</p>
+              <h1 className="text-xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">Grower</h1>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                audioService.playClick();
+                setShowAudioSettings(true);
+              }}
+              className="p-2.5 glass-card rounded-full text-white hover:bg-white/10 transition active:scale-95"
+            >
+              <Volume2 className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => {
+                audioService.playClick();
+                setView('profile');
+              }}
+              className="p-2.5 glass-card rounded-full text-white hover:bg-white/10 transition active:scale-95 relative"
+            >
+              <UserCheck className="w-5 h-5" />
+              <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#0f172a]"></span>
+            </button>
+          </div>
         </div>
-        <Camera className="w-8 h-8 text-white mb-4" />
-        <h1 className="text-3xl font-bold mb-2">AI Crop Diagnosis</h1>
-        <p className="text-gray-400 text-sm">Smart Disease Detection</p>
       </header>
 
-      {/* Audio Settings Modal */}
-      {showAudioSettings && (
-        <AudioSettingsPanel onClose={() => setShowAudioSettings(false)} />
-      )}
-
-      {/* Connection Status */}
-      <div className="flex flex-col items-center mb-8">
-        <div className="p-3 bg-white/10 rounded-xl mb-2">
-          <Smartphone className="w-6 h-6 text-white" />
+      {/* Weather Widget */}
+      <div className="w-full max-w-lg mb-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+        <div className="glass-card rounded-2xl p-6 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+            <Cloud className="w-32 h-32" />
+          </div>
+          <div className="flex justify-between items-end relative z-10">
+            <div>
+              <div className="flex items-center gap-2 mb-2 text-emerald-400">
+                <MapPin className="w-4 h-4" />
+                <span className="text-sm font-medium">Your Farm</span>
+              </div>
+              <div className="text-4xl font-bold mb-1">24°C</div>
+              <div className="text-sm text-gray-400">Partly Cloudy</div>
+            </div>
+            <div className="flex gap-6 text-sm">
+              <div className="flex flex-col items-center gap-1">
+                <Droplets className="w-5 h-5 text-blue-400" />
+                <span className="text-gray-400">62%</span>
+              </div>
+              <div className="flex flex-col items-center gap-1">
+                <Wind className="w-5 h-5 text-gray-400" />
+                <span className="text-gray-400">8km/h</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-300">
-          <Wifi className="w-4 h-4" />
-          <span>{isOnline ? 'Online' : 'Offline Mode'}</span>
+      </div>
+
+      {/* Disease Alert */}
+      <div className="w-full max-w-lg mb-8 animate-slide-up" style={{ animationDelay: '0.15s' }}>
+        <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-xl p-4 flex items-start gap-4">
+          <div className="p-2 bg-amber-500/20 rounded-lg">
+            <AlertOctagon className="w-6 h-6 text-amber-500" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-amber-500 mb-1">Pest Alert</h3>
+            <p className="text-xs text-gray-400 leading-relaxed">Early blight risk detected in your region due to high humidity. Monitor tomato crops closely.</p>
+          </div>
         </div>
       </div>
 
       {/* Main Actions Grid */}
-      <div className="grid grid-cols-4 gap-2 w-full max-w-lg mb-12">
+      <div className="grid grid-cols-2 gap-4 w-full max-w-lg mb-10 animate-slide-up" style={{ animationDelay: '0.2s' }}>
         <button
           onClick={() => {
             audioService.playClick();
             setShowTutorial(true);
             setView('camera');
           }}
-          className="col-span-1 bg-[#242424] p-4 rounded-xl flex flex-col items-center justify-center gap-2 border border-white/5 hover:bg-[#2a2a2a] transition relative group"
+          className="col-span-2 bg-gradient-to-r from-emerald-600 to-green-500 p-6 rounded-2xl flex items-center justify-between shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all hover:-translate-y-1 group"
         >
-          <div className="absolute top-2 left-2 text-[10px] bg-white/10 px-1.5 py-0.5 rounded text-gray-300">New</div>
-          <Camera className="w-6 h-6 text-white group-hover:scale-110 transition" />
-          <span className="text-xs font-medium text-center">Smart Camera</span>
-          <span className="text-[10px] text-gray-500 text-center leading-tight">AI-guided photo capture</span>
+          <div className="flex flex-col items-start gap-1">
+            <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm mb-2">
+              AI POWERED
+            </span>
+            <h3 className="text-xl font-bold">Smart Diagnosis</h3>
+            <p className="text-emerald-100 text-sm">Scan plants for instant analysis</p>
+          </div>
+          <div className="bg-white/10 p-3 rounded-xl group-hover:scale-110 transition">
+            <Camera className="w-8 h-8 text-white" />
+          </div>
         </button>
 
         <button
@@ -226,23 +278,12 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial }) => {
             audioService.playClick();
             setView('upload');
           }}
-          className="col-span-1 bg-[#1a1a1a] p-4 rounded-xl flex flex-col items-center justify-center gap-2 hover:bg-[#242424] transition"
+          className="glass-card p-4 rounded-2xl flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition group"
         >
-          <Upload className="w-6 h-6 text-white" />
-          <span className="text-xs font-medium text-center">Upload</span>
-          <span className="text-[10px] text-gray-500 text-center leading-tight">Select from gallery</span>
-        </button>
-
-        <button
-          onClick={() => {
-            audioService.playClick();
-            setView('video');
-          }}
-          className="col-span-1 bg-[#1a1a1a] p-4 rounded-xl flex flex-col items-center justify-center gap-2 hover:bg-[#242424] transition"
-        >
-          <Video className="w-6 h-6 text-white" />
-          <span className="text-xs font-medium text-center">Record Video</span>
-          <span className="text-[10px] text-gray-500 text-center leading-tight">Show plant condition</span>
+          <div className="p-3 bg-blue-500/10 rounded-full group-hover:bg-blue-500/20 transition">
+            <Upload className="w-6 h-6 text-blue-400" />
+          </div>
+          <span className="font-medium">Upload Image</span>
         </button>
 
         <button
@@ -250,53 +291,71 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial }) => {
             audioService.playClick();
             setView('voice');
           }}
-          className="col-span-1 bg-[#1a1a1a] p-4 rounded-xl flex flex-col items-center justify-center gap-2 hover:bg-[#242424] transition"
+          className="glass-card p-4 rounded-2xl flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition group"
         >
-          <Mic className="w-6 h-6 text-white" />
-          <span className="text-xs font-medium text-center">Voice Input</span>
-          <span className="text-[10px] text-gray-500 text-center leading-tight">Describe symptoms</span>
+          <div className="p-3 bg-purple-500/10 rounded-full group-hover:bg-purple-500/20 transition">
+            <Mic className="w-6 h-6 text-purple-400" />
+          </div>
+          <span className="font-medium">Voice Doctor</span>
         </button>
       </div>
 
-      {/* Features List */}
-      <div className="w-full max-w-lg text-center mb-12">
-        <Lightbulb className="w-5 h-5 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold mb-6">Smart Camera Features</h3>
-        <ul className="space-y-4 text-sm text-gray-400 text-left pl-8">
-          <li className="flex items-center gap-3">
-            <Focus className="w-5 h-5 text-gray-300" />
-            <span>Real-time Quality Analysis - <span className="text-gray-500">Checks for blur, darkness, and focus</span></span>
-          </li>
-          <li className="flex items-center gap-3">
-            <Volume2 className="w-5 h-5 text-gray-300" />
-            <span>Voice Guidance - <span className="text-gray-500">Audio instructions for perfect photos</span></span>
-          </li>
-          <li className="flex items-center gap-3">
-            <AlertTriangle className="w-5 h-5 text-gray-300" />
-            <span>Instant Warnings - <span className="text-gray-500">Alerts for poor lighting or blur</span></span>
-          </li>
-          <li className="flex items-center gap-3">
-            <CheckCircle className="w-5 h-5 text-gray-300" />
-            <span>Device Optimization - <span className="text-gray-500">Works on all phone models</span></span>
-          </li>
-        </ul>
+      {/* Recent Diagnoses */}
+      <div className="w-full max-w-lg mb-10 animate-slide-up" style={{ animationDelay: '0.3s' }}>
+        <div className="flex items-center justify-between mb-4 px-1">
+          <h3 className="font-bold flex items-center gap-2">
+            <History className="w-5 h-5 text-emerald-500" />
+            Recent Activity
+          </h3>
+          <button className="text-xs text-emerald-500 font-medium">View All</button>
+        </div>
+
+        {capturedImages && capturedImages.length > 0 ? (
+          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+            {capturedImages.slice(-3).reverse().map((img, idx) => (
+              <div key={idx} className="flex-shrink-0 w-64 glass-card p-3 rounded-xl flex gap-3 items-center">
+                <img src={img.data} alt="Crop" className="w-16 h-16 rounded-lg object-cover" />
+                <div>
+                  <p className="font-bold text-sm truncate">{img.metadata?.cropType || 'Unknown Crop'}</p>
+                  <p className={`text-xs ${img.metadata?.qualityScore >= 80 ? 'text-green-400' : 'text-amber-400'}`}>
+                    Health Score: {img.analysis?.healthScore}%
+                  </p>
+                  <p className="text-[10px] text-gray-500 mt-1">{new Date(img.metadata?.timestamp).toLocaleDateString()}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="glass-card rounded-xl p-6 text-center text-gray-500 text-sm border-dashed">
+            <p>No recent diagnoses</p>
+            <button
+              onClick={() => setView('camera')}
+              className="mt-2 text-emerald-500 font-medium text-xs hover:underline"
+            >
+              Start your first scan
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Compatibility Test */}
-      <div className="w-full max-w-lg text-center mb-8">
-        <Camera className="w-5 h-5 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold mb-4">Camera Compatibility Test</h3>
-        <button
-          onClick={() => setView('camera')}
-          className="bg-[#242424] text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-[#2a2a2a] transition"
-        >
-          Test Now
-        </button>
+      {/* Features List (Subtle) */}
+      <div className="w-full max-w-lg mb-8 opacity-60 hover:opacity-100 transition duration-500">
+        <div className="flex justify-center gap-6">
+          <div className="flex items-center gap-2 text-xs text-gray-400">
+            <Wifi className="w-3 h-3" />
+            <span>{isOnline ? 'Online' : 'Offline Mode'}</span>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-gray-400">
+            <Smartphone className="w-3 h-3" />
+            <span>{deviceInfo.isMobile ? 'Mobile Optimized' : 'Desktop View'}</span>
+          </div>
+        </div>
       </div>
 
-      <p className="text-xs text-gray-600 text-center max-w-xs">
-        Test your camera with our AI guidance system. We'll help you take perfect crop photos!
-      </p>
+      {/* Audio Settings Modal */}
+      {showAudioSettings && (
+        <AudioSettingsPanel onClose={() => setShowAudioSettings(false)} />
+      )}
     </div>
   );
 };
@@ -794,7 +853,7 @@ const EnhancedCompleteCameraCapture = ({
     }, 1000);
   };
 
-  const performCapture = () => {
+  const performCapture = async () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
 
@@ -807,15 +866,12 @@ const EnhancedCompleteCameraCapture = ({
       // Apply enhancements
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const data = imageData.data;
-
-      // Increase contrast and brightness if needed
       const enhancementFactor = liveQuality.brightness < 100 ? 1.2 : 1.1;
       for (let i = 0; i < data.length; i += 4) {
-        data[i] = Math.min(255, data[i] * enhancementFactor);     // R
-        data[i + 1] = Math.min(255, data[i + 1] * enhancementFactor); // G
-        data[i + 2] = Math.min(255, data[i + 2] * enhancementFactor); // B
+        data[i] = Math.min(255, data[i] * enhancementFactor);
+        data[i + 1] = Math.min(255, data[i + 1] * enhancementFactor);
+        data[i + 2] = Math.min(255, data[i + 2] * enhancementFactor);
       }
-
       ctx.putImageData(imageData, 0, 0);
 
       const photoData = canvas.toDataURL('image/jpeg', 0.95);
@@ -824,28 +880,39 @@ const EnhancedCompleteCameraCapture = ({
       // Audio feedback for capture
       audioService.playCapture();
 
-      // Perform analysis
-      const analysis = performDetailedAnalysis(ctx, canvas.width, canvas.height);
-      setAnalysisResult(analysis);
-
-      // Stop camera
+      // Stop camera immediately
       stopCamera();
 
-      // Show confirmation
-      setShowConfirmation(true);
-      setTimeout(() => setShowConfirmation(false), 3000);
-
-      // Speak confirmation
+      // Speak analyzing
       if (voiceInstructions) {
-        const qualityMessage = liveQuality.score >= 80 ? "Excellent quality!" :
-          liveQuality.score >= 60 ? "Good quality." : "Acceptable quality.";
-        speakGuidance(`Photo captured successfully. ${qualityMessage} Health score is ${analysis.healthScore} percent.`);
+        audioService.speak("Analyzing crop health. Please wait...", { rate: 1.0 });
       }
 
-      // Move to preparation step after delay
-      setTimeout(() => {
-        setCurrentStep('preparation');
-      }, 3000);
+      // Perform AI Analysis
+      try {
+        const aiResult = await aiService.analyze(photoData, cropType || 'general');
+        setAnalysisResult(aiResult);
+
+        // Show confirmation
+        setShowConfirmation(true);
+        setTimeout(() => setShowConfirmation(false), 3000);
+
+        // Speak result
+        if (voiceInstructions) {
+          const severe = aiResult.severity === 'severe';
+          const msg = `Analysis complete. ${aiResult.diagnosis} detected with ${aiResult.confidence * 100} percent confidence. ${severe ? 'Immediate action required.' : aiResult.explanation}`;
+          audioService.speak(msg);
+        }
+
+        // Move to preparation step
+        setTimeout(() => {
+          setCurrentStep('preparation');
+        }, 3000);
+
+      } catch (error) {
+        console.error("AI Analysis failed", error);
+        audioService.speak("Analysis failed. Please try again.");
+      }
     }
   };
 
@@ -1369,122 +1436,74 @@ const EnhancedCompleteCameraCapture = ({
                 </div>
               </div>
 
-              {/* Live Quality Banner */}
+              {/* Live Quality Banner Removed */}
+
+
+
+              {/* UNIFIED STATUS PILL (Top Center) */}
               {cameraReady && (
-                <div className="absolute top-20 left-4 right-4 z-20">
-                  <div className={`${getQualityColor()} text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 backdrop-blur-sm bg-opacity-90`}>
-                    <div className="flex-shrink-0">
-                      {liveQuality.status === 'good' ? (
-                        <CheckCircle className="w-7 h-7" />
-                      ) : (
-                        <AlertTriangle className="w-7 h-7 animate-pulse" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <p className="font-bold text-sm">{liveQuality.icon} {liveQuality.message}</p>
-                        <span className={`text-lg font-bold ${getQualityScoreColor(liveQuality.score)}`}>
-                          {liveQuality.score}%
-                        </span>
+                <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30 w-auto max-w-[90%]">
+                  <div className={`glass-card px-4 py-2 rounded-full flex items-center gap-3 backdrop-blur-md shadow-lg transition-all duration-300 ${liveQuality.issues.length > 0 ? 'border-amber-500/50 bg-black/60' :
+                    detectedObjects.length > 0 ? 'border-emerald-500/50 bg-black/60' : 'border-white/10 bg-black/40'
+                    }`}>
+
+                    {/* Icon Indicator */}
+                    <div className={`w-2 h-2 rounded-full animate-pulse ${liveQuality.issues.length > 0 ? 'bg-amber-500' :
+                      detectedObjects.length > 0 ? 'bg-emerald-500' : 'bg-white/50'
+                      }`}></div>
+
+                    {/* Status Text */}
+                    <div className="flex flex-col">
+                      <span className={`text-sm font-bold whitespace-nowrap ${liveQuality.issues.length > 0 ? 'text-amber-400' :
+                        detectedObjects.length > 0 ? 'text-emerald-400' : 'text-white'
+                        }`}>
+                        {liveQuality.issues.length > 0 ? 'Improve Quality' :
+                          detectedObjects.length > 0 ? 'Plant Detected' : 'Aim at Plant'}
+                      </span>
+
+                      {/* Subtext (Quality Issues or Score) */}
+                      <div className="flex items-center gap-2 text-[10px] text-gray-300 leading-none mt-0.5">
+                        {liveQuality.issues.length > 0 ? (
+                          <span>{liveQuality.issues[0]}</span>
+                        ) : (
+                          <>
+                            <span>Quality: {liveQuality.score}%</span>
+                            {detectedObjects.length > 0 && <span className="text-emerald-500 font-bold">• Ready</span>}
+                          </>
+                        )}
                       </div>
-                      <div className="flex gap-4 mt-2 text-xs opacity-90">
-                        <div className="flex items-center gap-1">
-                          <Sun className="w-3 h-3" />
-                          <span>Light: {liveQuality.brightness}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Focus className="w-3 h-3" />
-                          <span>Sharp: {liveQuality.sharpness}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Zap className="w-3 h-3" />
-                          <span>Contrast: {liveQuality.contrast}</span>
-                        </div>
-                      </div>
                     </div>
-                    {liveQuality.status !== 'good' && voiceInstructions && (
-                      <Volume2 className="w-5 h-5 animate-pulse" />
-                    )}
                   </div>
                 </div>
               )}
 
-              {/* Quality Issues List */}
-              {liveQuality.issues.length > 0 && (
-                <div className="absolute top-36 left-4 right-4 z-20">
-                  <div className="bg-red-500 bg-opacity-90 text-white px-4 py-2 rounded-xl backdrop-blur-sm">
-                    <div className="flex items-center gap-2 mb-1">
-                      <AlertTriangle className="w-4 h-4" />
-                      <span className="font-bold text-sm">Quality Issues:</span>
-                    </div>
-                    <p className="text-xs">{liveQuality.issues.join(', ')}</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Zoom Controls */}
-              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black bg-opacity-50 rounded-xl p-2 backdrop-blur-sm">
-                <div className="flex flex-col items-center gap-2">
-                  <button
-                    onClick={() => setZoomLevel(prev => Math.min(3, prev + 0.1))}
-                    className="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded-full"
-                  >
+              {/* Right Side Controls (Zoom) */}
+              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 flex flex-col gap-4">
+                <div className="glass-card p-1.5 rounded-full flex flex-col items-center gap-2 bg-black/40">
+                  <button onClick={() => setZoomLevel(prev => Math.min(3, prev + 0.5))} className="p-2 text-white hover:bg-white/20 rounded-full transition">
                     <Plus className="w-5 h-5" />
                   </button>
-                  <div className="text-white text-xs font-bold">{zoomLevel.toFixed(1)}x</div>
-                  <button
-                    onClick={() => setZoomLevel(prev => Math.max(1, prev - 0.1))}
-                    className="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded-full"
-                  >
+                  <span className="text-xs font-mono font-bold">{zoomLevel.toFixed(1)}x</span>
+                  <button onClick={() => setZoomLevel(prev => Math.max(1, prev - 0.5))} className="p-2 text-white hover:bg-white/20 rounded-full transition">
                     <Minus className="w-5 h-5" />
                   </button>
                 </div>
               </div>
 
-              {/* Detailed Tips Panel */}
-              {showDetailedTips && (
-                <div className="absolute bottom-24 left-4 right-4 bg-black bg-opacity-90 text-white p-4 rounded-xl backdrop-blur-sm z-20">
-                  <h3 className="font-bold mb-3 flex items-center gap-2">
-                    <Lightbulb className="w-5 h-5 text-yellow-400" />
-                    Photo Tips for Best Results
-                  </h3>
-                  <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div className="flex items-start gap-2">
-                      <Sun className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
-                      <span>Use natural daylight</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Focus className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
-                      <span>Hold phone steady</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Target className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
-                      <span>Fill frame with leaf</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <ShieldCheck className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-                      <span>Avoid shadows</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <ThermometerIcon className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
-                      <span>Check temperature</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Droplet className="w-4 h-4 text-blue-300 flex-shrink-0 mt-0.5" />
-                      <span>Morning is best</span>
-                    </div>
+              {/* Detailed Tips Drawer (Bottom) */}
+              <div className={`absolute bottom-32 left-4 right-4 z-20 transition-all duration-300 transform ${showDetailedTips ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0 pointer-events-none'}`}>
+                <div className="glass-card p-4 rounded-xl bg-black/80 backdrop-blur-md">
+                  <div className="flex justify-between items-center mb-3">
+                    <h3 className="text-sm font-bold flex items-center gap-2 text-yellow-400">
+                      <Lightbulb className="w-4 h-4" /> Photography Tips
+                    </h3>
+                    <button onClick={() => setShowDetailedTips(false)}><X className="w-4 h-4 text-gray-400" /></button>
                   </div>
-                </div>
-              )}
-
-              {/* Device Optimization Banner */}
-              <div className="absolute bottom-36 left-4 right-4 z-20">
-                <div className="bg-blue-500 bg-opacity-80 text-white px-4 py-2 rounded-xl backdrop-blur-sm text-center">
-                  <div className="flex items-center justify-center gap-2">
-                    <Smartphone className="w-4 h-4" />
-                    <span className="text-sm font-medium">
-                      Optimized for {deviceInfo.isMobile ? `${deviceInfo.isIOS ? 'iPhone' : 'Android'}` : 'your device'}
-                    </span>
+                  <div className="grid grid-cols-2 gap-2 text-[10px] text-gray-300">
+                    <div className="flex items-center gap-2"><Sun className="w-3 h-3 text-yellow-500" /> Natural Light</div>
+                    <div className="flex items-center gap-2"><Focus className="w-3 h-3 text-blue-500" /> Steady Hand</div>
+                    <div className="flex items-center gap-2"><Maximize2 className="w-3 h-3 text-green-500" /> Fill Frame</div>
+                    <div className="flex items-center gap-2"><Droplet className="w-3 h-3 text-cyan-500" /> Clean Lens</div>
                   </div>
                 </div>
               </div>
@@ -1511,99 +1530,58 @@ const EnhancedCompleteCameraCapture = ({
         )}
 
         {/* Bottom Controls */}
-        <div className="relative z-10 bg-gradient-to-t from-black to-transparent p-6 pb-8">
+        <div className="relative z-10 bg-[#0f172a] p-6 pb-8 border-t border-white/5">
           {!capturedPhoto ? (
             <div className="flex flex-col items-center gap-4">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center justify-between w-full max-w-xs px-4">
+                {/* Info / Tips Toggle */}
                 <button
-                  onClick={() => {
-                    setZoomLevel(1);
-                    if (voiceInstructions) speakGuidance("Zoom reset");
-                  }}
-                  className="p-3 bg-black bg-opacity-50 text-white rounded-full backdrop-blur-sm hover:bg-opacity-70 transition"
+                  onClick={() => setShowDetailedTips(!showDetailedTips)}
+                  className={`p-4 rounded-full glass-card transition ${showDetailedTips ? 'bg-white/20 text-yellow-400' : 'text-white hover:bg-white/10'}`}
                 >
-                  <Maximize2 className="w-6 h-6" />
+                  <Info className="w-6 h-6" />
                 </button>
 
+                {/* Shutter Button */}
                 <button
                   onClick={capturePhoto}
                   disabled={!cameraReady}
-                  className={`relative w-24 h-24 rounded-full border-4 flex items-center justify-center transition-all transform shadow-2xl ${detectedObjects.length > 0 && liveQuality.score >= 60
-                    ? 'border-green-500 bg-green-500 hover:scale-110'
-                    : 'border-white bg-black bg-opacity-50'
-                    } ${(!cameraReady) && 'opacity-50'}`}
+                  className={`relative group transition-all transform active:scale-95 ${!cameraReady && 'opacity-50 grayscale'}`}
                 >
-                  <div className={`w-20 h-20 rounded-full flex items-center justify-center ${detectedObjects.length > 0 && liveQuality.score >= 60 ? 'bg-white' : 'bg-white bg-opacity-20'
+                  <div className={`w-20 h-20 rounded-full border-4 flex items-center justify-center transition-all ${detectedObjects.length > 0 ? 'border-emerald-500 bg-emerald-500/20' : 'border-white/50 bg-white/10'
                     }`}>
-                    <Camera className={`w-10 h-10 ${detectedObjects.length > 0 && liveQuality.score >= 60 ? 'text-green-500' : 'text-white'
-                      }`} />
+                    <div className={`w-16 h-16 rounded-full transition-all ${detectedObjects.length > 0 ? 'bg-emerald-500 scale-90 group-hover:scale-100' : 'bg-white scale-90 group-hover:scale-100'
+                      }`}></div>
                   </div>
-                  {detectedObjects.length > 0 && liveQuality.score >= 60 && (
-                    <div className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full p-2 shadow-lg">
-                      <CheckCircle className="w-4 h-4" />
-                    </div>
-                  )}
-                  {liveQuality.score < 60 && (
-                    <div className="absolute -top-2 -right-2 bg-yellow-500 text-white rounded-full p-2 shadow-lg">
-                      <AlertTriangle className="w-4 h-4" />
-                    </div>
-                  )}
                 </button>
 
+                {/* Switch Camera */}
                 <button
-                  onClick={() => {
-                    setFlashMode(prev => prev === 'off' ? 'on' : 'off');
-                    if (voiceInstructions) speakGuidance(`Flash ${flashMode === 'off' ? 'enabled' : 'disabled'}`);
-                  }}
-                  className={`p-3 rounded-full backdrop-blur-sm transition ${flashMode === 'on'
-                    ? 'bg-yellow-500 text-black'
-                    : 'bg-black bg-opacity-50 text-white hover:bg-opacity-70'
-                    }`}
+                  onClick={switchCamera}
+                  className="p-4 rounded-full glass-card text-white hover:bg-white/10 transition rotate-0 active:rotate-180 duration-500"
                 >
-                  <Zap className="w-6 h-6" />
+                  <RotateCcw className="w-6 h-6" />
                 </button>
               </div>
 
-              <div className="text-white text-center space-y-1">
-                <p className="text-sm opacity-75">
-                  {cameraReady ? (
-                    detectedObjects.length > 0 ? (
-                      liveQuality.status === 'good' ? (
-                        <span className="text-green-300 font-semibold">✓ Ready to capture!</span>
-                      ) : (
-                        <span className="text-yellow-300 font-semibold">⚠️ {liveQuality.message}</span>
-                      )
-                    ) : (
-                      <span className="text-red-300 font-semibold">⚠️ Aim at plant</span>
-                    )
-                  ) : (
-                    'Initializing camera...'
-                  )}
-                </p>
-                <p className="text-xs opacity-60">
-                  {detectedObjects.length > 0 ? 'Plant detected' : 'No plant detected'} • Quality: {liveQuality.score}%
-                </p>
-                {qualityHistory.length > 1 && (
-                  <p className="text-xs opacity-60">
-                    Quality trend: {qualityHistory[qualityHistory.length - 1].score > qualityHistory[0].score ? 'Improving' : 'Stable'}
-                  </p>
-                )}
-              </div>
+              <p className="text-xs text-gray-500 font-medium mt-2">
+                {voiceInstructions ? 'Voice Guidance On' : 'Tap shutter to capture'}
+              </p>
             </div>
           ) : (
-            <div className="flex gap-3">
+            <div className="flex gap-4">
               <button
                 onClick={retakePhoto}
-                className="flex-1 bg-gray-600 bg-opacity-90 backdrop-blur-sm text-white py-4 rounded-xl font-bold hover:bg-opacity-100 transition flex items-center justify-center gap-2"
+                className="flex-1 glass-card p-4 rounded-xl text-white font-bold hover:bg-white/10 transition flex items-center justify-center gap-2"
               >
                 <RefreshCw className="w-6 h-6" />
                 Retake
               </button>
               <button
                 onClick={() => setCurrentStep('preparation')}
-                className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 backdrop-blur-sm text-white py-4 rounded-xl font-bold hover:opacity-90 transition flex items-center justify-center gap-2"
+                className="flex-1 bg-gradient-to-r from-emerald-500 to-green-500 p-4 rounded-xl text-white font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition flex items-center justify-center gap-2"
               >
-                <Check className="w-6 h-6" />
+                <CheckCircle className="w-6 h-6" />
                 Continue
               </button>
             </div>
@@ -1738,9 +1716,9 @@ const EnhancedCompleteCameraCapture = ({
                 <select
                   value={cropType}
                   onChange={(e) => setCropType(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900 bg-white"
                 >
-                  <option value="">Select crop type...</option>
+                  <option value="" className="text-gray-500">Select crop type...</option>
                   <option value="rice">Rice</option>
                   <option value="wheat">Wheat</option>
                   <option value="corn">Corn</option>
@@ -1773,13 +1751,13 @@ const EnhancedCompleteCameraCapture = ({
                       }}
                       className={`p-3 rounded-lg border transition-all ${diseaseSymptoms.includes(symptom)
                         ? 'border-red-500 bg-red-50 text-red-700'
-                        : 'border-gray-200 hover:border-gray-300'
+                        : 'border-gray-300 hover:border-gray-400 bg-white text-gray-700'
                         }`}
                     >
                       <div className="flex items-center gap-2">
                         <div className={`w-3 h-3 rounded-full ${diseaseSymptoms.includes(symptom) ? 'bg-red-500' : 'bg-gray-300'
                           }`} />
-                        <span className="text-sm">{symptom}</span>
+                        <span className={`text-sm font-medium ${diseaseSymptoms.includes(symptom) ? 'text-red-900' : 'text-gray-900'}`}>{symptom}</span>
                       </div>
                     </button>
                   ))}
@@ -2457,50 +2435,156 @@ const VoiceInput = ({ setView }) => (
   </div>
 );
 
-const ImageAnalysis = ({ setView, capturedImages }) => (
-  <div className="min-h-screen bg-nature-50 flex flex-col">
-    <div className="bg-nature-600 p-4 text-white shadow-lg">
-      <div className="max-w-4xl mx-auto flex items-center gap-3">
-        <button onClick={() => setView('home')} className="p-2 hover:bg-white/20 rounded-full transition">
-          <ChevronRight className="w-6 h-6 rotate-180" />
-        </button>
-        <h1 className="text-xl font-bold">Analysis History</h1>
-      </div>
-    </div>
+const ImageAnalysis = ({ setView, capturedImages }) => {
+  const [selectedReport, setSelectedReport] = React.useState(null);
 
-    <div className="max-w-4xl mx-auto p-6 w-full">
-      {capturedImages.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-3xl shadow-sm">
-          <div className="bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <BarChart3 className="w-8 h-8 text-gray-400" />
-          </div>
-          <h3 className="text-xl font-bold text-gray-700">No Analysis Yet</h3>
-          <p className="text-gray-500 mt-2">Use the camera to diagnose your first plant.</p>
+  return (
+    <div className="min-h-screen bg-[#0f172a] text-white flex flex-col">
+      <div className="glass-card p-4 text-white sticky top-0 z-20">
+        <div className="max-w-4xl mx-auto flex items-center gap-3">
+          <button onClick={() => selectedReport ? setSelectedReport(null) : setView('home')} className="p-2 hover:bg-white/10 rounded-full transition">
+            <ChevronRight className="w-6 h-6 rotate-180" />
+          </button>
+          <h1 className="text-xl font-bold">{selectedReport ? 'Analysis Report' : 'Diagnosis History'}</h1>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {capturedImages.map((img, idx) => (
-            <div key={idx} className="bg-white p-4 rounded-2xl shadow-md flex gap-4 border border-gray-100">
-              <img src={img.data} className="w-24 h-24 rounded-xl object-cover" alt="Captured" />
-              <div className="flex-1">
-                <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-bold text-gray-800">Analysis #{idx + 1}</h4>
-                  <span className="text-xs text-gray-500">{new Date(img.metadata?.timestamp).toLocaleDateString()}</span>
+      </div>
+
+      <div className="max-w-4xl mx-auto p-4 w-full flex-1">
+        {selectedReport ? (
+          // DETAILED REPORT VIEW
+          <div className="animate-slide-up">
+            <div className="glass-card rounded-2xl overflow-hidden mb-6">
+              <div className="relative h-64">
+                <img src={selectedReport.data} className="w-full h-full object-cover" alt="Analyzed Crop" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] to-transparent"></div>
+                <div className="absolute bottom-4 left-4">
+                  <h2 className="text-2xl font-bold text-white mb-1">{selectedReport.analysis?.diagnosis || 'Analysis'}</h2>
+                  <p className="text-gray-300 text-sm italic">{selectedReport.analysis?.scientificName}</p>
                 </div>
-                <div className="flex items-center gap-2 mb-3">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${img.analysis?.healthScore > 70 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                    }`}>
-                    Score: {img.analysis?.healthScore}%
-                  </span>
+              </div>
+
+              <div className="p-6">
+                {/* Confidence & Severity */}
+                <div className="flex flex-wrap gap-4 mb-6">
+                  <div className="flex-1 bg-white/5 p-4 rounded-xl border border-white/10">
+                    <p className="text-xs text-gray-400 mb-2">AI Confidence</p>
+                    <div className="flex items-end gap-2">
+                      <span className="text-2xl font-bold text-emerald-400">{Math.round((selectedReport.analysis?.confidence || 0) * 100)}%</span>
+                      <div className="flex-1 h-2 bg-gray-700 rounded-full mb-1.5">
+                        <div
+                          className="h-full bg-emerald-500 rounded-full"
+                          style={{ width: `${(selectedReport.analysis?.confidence || 0) * 100}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex-1 bg-white/5 p-4 rounded-xl border border-white/10">
+                    <p className="text-xs text-gray-400 mb-2">Severity Level</p>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-3 h-3 rounded-full ${selectedReport.analysis?.severity === 'severe' ? 'bg-red-500 animate-pulse' :
+                        selectedReport.analysis?.severity === 'moderate' ? 'bg-amber-500' : 'bg-green-500'
+                        }`}></div>
+                      <span className="text-xl font-bold capitalize">{selectedReport.analysis?.severity || 'Unknown'}</span>
+                    </div>
+                  </div>
                 </div>
-                <button className="text-nature-600 text-sm font-bold hover:underline">View Full Report</button>
+
+                {/* AI Insight */}
+                <div className="mb-6">
+                  <h3 className="flex items-center gap-2 font-bold text-lg mb-3">
+                    <Sparkles className="w-5 h-5 text-purple-400" />
+                    AI Insight
+                  </h3>
+                  <div className="bg-purple-500/10 border border-purple-500/20 p-4 rounded-xl">
+                    <p className="text-gray-300 leading-relaxed text-sm">
+                      {selectedReport.analysis?.explanation || "AI analysis complete. Detecting patterns consistent with the diagnosed condition."}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Symptoms */}
+                {selectedReport.analysis?.symptoms?.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="font-bold text-lg mb-3">Detected Symptoms</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedReport.analysis.symptoms.map((sym, i) => (
+                        <span key={i} className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-sm text-gray-300">
+                          {sym}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Treatments */}
+                {selectedReport.analysis?.treatments?.length > 0 && (
+                  <div>
+                    <h3 className="font-bold text-lg mb-3">Recommended Actions</h3>
+                    <ul className="space-y-3">
+                      {selectedReport.analysis.treatments.map((action, i) => (
+                        <li key={i} className="flex items-start gap-3 p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl">
+                          <CheckCircle className="w-5 h-5 text-emerald-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-sm text-gray-300">{action}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        ) : (
+          // LIST VIEW
+          capturedImages.length === 0 ? (
+            <div className="text-center py-20 bg-white/5 rounded-3xl border border-dashed border-white/10">
+              <div className="bg-white/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <BarChart3 className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-300">No Analysis Yet</h3>
+              <p className="text-gray-500 mt-2">Use the camera to diagnose your first plant.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {capturedImages.slice().reverse().map((img, idx) => (
+                <div key={idx} className="glass-card p-4 rounded-2xl flex gap-4 hover:bg-white/5 transition group cursor-pointer" onClick={() => setSelectedReport(img)}>
+                  <img src={img.data} className="w-24 h-24 rounded-xl object-cover" alt="Captured" />
+                  <div className="flex-1">
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="font-bold text-white group-hover:text-emerald-400 transition">{img.analysis?.diagnosis || `Analysis #${capturedImages.length - idx}`}</h4>
+                      <span className="text-xs text-gray-500">{new Date(img.metadata?.timestamp).toLocaleDateString()}</span>
+                    </div>
+
+                    {img.analysis?.confidence ? (
+                      <div className="mb-3">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className={`w-2 h-2 rounded-full ${img.analysis.severity === 'severe' ? 'bg-red-500' : 'bg-emerald-500'}`}></div>
+                          <span className="text-xs text-gray-400 capitalize">{img.analysis.severity} Risk</span>
+                        </div>
+                        <div className="w-full bg-gray-700 h-1.5 rounded-full">
+                          <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: `${img.analysis.confidence * 100}%` }}></div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${img.analysis?.healthScore > 70 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                          Score: {img.analysis?.healthScore}%
+                        </span>
+                      </div>
+                    )}
+
+                    <button className="text-emerald-400 text-sm font-bold flex items-center gap-1 group-hover:translate-x-1 transition">
+                      View Report <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default CropDiagnosisApp;
