@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 
-import CAM from "./components/CropDiagnosisApp";
+import CropAidCapture from "./components/CropAidCapture";
 import LoginScreen from "./components/LoginScreen";
 import LanguageScreen from "./components/LanguageScreen";
 import LandingPage from "./components/LandingPage";
@@ -91,7 +91,7 @@ function App() {
 
   return (
     <div className="app-container">
-      <CAM language={language} userId={userId} />
+      <CropAidCapture language={language} userId={userId} />
     </div>
   );
 }
