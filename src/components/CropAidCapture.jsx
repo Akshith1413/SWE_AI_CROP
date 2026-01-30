@@ -197,6 +197,78 @@ const styles = `
     background: #FFF8E1;
     color: #F57C00;
   }
+
+  .home-container {
+    padding: 0 1.25rem;
+    margin-top: 2rem;
+  }
+
+  .action-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .action-card {
+    background: white;
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border-color: #5FB764;
+  }
+
+  .action-card.primary {
+    grid-column: span 2;
+    background: linear-gradient(135deg, #5FB764 0%, #4A9F4F 100%);
+    color: white;
+  }
+
+  .action-icon {
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1rem;
+    background: rgba(95, 183, 100, 0.1);
+  }
+
+  .action-card.primary .action-icon {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .action-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2D3A2E;
+  }
+
+  .action-card.primary .action-title {
+    color: white;
+  }
+
+  .action-subtitle {
+    font-size: 0.8125rem;
+    color: #6B7B6E;
+    text-align: center;
+  }
+
+  .action-card.primary .action-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+  }
   
   .tabs-container {
     padding: 0 1.25rem;
@@ -1142,6 +1214,21 @@ const CaptureForm = ({ onPendingCountChange, t }) => {
         />
       </div>
 
+      <div className="card">
+        <div className="voice-section">
+          <div className="voice-header">
+            <span className="voice-label">{t.description}</span>
+          </div>
+          <textarea
+            className="textarea"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder={t.descriptionPlaceholder}
+            rows={4}
+          />
+        </div>
+      </div>
+
       <button onClick={handleSubmit} disabled={!videoBlob || isSubmitting} className="submit-btn">
         {isSubmitting ? (
           <>
@@ -1173,7 +1260,7 @@ const CaptureForm = ({ onPendingCountChange, t }) => {
 // ==================== MAIN APP ====================
 function CropAidCapture({ language = 'en' }) {
   const [pendingCount, setPendingCount] = useState(0);
-  const [activeTab, setActiveTab] = useState('capture');
+  const [view, setView] = useState('home'); // 'home', 'capture', 'history'
   const t = TRANSLATIONS[language] || TRANSLATIONS.en;
 
   useEffect(() => {
@@ -1191,27 +1278,71 @@ function CropAidCapture({ language = 'en' }) {
       <div className="app">
         <NetworkStatus pendingCount={pendingCount} isSyncing={false} t={t} />
 
-        <div className="tabs-container">
-          <div className="tab-list">
-            <button
-              onClick={() => setActiveTab('capture')}
-              className={`tab-btn ${activeTab === 'capture' ? 'active' : ''}`}
-            >
-              <Icon name="camera" size={18} />
-              {t.capture}
-            </button>
-            <button
-              onClick={() => setActiveTab('history')}
-              className={`tab-btn ${activeTab === 'history' ? 'active' : ''}`}
-            >
-              <Icon name="history" size={18} />
-              {t.history}
-            </button>
-          </div>
+        {view === 'home' && (
+          <div className="home-container">
+            <div className="action-grid">
+              <div className="action-card primary" onClick={() => setView('capture')}>
+                <div className="action-icon">
+                  <Icon name="video" size={32} />
+                </div>
+                <div className="action-title">{t.capture}</div>
+                <div className="action-subtitle">Record video with voice description</div>
+              </div>
 
-          {activeTab === 'capture' && <CaptureForm onPendingCountChange={setPendingCount} t={t} />}
-          {activeTab === 'history' && <div className="card"><MediaGallery t={t} /></div>}
-        </div>
+              <div className="action-card" onClick={() => setView('history')}>
+                <div className="action-icon">
+                  <Icon name="history" size={28} />
+                </div>
+                <div className="action-title">{t.history}</div>
+                <div className="action-subtitle">View saved captures</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {view === 'capture' && (
+          <div className="tabs-container">
+            <button
+              onClick={() => setView('home')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#5FB764',
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}
+            >
+              ← Back to Home
+            </button>
+            <CaptureForm onPendingCountChange={setPendingCount} t={t} onComplete={() => setView('home')} />
+          </div>
+        )}
+
+        {view === 'history' && (
+          <div className="tabs-container">
+            <button
+              onClick={() => setView('home')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#5FB764',
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}
+            >
+              ← Back to Home
+            </button>
+            <div className="card"><MediaGallery t={t} /></div>
+          </div>
+        )}
       </div>
     </>
   );
