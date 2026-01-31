@@ -164,24 +164,24 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
   const [showAudioSettings, setShowAudioSettings] = React.useState(false);
 
   return (
-    <div className="min-h-screen h-screen bg-[#0f172a] text-white flex flex-col p-4 sm:p-6 overflow-y-auto">
-      {/* Compact Header */}
-      <header className="w-full mb-4 flex justify-between items-center">
+    <div className="min-h-screen h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 text-gray-800 flex flex-col p-4 sm:p-6 overflow-y-auto">
+      {/* Header */}
+      <header className="w-full mb-6 flex justify-between items-center">
         <div className="flex items-center gap-3">
           {onBack && (
             <button
               onClick={onBack}
-              className="p-2 glass-card rounded-full text-white hover:bg-white/10 transition active:scale-95"
+              className="p-2.5 bg-white rounded-full text-gray-600 hover:bg-gray-100 transition active:scale-95 shadow-md"
             >
               <ArrowRight className="w-5 h-5 rotate-180" />
             </button>
           )}
-          <div className="p-2.5 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl shadow-lg shadow-emerald-500/20">
+          <div className="p-3 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl shadow-lg shadow-emerald-200">
             <Leaf className="w-7 h-7 text-white" />
           </div>
           <div>
-            <p className="text-base text-gray-400 font-medium">Good Morning,</p>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Grower</h1>
+            <p className="text-base text-gray-500 font-medium">Good Morning,</p>
+            <h1 className="text-2xl font-bold text-gray-800">Grower</h1>
           </div>
         </div>
         <div className="flex gap-2">
@@ -190,7 +190,7 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
               audioService.playClick();
               setShowAudioSettings(true);
             }}
-            className="p-3 glass-card rounded-full text-white hover:bg-white/10 transition active:scale-95"
+            className="p-3 bg-white rounded-full text-gray-600 hover:bg-gray-100 transition active:scale-95 shadow-md"
           >
             <Volume2 className="w-5 h-5" />
           </button>
@@ -199,34 +199,34 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
               audioService.playClick();
               setView('profile');
             }}
-            className="p-3 glass-card rounded-full text-white hover:bg-white/10 transition active:scale-95 relative"
+            className="p-3 bg-white rounded-full text-gray-600 hover:bg-gray-100 transition active:scale-95 shadow-md relative"
           >
             <UserCheck className="w-5 h-5" />
-            <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#0f172a]"></span>
+            <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
           </button>
         </div>
       </header>
 
-      {/* Main Actions Grid - TOP PRIORITY */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 w-full mb-6 animate-slide-up">
-        {/* Smart Diagnosis - Full Width */}
+      {/* Main Actions Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 w-full mb-6">
+        {/* Scan Plant - Full Width */}
         <button
           onClick={() => {
             audioService.playClick();
             setShowTutorial(true);
             setView('camera');
           }}
-          className="col-span-2 sm:col-span-3 bg-gradient-to-r from-emerald-600 to-green-500 p-5 sm:p-6 rounded-2xl flex items-center justify-between shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all hover:-translate-y-1 group"
+          className="col-span-2 sm:col-span-3 bg-gradient-to-r from-emerald-500 to-green-500 p-6 rounded-3xl flex items-center justify-between shadow-xl shadow-emerald-200 hover:shadow-emerald-300 transition-all hover:-translate-y-1 group"
         >
           <div className="flex flex-col items-start gap-1">
-            <span className="bg-white/20 text-white text-xs font-bold px-2.5 py-1 rounded-full backdrop-blur-sm mb-1">
-              AI POWERED
+            <span className="bg-white/25 text-white text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm mb-2">
+              ✨ AI POWERED
             </span>
-            <h3 className="text-xl sm:text-2xl font-bold">Scan Plant</h3>
-            <p className="text-emerald-100 text-sm sm:text-base">Instant AI diagnosis</p>
+            <h3 className="text-2xl sm:text-3xl font-bold text-white">Scan Plant</h3>
+            <p className="text-emerald-100 text-sm sm:text-base">Get instant AI diagnosis</p>
           </div>
-          <div className="bg-white/10 p-4 rounded-xl group-hover:scale-110 transition">
-            <Camera className="w-10 h-10 text-white" />
+          <div className="bg-white/20 p-4 rounded-2xl group-hover:scale-110 transition backdrop-blur-sm">
+            <Camera className="w-12 h-12 text-white" />
           </div>
         </button>
 
@@ -236,12 +236,12 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
             audioService.playClick();
             setView('upload');
           }}
-          className="glass-card p-4 sm:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-white/5 transition group"
+          className="bg-white p-5 rounded-2xl flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all shadow-md group border border-gray-100"
         >
-          <div className="p-3 bg-blue-500/20 rounded-full group-hover:bg-blue-500/30 transition">
-            <Upload className="w-7 h-7 text-blue-400" />
+          <div className="p-4 bg-gradient-to-br from-blue-100 to-blue-50 rounded-2xl group-hover:from-blue-200 group-hover:to-blue-100 transition">
+            <Upload className="w-8 h-8 text-blue-600" />
           </div>
-          <span className="font-semibold text-base">Upload</span>
+          <span className="font-semibold text-gray-700 text-base">Upload</span>
         </button>
 
         {/* Voice */}
@@ -250,12 +250,12 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
             audioService.playClick();
             setView('voice');
           }}
-          className="glass-card p-4 sm:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-white/5 transition group"
+          className="bg-white p-5 rounded-2xl flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all shadow-md group border border-gray-100"
         >
-          <div className="p-3 bg-purple-500/20 rounded-full group-hover:bg-purple-500/30 transition">
-            <Mic className="w-7 h-7 text-purple-400" />
+          <div className="p-4 bg-gradient-to-br from-purple-100 to-purple-50 rounded-2xl group-hover:from-purple-200 group-hover:to-purple-100 transition">
+            <Mic className="w-8 h-8 text-purple-600" />
           </div>
-          <span className="font-semibold text-base">Voice</span>
+          <span className="font-semibold text-gray-700 text-base">Voice</span>
         </button>
 
         {/* Record */}
@@ -264,12 +264,12 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
             audioService.playClick();
             setView('video');
           }}
-          className="glass-card p-4 sm:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-white/5 transition group"
+          className="bg-white p-5 rounded-2xl flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all shadow-md group border border-gray-100"
         >
-          <div className="p-3 bg-red-500/20 rounded-full group-hover:bg-red-500/30 transition">
-            <Video className="w-7 h-7 text-red-400" />
+          <div className="p-4 bg-gradient-to-br from-red-100 to-red-50 rounded-2xl group-hover:from-red-200 group-hover:to-red-100 transition">
+            <Video className="w-8 h-8 text-red-500" />
           </div>
-          <span className="font-semibold text-base">Record</span>
+          <span className="font-semibold text-gray-700 text-base">Record</span>
         </button>
 
         {/* History */}
@@ -278,102 +278,75 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
             audioService.playClick();
             setView('analysis');
           }}
-          className="glass-card p-4 sm:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-white/5 transition group"
+          className="bg-white p-5 rounded-2xl flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all shadow-md group border border-gray-100"
         >
-          <div className="p-3 bg-amber-500/20 rounded-full group-hover:bg-amber-500/30 transition">
-            <History className="w-7 h-7 text-amber-400" />
+          <div className="p-4 bg-gradient-to-br from-amber-100 to-amber-50 rounded-2xl group-hover:from-amber-200 group-hover:to-amber-100 transition">
+            <History className="w-8 h-8 text-amber-600" />
           </div>
-          <span className="font-semibold text-base">History</span>
+          <span className="font-semibold text-gray-700 text-base">History</span>
         </button>
       </div>
 
-      {/* Disease Alert - Compact */}
-      <div className="w-full mb-4 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-        <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-xl p-3 flex items-center gap-3">
-          <div className="p-2 bg-amber-500/20 rounded-lg flex-shrink-0">
-            <AlertOctagon className="w-5 h-5 text-amber-500" />
+      {/* Disease Alert */}
+      <div className="w-full mb-4">
+        <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4 flex items-center gap-4 shadow-sm">
+          <div className="p-3 bg-amber-100 rounded-xl">
+            <AlertOctagon className="w-6 h-6 text-amber-600" />
           </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-amber-500 text-sm">Pest Alert</h3>
-            <p className="text-xs text-gray-400 truncate">Early blight risk - high humidity in your region</p>
+          <div className="flex-1">
+            <h3 className="font-bold text-amber-700 text-base">Pest Alert</h3>
+            <p className="text-sm text-amber-600/80">Early blight risk - high humidity in your region</p>
           </div>
         </div>
       </div>
 
-      {/* Weather Widget - Compact */}
-      <div className="w-full mb-4 animate-slide-up" style={{ animationDelay: '0.15s' }}>
-        <div className="glass-card rounded-xl p-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Cloud className="w-10 h-10 text-gray-400" />
+      {/* Weather Widget */}
+      <div className="w-full mb-6">
+        <div className="bg-white rounded-2xl p-5 flex items-center justify-between shadow-md border border-gray-100">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-gradient-to-br from-sky-100 to-blue-50 rounded-xl">
+              <Cloud className="w-10 h-10 text-sky-500" />
+            </div>
             <div>
-              <div className="text-2xl font-bold">24°C</div>
-              <div className="text-xs text-gray-400">Partly Cloudy</div>
+              <div className="text-3xl font-bold text-gray-800">24°C</div>
+              <div className="text-sm text-gray-500">Partly Cloudy</div>
             </div>
           </div>
-          <div className="flex gap-4 text-sm">
-            <div className="flex items-center gap-1.5">
-              <Droplets className="w-4 h-4 text-blue-400" />
-              <span className="text-gray-400">62%</span>
+          <div className="flex gap-6">
+            <div className="flex flex-col items-center gap-1">
+              <Droplets className="w-5 h-5 text-blue-500" />
+              <span className="text-sm font-medium text-gray-600">62%</span>
             </div>
-            <div className="flex items-center gap-1.5">
-              <Wind className="w-4 h-4 text-gray-400" />
-              <span className="text-gray-400">8km/h</span>
+            <div className="flex flex-col items-center gap-1">
+              <Wind className="w-5 h-5 text-gray-400" />
+              <span className="text-sm font-medium text-gray-600">8km/h</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Recent Activity - Scrollable */}
-      <div className="flex-1 w-full min-h-0 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-bold text-lg flex items-center gap-2">
-            <History className="w-5 h-5 text-emerald-500" />
-            Recent Activity
+      {/* Tips Section */}
+      <div className="flex-1 w-full">
+        <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 text-white shadow-lg">
+          <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
+            <Sparkles className="w-5 h-5" />
+            Quick Tip
           </h3>
-          <button
-            onClick={() => setView('analysis')}
-            className="text-sm text-emerald-500 font-medium hover:underline"
-          >
-            View All
-          </button>
+          <p className="text-emerald-100 text-sm leading-relaxed">
+            For best results, take photos in natural daylight and focus on the affected areas of your plant.
+            Our AI works best with clear, well-lit images.
+          </p>
         </div>
-
-        {capturedImages && capturedImages.length > 0 ? (
-          <div className="flex gap-3 overflow-x-auto pb-3 scrollbar-hide">
-            {capturedImages.slice(-5).reverse().map((img, idx) => (
-              <div key={idx} className="flex-shrink-0 w-56 glass-card p-3 rounded-xl flex gap-3 items-center">
-                <img src={img.data} alt="Crop" className="w-14 h-14 rounded-lg object-cover" />
-                <div className="min-w-0 flex-1">
-                  <p className="font-bold text-sm truncate">{img.metadata?.cropType || 'Crop'}</p>
-                  <p className={`text-xs ${(img.analysis?.healthScore || 0) >= 70 ? 'text-green-400' : 'text-amber-400'}`}>
-                    {img.analysis?.healthScore || '--'}% Health
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="glass-card rounded-xl p-8 text-center text-gray-500">
-            <Camera className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p className="text-base font-medium">No diagnoses yet</p>
-            <button
-              onClick={() => setView('camera')}
-              className="mt-3 text-emerald-500 font-semibold text-sm hover:underline"
-            >
-              Start your first scan →
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Status Footer */}
       <div className="w-full pt-4 mt-auto">
         <div className="flex justify-center gap-6">
-          <div className="flex items-center gap-2 text-sm text-gray-400">
-            <Wifi className="w-4 h-4" />
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-500' : 'bg-amber-500'}`}></div>
             <span>{isOnline ? 'Online' : 'Offline'}</span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-400">
+          <div className="flex items-center gap-2 text-sm text-gray-500">
             <Smartphone className="w-4 h-4" />
             <span>{deviceInfo.isMobile ? 'Mobile' : 'Desktop'}</span>
           </div>
