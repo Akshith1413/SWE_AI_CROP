@@ -27,6 +27,7 @@ import { cropService } from '../services/cropService';
 import { consentService } from '../services/consentService';
 import { audioService } from '../services/audioService';
 import { aiService } from '../services/aiService';
+import { useTranslation } from '../hooks/useTranslation';
 
 const CropDiagnosisApp = ({ onBack }) => {
   const [appState, setAppState] = useState('loading'); // loading, landing, consent, app
@@ -162,6 +163,15 @@ const CropDiagnosisApp = ({ onBack }) => {
 
 const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceInfo, onBack }) => {
   const [showAudioSettings, setShowAudioSettings] = React.useState(false);
+  const { t } = useTranslation();
+
+  // Dynamic greeting based on time of day
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return t('homeView.greeting');
+    if (hour < 17) return t('homeView.greetingAfternoon');
+    return t('homeView.greetingEvening');
+  };
 
   return (
     <div className="min-h-screen h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 text-gray-800 flex flex-col p-4 sm:p-6 overflow-y-auto">
@@ -180,8 +190,8 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
             <Leaf className="w-7 h-7 text-white" />
           </div>
           <div>
-            <p className="text-base text-gray-500 font-medium">Good Morning,</p>
-            <h1 className="text-2xl font-bold text-gray-800">Grower</h1>
+            <p className="text-base text-gray-500 font-medium">{getGreeting()},</p>
+            <h1 className="text-2xl font-bold text-gray-800">{t('homeView.userTitle')}</h1>
           </div>
         </div>
         <div className="flex gap-2">
@@ -220,10 +230,10 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
         >
           <div className="flex flex-col items-start gap-1">
             <span className="bg-white/25 text-white text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm mb-2">
-              ✨ AI POWERED
+              {t('homeView.aiPowered')}
             </span>
-            <h3 className="text-2xl sm:text-3xl font-bold text-white">Scan Plant</h3>
-            <p className="text-emerald-100 text-sm sm:text-base">Get instant AI diagnosis</p>
+            <h3 className="text-2xl sm:text-3xl font-bold text-white">{t('homeView.scanPlant')}</h3>
+            <p className="text-emerald-100 text-sm sm:text-base">{t('homeView.scanPlantDesc')}</p>
           </div>
           <div className="bg-white/20 p-4 rounded-2xl group-hover:scale-110 transition backdrop-blur-sm">
             <Camera className="w-12 h-12 text-white" />
@@ -241,7 +251,7 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
           <div className="p-4 bg-gradient-to-br from-blue-100 to-blue-50 rounded-2xl group-hover:from-blue-200 group-hover:to-blue-100 transition">
             <Upload className="w-8 h-8 text-blue-600" />
           </div>
-          <span className="font-semibold text-gray-700 text-base">Upload</span>
+          <span className="font-semibold text-gray-700 text-base">{t('homeView.upload')}</span>
         </button>
 
         {/* Voice */}
@@ -255,7 +265,7 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
           <div className="p-4 bg-gradient-to-br from-purple-100 to-purple-50 rounded-2xl group-hover:from-purple-200 group-hover:to-purple-100 transition">
             <Mic className="w-8 h-8 text-purple-600" />
           </div>
-          <span className="font-semibold text-gray-700 text-base">Voice</span>
+          <span className="font-semibold text-gray-700 text-base">{t('homeView.voice')}</span>
         </button>
 
         {/* Record */}
@@ -269,7 +279,7 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
           <div className="p-4 bg-gradient-to-br from-red-100 to-red-50 rounded-2xl group-hover:from-red-200 group-hover:to-red-100 transition">
             <Video className="w-8 h-8 text-red-500" />
           </div>
-          <span className="font-semibold text-gray-700 text-base">Record</span>
+          <span className="font-semibold text-gray-700 text-base">{t('homeView.record')}</span>
         </button>
 
         {/* History */}
@@ -283,7 +293,7 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
           <div className="p-4 bg-gradient-to-br from-amber-100 to-amber-50 rounded-2xl group-hover:from-amber-200 group-hover:to-amber-100 transition">
             <History className="w-8 h-8 text-amber-600" />
           </div>
-          <span className="font-semibold text-gray-700 text-base">History</span>
+          <span className="font-semibold text-gray-700 text-base">{t('homeView.history')}</span>
         </button>
       </div>
 
@@ -294,8 +304,8 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
             <AlertOctagon className="w-6 h-6 text-amber-600" />
           </div>
           <div className="flex-1">
-            <h3 className="font-bold text-amber-700 text-base">Pest Alert</h3>
-            <p className="text-sm text-amber-600/80">Early blight risk - high humidity in your region</p>
+            <h3 className="font-bold text-amber-700 text-base">{t('homeView.pestAlert')}</h3>
+            <p className="text-sm text-amber-600/80">{t('homeView.pestAlertDesc')}</p>
           </div>
         </div>
       </div>
@@ -308,8 +318,8 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
               <Cloud className="w-10 h-10 text-sky-500" />
             </div>
             <div>
-              <div className="text-3xl font-bold text-gray-800">24°C</div>
-              <div className="text-sm text-gray-500">Partly Cloudy</div>
+              <div className="text-3xl font-bold text-gray-800">{t('homeView.temperature')}</div>
+              <div className="text-sm text-gray-500">{t('homeView.partlyCloudy')}</div>
             </div>
           </div>
           <div className="flex gap-6">
@@ -330,11 +340,10 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
         <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 text-white shadow-lg">
           <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
             <Sparkles className="w-5 h-5" />
-            Quick Tip
+            {t('homeView.quickTip')}
           </h3>
           <p className="text-emerald-100 text-sm leading-relaxed">
-            For best results, take photos in natural daylight and focus on the affected areas of your plant.
-            Our AI works best with clear, well-lit images.
+            {t('homeView.quickTipText')}
           </p>
         </div>
       </div>
@@ -344,11 +353,11 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
         <div className="flex justify-center gap-6">
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-500' : 'bg-amber-500'}`}></div>
-            <span>{isOnline ? 'Online' : 'Offline'}</span>
+            <span>{isOnline ? t('homeView.online') : t('homeView.offline')}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <Smartphone className="w-4 h-4" />
-            <span>{deviceInfo.isMobile ? 'Mobile' : 'Desktop'}</span>
+            <span>{deviceInfo.isMobile ? t('homeView.mobile') : t('homeView.desktop')}</span>
           </div>
         </div>
       </div>

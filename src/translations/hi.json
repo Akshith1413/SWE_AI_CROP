@@ -111,5 +111,28 @@
         "uploadComplete": "अपलोड पूर्ण",
         "analysisComplete": "विश्लेषण पूर्ण",
         "imagesSelected": "छवियाँ चयनित"
+    },
+    "homeView": {
+        "greeting": "सुप्रभात",
+        "greetingAfternoon": "शुभ दोपहर",
+        "greetingEvening": "शुभ संध्या",
+        "userTitle": "किसान",
+        "aiPowered": "✨ AI संचालित",
+        "scanPlant": "पौधा स्कैन करें",
+        "scanPlantDesc": "तुरंत AI निदान पाएं",
+        "upload": "अपलोड",
+        "voice": "आवाज़",
+        "record": "रिकॉर्ड",
+        "history": "इतिहास",
+        "pestAlert": "कीट चेतावनी",
+        "pestAlertDesc": "जल्दी झुलसा जोखिम - आपके क्षेत्र में उच्च आर्द्रता",
+        "temperature": "24°C",
+        "partlyCloudy": "आंशिक बादल",
+        "quickTip": "त्वरित सुझाव",
+        "quickTipText": "सर्वोत्तम परिणामों के लिए, प्राकृतिक दिन के उजाले में फोटो लें और अपने पौधे के प्रभावित क्षेत्रों पर ध्यान दें। हमारा AI स्पष्ट, अच्छी रोशनी वाली छवियों के साथ सबसे अच्छा काम करता है।",
+        "online": "ऑनलाइन",
+        "offline": "ऑफ़लाइन",
+        "mobile": "मोबाइल",
+        "desktop": "डेस्कटॉप"
     }
 }

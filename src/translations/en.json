@@ -111,5 +111,28 @@
         "uploadComplete": "Upload complete",
         "analysisComplete": "Analysis complete",
         "imagesSelected": "images selected"
+    },
+    "homeView": {
+        "greeting": "Good Morning",
+        "greetingAfternoon": "Good Afternoon",
+        "greetingEvening": "Good Evening",
+        "userTitle": "Grower",
+        "aiPowered": "✨ AI POWERED",
+        "scanPlant": "Scan Plant",
+        "scanPlantDesc": "Get instant AI diagnosis",
+        "upload": "Upload",
+        "voice": "Voice",
+        "record": "Record",
+        "history": "History",
+        "pestAlert": "Pest Alert",
+        "pestAlertDesc": "Early blight risk - high humidity in your region",
+        "temperature": "24°C",
+        "partlyCloudy": "Partly Cloudy",
+        "quickTip": "Quick Tip",
+        "quickTipText": "For best results, take photos in natural daylight and focus on the affected areas of your plant. Our AI works best with clear, well-lit images.",
+        "online": "Online",
+        "offline": "Offline",
+        "mobile": "Mobile",
+        "desktop": "Desktop"
     }
 }
