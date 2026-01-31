@@ -164,216 +164,218 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
   const [showAudioSettings, setShowAudioSettings] = React.useState(false);
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white flex flex-col items-center p-4 overflow-x-hidden">
-      {/* Premium Header */}
-      <header className="w-full max-w-lg mt-6 mb-8 relative z-10">
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-3">
-            {onBack && (
-              <button
-                onClick={onBack}
-                className="p-2 glass-card rounded-full text-white hover:bg-white/10 transition active:scale-95 mr-2"
-              >
-                <ArrowRight className="w-5 h-5 rotate-180" />
-              </button>
-            )}
-            <div className="p-2 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl shadow-lg shadow-emerald-500/20">
-              <Leaf className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-400 font-medium">Good Morning,</p>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">Grower</h1>
-            </div>
-          </div>
-          <div className="flex gap-3">
+    <div className="min-h-screen h-screen bg-[#0f172a] text-white flex flex-col p-4 sm:p-6 overflow-y-auto">
+      {/* Compact Header */}
+      <header className="w-full mb-4 flex justify-between items-center">
+        <div className="flex items-center gap-3">
+          {onBack && (
             <button
-              onClick={() => {
-                audioService.playClick();
-                setShowAudioSettings(true);
-              }}
-              className="p-2.5 glass-card rounded-full text-white hover:bg-white/10 transition active:scale-95"
+              onClick={onBack}
+              className="p-2 glass-card rounded-full text-white hover:bg-white/10 transition active:scale-95"
             >
-              <Volume2 className="w-5 h-5" />
+              <ArrowRight className="w-5 h-5 rotate-180" />
             </button>
-            <button
-              onClick={() => {
-                audioService.playClick();
-                setView('profile');
-              }}
-              className="p-2.5 glass-card rounded-full text-white hover:bg-white/10 transition active:scale-95 relative"
-            >
-              <UserCheck className="w-5 h-5" />
-              <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#0f172a]"></span>
-            </button>
+          )}
+          <div className="p-2.5 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl shadow-lg shadow-emerald-500/20">
+            <Leaf className="w-7 h-7 text-white" />
           </div>
+          <div>
+            <p className="text-base text-gray-400 font-medium">Good Morning,</p>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Grower</h1>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => {
+              audioService.playClick();
+              setShowAudioSettings(true);
+            }}
+            className="p-3 glass-card rounded-full text-white hover:bg-white/10 transition active:scale-95"
+          >
+            <Volume2 className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => {
+              audioService.playClick();
+              setView('profile');
+            }}
+            className="p-3 glass-card rounded-full text-white hover:bg-white/10 transition active:scale-95 relative"
+          >
+            <UserCheck className="w-5 h-5" />
+            <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#0f172a]"></span>
+          </button>
         </div>
       </header>
 
-      {/* Weather Widget */}
-      <div className="w-full max-w-lg mb-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-        <div className="glass-card rounded-2xl p-6 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
-            <Cloud className="w-32 h-32" />
-          </div>
-          <div className="flex justify-between items-end relative z-10">
-            <div>
-              <div className="flex items-center gap-2 mb-2 text-emerald-400">
-                <MapPin className="w-4 h-4" />
-                <span className="text-sm font-medium">Your Farm</span>
-              </div>
-              <div className="text-4xl font-bold mb-1">24°C</div>
-              <div className="text-sm text-gray-400">Partly Cloudy</div>
-            </div>
-            <div className="flex gap-6 text-sm">
-              <div className="flex flex-col items-center gap-1">
-                <Droplets className="w-5 h-5 text-blue-400" />
-                <span className="text-gray-400">62%</span>
-              </div>
-              <div className="flex flex-col items-center gap-1">
-                <Wind className="w-5 h-5 text-gray-400" />
-                <span className="text-gray-400">8km/h</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Disease Alert */}
-      <div className="w-full max-w-lg mb-8 animate-slide-up" style={{ animationDelay: '0.15s' }}>
-        <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-xl p-4 flex items-start gap-4">
-          <div className="p-2 bg-amber-500/20 rounded-lg">
-            <AlertOctagon className="w-6 h-6 text-amber-500" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-amber-500 mb-1">Pest Alert</h3>
-            <p className="text-xs text-gray-400 leading-relaxed">Early blight risk detected in your region due to high humidity. Monitor tomato crops closely.</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Actions Grid */}
-      <div className="grid grid-cols-2 gap-4 w-full max-w-lg mb-10 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+      {/* Main Actions Grid - TOP PRIORITY */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 w-full mb-6 animate-slide-up">
+        {/* Smart Diagnosis - Full Width */}
         <button
           onClick={() => {
             audioService.playClick();
             setShowTutorial(true);
             setView('camera');
           }}
-          className="col-span-2 bg-gradient-to-r from-emerald-600 to-green-500 p-6 rounded-2xl flex items-center justify-between shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all hover:-translate-y-1 group"
+          className="col-span-2 sm:col-span-3 bg-gradient-to-r from-emerald-600 to-green-500 p-5 sm:p-6 rounded-2xl flex items-center justify-between shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all hover:-translate-y-1 group"
         >
           <div className="flex flex-col items-start gap-1">
-            <span className="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm mb-2">
+            <span className="bg-white/20 text-white text-xs font-bold px-2.5 py-1 rounded-full backdrop-blur-sm mb-1">
               AI POWERED
             </span>
-            <h3 className="text-xl font-bold">Smart Diagnosis</h3>
-            <p className="text-emerald-100 text-sm">Scan plants for instant analysis</p>
+            <h3 className="text-xl sm:text-2xl font-bold">Scan Plant</h3>
+            <p className="text-emerald-100 text-sm sm:text-base">Instant AI diagnosis</p>
           </div>
-          <div className="bg-white/10 p-3 rounded-xl group-hover:scale-110 transition">
-            <Camera className="w-8 h-8 text-white" />
+          <div className="bg-white/10 p-4 rounded-xl group-hover:scale-110 transition">
+            <Camera className="w-10 h-10 text-white" />
           </div>
         </button>
 
+        {/* Upload */}
         <button
           onClick={() => {
             audioService.playClick();
             setView('upload');
           }}
-          className="glass-card p-4 rounded-2xl flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition group"
+          className="glass-card p-4 sm:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-white/5 transition group"
         >
-          <div className="p-3 bg-blue-500/10 rounded-full group-hover:bg-blue-500/20 transition">
-            <Upload className="w-6 h-6 text-blue-400" />
+          <div className="p-3 bg-blue-500/20 rounded-full group-hover:bg-blue-500/30 transition">
+            <Upload className="w-7 h-7 text-blue-400" />
           </div>
-          <span className="font-medium">Upload Image</span>
+          <span className="font-semibold text-base">Upload</span>
         </button>
 
+        {/* Voice */}
         <button
           onClick={() => {
             audioService.playClick();
             setView('voice');
           }}
-          className="glass-card p-4 rounded-2xl flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition group"
+          className="glass-card p-4 sm:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-white/5 transition group"
         >
-          <div className="p-3 bg-purple-500/10 rounded-full group-hover:bg-purple-500/20 transition">
-            <Mic className="w-6 h-6 text-purple-400" />
+          <div className="p-3 bg-purple-500/20 rounded-full group-hover:bg-purple-500/30 transition">
+            <Mic className="w-7 h-7 text-purple-400" />
           </div>
-          <span className="font-medium">Voice Doctor</span>
+          <span className="font-semibold text-base">Voice</span>
         </button>
 
+        {/* Record */}
         <button
           onClick={() => {
             audioService.playClick();
             setView('video');
           }}
-          className="glass-card p-4 rounded-2xl flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition group"
+          className="glass-card p-4 sm:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-white/5 transition group"
         >
-          <div className="p-3 bg-red-500/10 rounded-full group-hover:bg-red-500/20 transition">
-            <Video className="w-6 h-6 text-red-400" />
+          <div className="p-3 bg-red-500/20 rounded-full group-hover:bg-red-500/30 transition">
+            <Video className="w-7 h-7 text-red-400" />
           </div>
-          <span className="font-medium">Record Video</span>
+          <span className="font-semibold text-base">Record</span>
         </button>
 
+        {/* History */}
         <button
           onClick={() => {
             audioService.playClick();
             setView('analysis');
           }}
-          className="glass-card p-4 rounded-2xl flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition group"
+          className="glass-card p-4 sm:p-5 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-white/5 transition group"
         >
-          <div className="p-3 bg-amber-500/10 rounded-full group-hover:bg-amber-500/20 transition">
-            <History className="w-6 h-6 text-amber-400" />
+          <div className="p-3 bg-amber-500/20 rounded-full group-hover:bg-amber-500/30 transition">
+            <History className="w-7 h-7 text-amber-400" />
           </div>
-          <span className="font-medium">History</span>
+          <span className="font-semibold text-base">History</span>
         </button>
       </div>
 
-      {/* Recent Diagnoses */}
-      <div className="w-full max-w-lg mb-10 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-        <div className="flex items-center justify-between mb-4 px-1">
-          <h3 className="font-bold flex items-center gap-2">
+      {/* Disease Alert - Compact */}
+      <div className="w-full mb-4 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+        <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-xl p-3 flex items-center gap-3">
+          <div className="p-2 bg-amber-500/20 rounded-lg flex-shrink-0">
+            <AlertOctagon className="w-5 h-5 text-amber-500" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-amber-500 text-sm">Pest Alert</h3>
+            <p className="text-xs text-gray-400 truncate">Early blight risk - high humidity in your region</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Weather Widget - Compact */}
+      <div className="w-full mb-4 animate-slide-up" style={{ animationDelay: '0.15s' }}>
+        <div className="glass-card rounded-xl p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Cloud className="w-10 h-10 text-gray-400" />
+            <div>
+              <div className="text-2xl font-bold">24°C</div>
+              <div className="text-xs text-gray-400">Partly Cloudy</div>
+            </div>
+          </div>
+          <div className="flex gap-4 text-sm">
+            <div className="flex items-center gap-1.5">
+              <Droplets className="w-4 h-4 text-blue-400" />
+              <span className="text-gray-400">62%</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Wind className="w-4 h-4 text-gray-400" />
+              <span className="text-gray-400">8km/h</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Activity - Scrollable */}
+      <div className="flex-1 w-full min-h-0 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-bold text-lg flex items-center gap-2">
             <History className="w-5 h-5 text-emerald-500" />
             Recent Activity
           </h3>
-          <button className="text-xs text-emerald-500 font-medium">View All</button>
+          <button
+            onClick={() => setView('analysis')}
+            className="text-sm text-emerald-500 font-medium hover:underline"
+          >
+            View All
+          </button>
         </div>
 
         {capturedImages && capturedImages.length > 0 ? (
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-            {capturedImages.slice(-3).reverse().map((img, idx) => (
-              <div key={idx} className="flex-shrink-0 w-64 glass-card p-3 rounded-xl flex gap-3 items-center">
-                <img src={img.data} alt="Crop" className="w-16 h-16 rounded-lg object-cover" />
-                <div>
-                  <p className="font-bold text-sm truncate">{img.metadata?.cropType || 'Unknown Crop'}</p>
-                  <p className={`text-xs ${img.metadata?.qualityScore >= 80 ? 'text-green-400' : 'text-amber-400'}`}>
-                    Health Score: {img.analysis?.healthScore}%
+          <div className="flex gap-3 overflow-x-auto pb-3 scrollbar-hide">
+            {capturedImages.slice(-5).reverse().map((img, idx) => (
+              <div key={idx} className="flex-shrink-0 w-56 glass-card p-3 rounded-xl flex gap-3 items-center">
+                <img src={img.data} alt="Crop" className="w-14 h-14 rounded-lg object-cover" />
+                <div className="min-w-0 flex-1">
+                  <p className="font-bold text-sm truncate">{img.metadata?.cropType || 'Crop'}</p>
+                  <p className={`text-xs ${(img.analysis?.healthScore || 0) >= 70 ? 'text-green-400' : 'text-amber-400'}`}>
+                    {img.analysis?.healthScore || '--'}% Health
                   </p>
-                  <p className="text-[10px] text-gray-500 mt-1">{new Date(img.metadata?.timestamp).toLocaleDateString()}</p>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="glass-card rounded-xl p-6 text-center text-gray-500 text-sm border-dashed">
-            <p>No recent diagnoses</p>
+          <div className="glass-card rounded-xl p-8 text-center text-gray-500">
+            <Camera className="w-12 h-12 mx-auto mb-3 opacity-30" />
+            <p className="text-base font-medium">No diagnoses yet</p>
             <button
               onClick={() => setView('camera')}
-              className="mt-2 text-emerald-500 font-medium text-xs hover:underline"
+              className="mt-3 text-emerald-500 font-semibold text-sm hover:underline"
             >
-              Start your first scan
+              Start your first scan →
             </button>
           </div>
         )}
       </div>
 
-      {/* Features List (Subtle) */}
-      <div className="w-full max-w-lg mb-8 opacity-60 hover:opacity-100 transition duration-500">
+      {/* Status Footer */}
+      <div className="w-full pt-4 mt-auto">
         <div className="flex justify-center gap-6">
-          <div className="flex items-center gap-2 text-xs text-gray-400">
-            <Wifi className="w-3 h-3" />
-            <span>{isOnline ? 'Online' : 'Offline Mode'}</span>
+          <div className="flex items-center gap-2 text-sm text-gray-400">
+            <Wifi className="w-4 h-4" />
+            <span>{isOnline ? 'Online' : 'Offline'}</span>
           </div>
-          <div className="flex items-center gap-2 text-xs text-gray-400">
-            <Smartphone className="w-3 h-3" />
-            <span>{deviceInfo.isMobile ? 'Mobile Optimized' : 'Desktop View'}</span>
+          <div className="flex items-center gap-2 text-sm text-gray-400">
+            <Smartphone className="w-4 h-4" />
+            <span>{deviceInfo.isMobile ? 'Mobile' : 'Desktop'}</span>
           </div>
         </div>
       </div>
