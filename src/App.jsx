@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import "./App.css";
 
 import { LanguageProvider, useLanguage } from "./context/LanguageContext";
-import CropAidCapture from "./components/CropAidCapture";
+import CropDiagnosisApp from "./components/CropDiagnosisApp";
 import LoginScreen from "./components/LoginScreen";
 import LanguageScreen from "./components/LanguageScreen";
 import LandingPage from "./components/LandingPage";
@@ -89,7 +89,7 @@ function MainAppFlow() {
 
   return (
     <div className="app-container">
-      <CropAidCapture userId={userId} />
+      <CropDiagnosisApp />
     </div>
   );
 }

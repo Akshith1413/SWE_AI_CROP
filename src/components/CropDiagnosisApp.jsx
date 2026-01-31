@@ -298,6 +298,32 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
           </div>
           <span className="font-medium">Voice Doctor</span>
         </button>
+
+        <button
+          onClick={() => {
+            audioService.playClick();
+            setView('video');
+          }}
+          className="glass-card p-4 rounded-2xl flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition group"
+        >
+          <div className="p-3 bg-red-500/10 rounded-full group-hover:bg-red-500/20 transition">
+            <Video className="w-6 h-6 text-red-400" />
+          </div>
+          <span className="font-medium">Record Video</span>
+        </button>
+
+        <button
+          onClick={() => {
+            audioService.playClick();
+            setView('analysis');
+          }}
+          className="glass-card p-4 rounded-2xl flex flex-col items-center justify-center gap-3 hover:bg-white/5 transition group"
+        >
+          <div className="p-3 bg-amber-500/10 rounded-full group-hover:bg-amber-500/20 transition">
+            <History className="w-6 h-6 text-amber-400" />
+          </div>
+          <span className="font-medium">History</span>
+        </button>
       </div>
 
       {/* Recent Diagnoses */}
