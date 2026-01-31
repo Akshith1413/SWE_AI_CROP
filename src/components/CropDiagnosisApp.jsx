@@ -379,6 +379,7 @@ const EnhancedCompleteCameraCapture = ({
   setShowTutorial,
   deviceInfo
 }) => {
+  const { t } = useTranslation();
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const detectionCanvasRef = useRef(null);
@@ -1189,8 +1190,8 @@ const EnhancedCompleteCameraCapture = ({
               <div className="flex items-center gap-3 mb-4">
                 <Target className="w-8 h-8 text-green-600" />
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">Smart Camera Guide</h2>
-                  <p className="text-sm text-gray-600">AI-powered assistance for perfect photos</p>
+                  <h2 className="text-xl font-bold text-gray-900">{t('smartCameraGuide.title')}</h2>
+                  <p className="text-sm text-gray-600">{t('smartCameraGuide.subtitle')}</p>
                 </div>
               </div>
 
@@ -1198,32 +1199,32 @@ const EnhancedCompleteCameraCapture = ({
                 <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
                   <Leaf className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-semibold text-green-900 text-sm">Auto Leaf Detection</p>
-                    <p className="text-xs text-green-700">Green frame appears when leaf is detected</p>
+                    <p className="font-semibold text-green-900 text-sm">{t('smartCameraGuide.autoLeafDetection')}</p>
+                    <p className="text-xs text-green-700">{t('smartCameraGuide.autoLeafDetectionDesc')}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
                   <Thermometer className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-semibold text-blue-900 text-sm">Quality Meter</p>
-                    <p className="text-xs text-blue-700">Real-time quality score and feedback</p>
+                    <p className="font-semibold text-blue-900 text-sm">{t('smartCameraGuide.qualityMeter')}</p>
+                    <p className="text-xs text-blue-700">{t('smartCameraGuide.qualityMeterDesc')}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
                   <Volume2 className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-semibold text-purple-900 text-sm">Voice Guidance</p>
-                    <p className="text-xs text-purple-700">Audio prompts for perfect capture</p>
+                    <p className="font-semibold text-purple-900 text-sm">{t('smartCameraGuide.voiceGuidance')}</p>
+                    <p className="text-xs text-purple-700">{t('smartCameraGuide.voiceGuidanceDesc')}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg">
                   <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-semibold text-yellow-900 text-sm">Quality Warnings</p>
-                    <p className="text-xs text-yellow-700">Alerts for blur, darkness, and other issues</p>
+                    <p className="font-semibold text-yellow-900 text-sm">{t('smartCameraGuide.qualityWarnings')}</p>
+                    <p className="text-xs text-yellow-700">{t('smartCameraGuide.qualityWarningsDesc')}</p>
                   </div>
                 </div>
               </div>
@@ -1232,7 +1233,7 @@ const EnhancedCompleteCameraCapture = ({
                 onClick={() => setShowTutorial(false)}
                 className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-lg font-semibold hover:opacity-90 transition"
               >
-                Start Smart Camera
+                {t('smartCameraGuide.startSmartCamera')}
               </button>
             </div>
           </div>
@@ -1243,7 +1244,7 @@ const EnhancedCompleteCameraCapture = ({
           <div className="absolute inset-0 bg-black bg-opacity-70 z-40 flex items-center justify-center">
             <div className="text-white text-center">
               <div className="text-8xl font-bold animate-pulse mb-4">{captureCountdown}</div>
-              <p className="text-xl opacity-80">Get ready...</p>
+              <p className="text-xl opacity-80">{t('smartCameraGuide.getReady')}</p>
             </div>
           </div>
         )}
@@ -2034,6 +2035,7 @@ const MultiImageUpload = ({ setView, setCapturedImages, isOnline, addToOfflineQu
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef(null);
+  const { t } = useTranslation();
 
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
@@ -2212,20 +2214,20 @@ const MultiImageUpload = ({ setView, setCapturedImages, isOnline, addToOfflineQu
               <X className="w-6 h-6" />
             </button>
             <div>
-              <h1 className="text-xl font-bold">Batch Upload</h1>
-              <p className="text-xs opacity-90">Upload up to 10 images</p>
+              <h1 className="text-xl font-bold">{t('uploadView.title')}</h1>
+              <p className="text-xs opacity-90">{t('uploadView.supportedFormats')}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full">
             {isOnline ? (
               <>
                 <Wifi className="w-4 h-4" />
-                <span className="text-xs">Online</span>
+                <span className="text-xs">{t('homeView.online')}</span>
               </>
             ) : (
               <>
                 <WifiOff className="w-4 h-4" />
-                <span className="text-xs">Offline</span>
+                <span className="text-xs">{t('homeView.offline')}</span>
               </>
             )}
           </div>
@@ -2250,13 +2252,13 @@ const MultiImageUpload = ({ setView, setCapturedImages, isOnline, addToOfflineQu
             </div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">
               {selectedImages.length > 0
-                ? `${selectedImages.length} image${selectedImages.length > 1 ? 's' : ''} selected`
-                : 'Select Multiple Images'}
+                ? `${selectedImages.length} ${t('cropCapture.imagesSelected')}`
+                : t('uploadView.selectImages')}
             </h2>
             <p className="text-gray-600 mb-6">
               {isDragging
-                ? 'Drop images here...'
-                : 'Drag and drop images here, or click to browse'}
+                ? t('uploadView.dragDropText')
+                : t('uploadView.orClickToSelect')}
             </p>
 
             <input
@@ -2273,11 +2275,11 @@ const MultiImageUpload = ({ setView, setCapturedImages, isOnline, addToOfflineQu
               className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg transition transform hover:scale-105 inline-flex items-center gap-2"
             >
               <Image className="w-5 h-5" />
-              Browse Gallery
+              {t('uploadView.selectImages')}
             </button>
 
             <p className="text-sm text-gray-500 mt-4">
-              Supported: JPG, PNG, JPEG • Max 10 images per batch
+              {t('uploadView.supportedFormats')}
             </p>
           </div>
         </div>
@@ -2288,14 +2290,14 @@ const MultiImageUpload = ({ setView, setCapturedImages, isOnline, addToOfflineQu
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-gray-800 flex items-center gap-2">
                 <ImageIcon className="w-5 h-5 text-blue-600" />
-                Selected Images ({uploadedPreviewImages.length}/10)
+                {t('uploadView.selectedImages')} ({uploadedPreviewImages.length}/10)
               </h3>
               <button
                 onClick={clearAll}
                 className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center gap-1"
               >
                 <X className="w-4 h-4" />
-                Clear All
+                {t('uploadView.removeAll')}
               </button>
             </div>
 
@@ -2335,7 +2337,7 @@ const MultiImageUpload = ({ setView, setCapturedImages, isOnline, addToOfflineQu
           <div className="bg-white rounded-2xl p-6 shadow-lg mb-6">
             <div className="flex items-center gap-3 mb-3">
               <RefreshCw className="w-5 h-5 text-blue-600 animate-spin" />
-              <h3 className="font-bold text-gray-800">Uploading images...</h3>
+              <h3 className="font-bold text-gray-800">{t('uploadView.uploading')}</h3>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
               <div
@@ -2343,7 +2345,7 @@ const MultiImageUpload = ({ setView, setCapturedImages, isOnline, addToOfflineQu
                 style={{ width: `${uploadProgress}%` }}
               />
             </div>
-            <p className="text-sm text-gray-600 mt-2 text-center">{uploadProgress}% complete</p>
+            <p className="text-sm text-gray-600 mt-2 text-center">{uploadProgress}%</p>
           </div>
         )}
 
@@ -2355,7 +2357,7 @@ const MultiImageUpload = ({ setView, setCapturedImages, isOnline, addToOfflineQu
             disabled={isUploading}
           >
             <X className="w-5 h-5" />
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             onClick={handleUpload}
@@ -2366,7 +2368,7 @@ const MultiImageUpload = ({ setView, setCapturedImages, isOnline, addToOfflineQu
               }`}
           >
             <Check className="w-5 h-5" />
-            Upload {selectedImages.length > 0 && `${selectedImages.length} image${selectedImages.length > 1 ? 's' : ''}`}
+            {t('uploadView.uploadAndAnalyze')} {selectedImages.length > 0 && `(${selectedImages.length})`}
           </button>
         </div>
 
@@ -2374,79 +2376,85 @@ const MultiImageUpload = ({ setView, setCapturedImages, isOnline, addToOfflineQu
         <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
           <h4 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
             <Lightbulb className="w-5 h-5" />
-            Tips for Best Results
+            {t('homeView.quickTip')}
           </h4>
-          <ul className="text-sm text-blue-800 space-y-1">
-            <li>• Upload multiple angles of the same plant for comprehensive analysis</li>
-            <li>• Ensure good lighting and focus for each image</li>
-            <li>• Include close-up shots of affected areas</li>
-            <li>• Images will be analyzed individually</li>
-          </ul>
+          <p className="text-sm text-blue-800">
+            {t('homeView.quickTipText')}
+          </p>
         </div>
       </div>
     </div>
   );
 };
 
-const VideoRecorder = ({ setView }) => (
-  <div className="min-h-screen bg-nature-50 flex flex-col">
-    <div className="bg-nature-600 p-4 text-white shadow-lg">
-      <div className="max-w-4xl mx-auto flex items-center gap-3">
-        <button onClick={() => setView('home')} className="p-2 hover:bg-white/20 rounded-full transition">
-          <ChevronRight className="w-6 h-6 rotate-180" />
-        </button>
-        <h1 className="text-xl font-bold">Video Analysis</h1>
-      </div>
-    </div>
+const VideoRecorder = ({ setView }) => {
+  const { t } = useTranslation();
 
-    <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-      <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-nature-100">
-        <div className="bg-purple-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-          <Video className="w-10 h-10 text-purple-600" />
+  return (
+    <div className="min-h-screen bg-nature-50 flex flex-col">
+      <div className="bg-nature-600 p-4 text-white shadow-lg">
+        <div className="max-w-4xl mx-auto flex items-center gap-3">
+          <button onClick={() => setView('home')} className="p-2 hover:bg-white/20 rounded-full transition">
+            <ChevronRight className="w-6 h-6 rotate-180" />
+          </button>
+          <h1 className="text-xl font-bold">{t('videoView.title')}</h1>
         </div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Record Video</h2>
-        <p className="text-gray-500 mb-8">Record a short video of the plant to analyze motion-based symptoms.</p>
-
-        <button className="w-full bg-purple-600 text-white py-4 rounded-xl font-bold hover:bg-purple-700 transition shadow-lg shadow-purple-200 mb-3">
-          Start Recording
-        </button>
-        <button onClick={() => setView('home')} className="w-full bg-gray-100 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-200 transition">
-          Cancel
-        </button>
       </div>
-    </div>
-  </div>
-);
 
-const VoiceInput = ({ setView }) => (
-  <div className="min-h-screen bg-nature-50 flex flex-col">
-    <div className="bg-nature-600 p-4 text-white shadow-lg">
-      <div className="max-w-4xl mx-auto flex items-center gap-3">
-        <button onClick={() => setView('home')} className="p-2 hover:bg-white/20 rounded-full transition">
-          <ChevronRight className="w-6 h-6 rotate-180" />
-        </button>
-        <h1 className="text-xl font-bold">Voice Assistant</h1>
-      </div>
-    </div>
+      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+        <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-nature-100">
+          <div className="bg-purple-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Video className="w-10 h-10 text-purple-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('videoView.title')}</h2>
+          <p className="text-gray-500 mb-8">{t('videoView.recordInstructions')}</p>
 
-    <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-      <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-nature-100">
-        <div className="bg-red-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
-          <Mic className="w-10 h-10 text-red-600" />
+          <button className="w-full bg-purple-600 text-white py-4 rounded-xl font-bold hover:bg-purple-700 transition shadow-lg shadow-purple-200 mb-3">
+            {t('videoView.startRecording')}
+          </button>
+          <button onClick={() => setView('home')} className="w-full bg-gray-100 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-200 transition">
+            {t('common.cancel')}
+          </button>
         </div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Listening...</h2>
-        <p className="text-gray-500 mb-8">Describe the symptoms you see on the plant.</p>
-
-        <button onClick={() => setView('home')} className="w-full bg-gray-100 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-200 transition">
-          Stop Listening
-        </button>
       </div>
     </div>
-  </div>
-);
+  );
+};
+
+const VoiceInput = ({ setView }) => {
+  const { t } = useTranslation();
+
+  return (
+    <div className="min-h-screen bg-nature-50 flex flex-col">
+      <div className="bg-nature-600 p-4 text-white shadow-lg">
+        <div className="max-w-4xl mx-auto flex items-center gap-3">
+          <button onClick={() => setView('home')} className="p-2 hover:bg-white/20 rounded-full transition">
+            <ChevronRight className="w-6 h-6 rotate-180" />
+          </button>
+          <h1 className="text-xl font-bold">{t('voiceView.title')}</h1>
+        </div>
+      </div>
+
+      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+        <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-nature-100">
+          <div className="bg-red-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
+            <Mic className="w-10 h-10 text-red-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('voiceView.listening')}</h2>
+          <p className="text-gray-500 mb-8">{t('voiceView.askQuestion')}</p>
+
+          <button onClick={() => setView('home')} className="w-full bg-gray-100 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-200 transition">
+            {t('common.cancel')}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const ImageAnalysis = ({ setView, capturedImages }) => {
   const [selectedReport, setSelectedReport] = React.useState(null);
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-[#0f172a] text-white flex flex-col">
@@ -2455,7 +2463,7 @@ const ImageAnalysis = ({ setView, capturedImages }) => {
           <button onClick={() => selectedReport ? setSelectedReport(null) : setView('home')} className="p-2 hover:bg-white/10 rounded-full transition">
             <ChevronRight className="w-6 h-6 rotate-180" />
           </button>
-          <h1 className="text-xl font-bold">{selectedReport ? 'Analysis Report' : 'Diagnosis History'}</h1>
+          <h1 className="text-xl font-bold">{selectedReport ? t('cameraView.analysisResult') : t('analysisView.title')}</h1>
         </div>
       </div>
 
@@ -2468,7 +2476,7 @@ const ImageAnalysis = ({ setView, capturedImages }) => {
                 <img src={selectedReport.data} className="w-full h-full object-cover" alt="Analyzed Crop" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] to-transparent"></div>
                 <div className="absolute bottom-4 left-4">
-                  <h2 className="text-2xl font-bold text-white mb-1">{selectedReport.analysis?.diagnosis || 'Analysis'}</h2>
+                  <h2 className="text-2xl font-bold text-white mb-1">{selectedReport.analysis?.diagnosis || t('diagnosis.result')}</h2>
                   <p className="text-gray-300 text-sm italic">{selectedReport.analysis?.scientificName}</p>
                 </div>
               </div>
@@ -2477,7 +2485,7 @@ const ImageAnalysis = ({ setView, capturedImages }) => {
                 {/* Confidence & Severity */}
                 <div className="flex flex-wrap gap-4 mb-6">
                   <div className="flex-1 bg-white/5 p-4 rounded-xl border border-white/10">
-                    <p className="text-xs text-gray-400 mb-2">AI Confidence</p>
+                    <p className="text-xs text-gray-400 mb-2">{t('cameraView.confidence')}</p>
                     <div className="flex items-end gap-2">
                       <span className="text-2xl font-bold text-emerald-400">{Math.round((selectedReport.analysis?.confidence || 0) * 100)}%</span>
                       <div className="flex-1 h-2 bg-gray-700 rounded-full mb-1.5">
@@ -2490,12 +2498,12 @@ const ImageAnalysis = ({ setView, capturedImages }) => {
                   </div>
 
                   <div className="flex-1 bg-white/5 p-4 rounded-xl border border-white/10">
-                    <p className="text-xs text-gray-400 mb-2">Severity Level</p>
+                    <p className="text-xs text-gray-400 mb-2">{t('diagnosis.severity')}</p>
                     <div className="flex items-center gap-2">
                       <div className={`w-3 h-3 rounded-full ${selectedReport.analysis?.severity === 'severe' ? 'bg-red-500 animate-pulse' :
                         selectedReport.analysis?.severity === 'moderate' ? 'bg-amber-500' : 'bg-green-500'
                         }`}></div>
-                      <span className="text-xl font-bold capitalize">{selectedReport.analysis?.severity || 'Unknown'}</span>
+                      <span className="text-xl font-bold capitalize">{selectedReport.analysis?.severity || t('analysisView.unknown')}</span>
                     </div>
                   </div>
                 </div>
@@ -2504,11 +2512,11 @@ const ImageAnalysis = ({ setView, capturedImages }) => {
                 <div className="mb-6">
                   <h3 className="flex items-center gap-2 font-bold text-lg mb-3">
                     <Sparkles className="w-5 h-5 text-purple-400" />
-                    AI Insight
+                    {t('homeView.quickTip')}
                   </h3>
                   <div className="bg-purple-500/10 border border-purple-500/20 p-4 rounded-xl">
                     <p className="text-gray-300 leading-relaxed text-sm">
-                      {selectedReport.analysis?.explanation || "AI analysis complete. Detecting patterns consistent with the diagnosed condition."}
+                      {selectedReport.analysis?.explanation || t('homeView.quickTipText')}
                     </p>
                   </div>
                 </div>
@@ -2516,7 +2524,7 @@ const ImageAnalysis = ({ setView, capturedImages }) => {
                 {/* Symptoms */}
                 {selectedReport.analysis?.symptoms?.length > 0 && (
                   <div className="mb-6">
-                    <h3 className="font-bold text-lg mb-3">Detected Symptoms</h3>
+                    <h3 className="font-bold text-lg mb-3">{t('diagnosis.diseased')}</h3>
                     <div className="flex flex-wrap gap-2">
                       {selectedReport.analysis.symptoms.map((sym, i) => (
                         <span key={i} className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-sm text-gray-300">
@@ -2530,7 +2538,7 @@ const ImageAnalysis = ({ setView, capturedImages }) => {
                 {/* Treatments */}
                 {selectedReport.analysis?.treatments?.length > 0 && (
                   <div>
-                    <h3 className="font-bold text-lg mb-3">Recommended Actions</h3>
+                    <h3 className="font-bold text-lg mb-3">{t('cameraView.treatment')}</h3>
                     <ul className="space-y-3">
                       {selectedReport.analysis.treatments.map((action, i) => (
                         <li key={i} className="flex items-start gap-3 p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl">
@@ -2551,8 +2559,8 @@ const ImageAnalysis = ({ setView, capturedImages }) => {
               <div className="bg-white/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <BarChart3 className="w-8 h-8 text-gray-400" />
               </div>
-              <h3 className="text-xl font-bold text-gray-300">No Analysis Yet</h3>
-              <p className="text-gray-500 mt-2">Use the camera to diagnose your first plant.</p>
+              <h3 className="text-xl font-bold text-gray-300">{t('analysisView.noHistory')}</h3>
+              <p className="text-gray-500 mt-2">{t('analysisView.startScanning')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -2561,7 +2569,7 @@ const ImageAnalysis = ({ setView, capturedImages }) => {
                   <img src={img.data} className="w-24 h-24 rounded-xl object-cover" alt="Captured" />
                   <div className="flex-1">
                     <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-bold text-white group-hover:text-emerald-400 transition">{img.analysis?.diagnosis || `Analysis #${capturedImages.length - idx}`}</h4>
+                      <h4 className="font-bold text-white group-hover:text-emerald-400 transition">{img.analysis?.diagnosis || `${t('diagnosis.result')} #${capturedImages.length - idx}`}</h4>
                       <span className="text-xs text-gray-500">{new Date(img.metadata?.timestamp).toLocaleDateString()}</span>
                     </div>
 
@@ -2569,7 +2577,7 @@ const ImageAnalysis = ({ setView, capturedImages }) => {
                       <div className="mb-3">
                         <div className="flex items-center gap-2 mb-1">
                           <div className={`w-2 h-2 rounded-full ${img.analysis.severity === 'severe' ? 'bg-red-500' : 'bg-emerald-500'}`}></div>
-                          <span className="text-xs text-gray-400 capitalize">{img.analysis.severity} Risk</span>
+                          <span className="text-xs text-gray-400 capitalize">{img.analysis.severity}</span>
                         </div>
                         <div className="w-full bg-gray-700 h-1.5 rounded-full">
                           <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: `${img.analysis.confidence * 100}%` }}></div>
@@ -2578,13 +2586,13 @@ const ImageAnalysis = ({ setView, capturedImages }) => {
                     ) : (
                       <div className="flex items-center gap-2 mb-3">
                         <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${img.analysis?.healthScore > 70 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                          Score: {img.analysis?.healthScore}%
+                          {t('analysisView.healthScore')}: {img.analysis?.healthScore}%
                         </span>
                       </div>
                     )}
 
                     <button className="text-emerald-400 text-sm font-bold flex items-center gap-1 group-hover:translate-x-1 transition">
-                      View Report <ChevronRight className="w-4 h-4" />
+                      {t('analysisView.viewDetails')} <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>

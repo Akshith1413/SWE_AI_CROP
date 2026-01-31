@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Volume2, VolumeX, Music, Settings, X } from 'lucide-react';
 import { audioService } from '../services/audioService';
+import { useTranslation } from '../hooks/useTranslation';
 
 /**
  * AudioSettingsPanel Component
  * Provides UI controls for audio feedback settings
  */
 const AudioSettingsPanel = ({ onClose }) => {
+    const { t } = useTranslation();
     const [soundEnabled, setSoundEnabled] = useState(audioService.isSoundEnabled());
     const [voiceEnabled, setVoiceEnabled] = useState(audioService.isVoiceEnabled());
 
@@ -26,13 +28,13 @@ const AudioSettingsPanel = ({ onClose }) => {
 
         // Speak confirmation if enabling
         if (newState) {
-            audioService.speak('Voice feedback enabled');
+            audioService.speak(t('audioSettings.voiceFeedbackEnabledSpeak'));
         }
     };
 
     const testSounds = () => {
         audioService.playSuccess();
-        setTimeout(() => audioService.speak('Audio test successful'), 500);
+        setTimeout(() => audioService.speak(t('audioSettings.audioTestSuccess')), 500);
     };
 
     return (
@@ -42,7 +44,7 @@ const AudioSettingsPanel = ({ onClose }) => {
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
                         <Settings className="w-6 h-6 text-blue-600" />
-                        <h2 className="text-2xl font-bold text-gray-800">Audio Settings</h2>
+                        <h2 className="text-2xl font-bold text-gray-800">{t('audioSettings.title')}</h2>
                     </div>
                     <button
                         onClick={onClose}
@@ -64,8 +66,8 @@ const AudioSettingsPanel = ({ onClose }) => {
                                     <Music className="w-5 h-5 text-gray-400 opacity-50" />
                                 )}
                                 <div>
-                                    <h3 className="font-bold text-gray-800">Sound Effects</h3>
-                                    <p className="text-xs text-gray-600">Short beeps for actions</p>
+                                    <h3 className="font-bold text-gray-800">{t('audioSettings.soundEffects')}</h3>
+                                    <p className="text-xs text-gray-600">{t('audioSettings.soundEffectsDesc')}</p>
                                 </div>
                             </div>
                             <button
@@ -80,7 +82,7 @@ const AudioSettingsPanel = ({ onClose }) => {
                             </button>
                         </div>
                         <p className="text-xs text-gray-500 italic">
-                            {soundEnabled ? 'Click sounds, beeps, and notifications enabled' : 'All sound effects are muted'}
+                            {soundEnabled ? t('audioSettings.soundEffectsEnabled') : t('audioSettings.soundEffectsMuted')}
                         </p>
                     </div>
 
@@ -94,8 +96,8 @@ const AudioSettingsPanel = ({ onClose }) => {
                                     <VolumeX className="w-5 h-5 text-gray-400" />
                                 )}
                                 <div>
-                                    <h3 className="font-bold text-gray-800">Voice Feedback</h3>
-                                    <p className="text-xs text-gray-600">Spoken confirmations</p>
+                                    <h3 className="font-bold text-gray-800">{t('audioSettings.voiceFeedback')}</h3>
+                                    <p className="text-xs text-gray-600">{t('audioSettings.voiceFeedbackDesc')}</p>
                                 </div>
                             </div>
                             <button
@@ -110,7 +112,7 @@ const AudioSettingsPanel = ({ onClose }) => {
                             </button>
                         </div>
                         <p className="text-xs text-gray-500 italic">
-                            {voiceEnabled ? 'Text-to-speech announcements enabled' : 'Voice announcements are off'}
+                            {voiceEnabled ? t('audioSettings.voiceFeedbackEnabled') : t('audioSettings.voiceFeedbackOff')}
                         </p>
                     </div>
 
@@ -124,14 +126,13 @@ const AudioSettingsPanel = ({ onClose }) => {
                             }`}
                     >
                         <Music className="w-5 h-5" />
-                        Test Audio
+                        {t('audioSettings.testAudio')}
                     </button>
 
                     {/* Info */}
                     <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3">
                         <p className="text-xs text-yellow-800">
-                            <strong>Note:</strong> Audio feedback helps confirm your actions with sounds and voice messages.
-                            Adjust these settings based on your preference and environment.
+                            <strong>{t('audioSettings.note')}</strong> {t('audioSettings.noteText')}
                         </p>
                     </div>
                 </div>
@@ -141,7 +142,7 @@ const AudioSettingsPanel = ({ onClose }) => {
                     onClick={onClose}
                     className="w-full mt-6 bg-gray-200 text-gray-800 py-3 rounded-xl font-bold hover:bg-gray-300 transition"
                 >
-                    Close
+                    {t('audioSettings.close')}
                 </button>
             </div>
         </div>
