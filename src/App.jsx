@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
 import "./App.css";
 
 import CropAidCapture from "./components/CropAidCapture";
@@ -6,11 +7,12 @@ import LoginScreen from "./components/LoginScreen";
 import LanguageScreen from "./components/LanguageScreen";
 import LandingPage from "./components/LandingPage";
 import ConsentScreen from "./components/ConsentScreen";
+import HomePage from "./components/HomePage";
 import { preferencesService } from "./services/preferencesService";
 import { audioService } from "./services/audioService";
 
-
-function App() {
+// Component for the main app flow (previously the default view)
+function MainAppFlow() {
   const [view, setView] = useState("loading"); // 'loading', 'landing', 'consent', 'login', 'main'
   const [language, setLanguage] = useState(null);
   const [userId, setUserId] = useState(null);
@@ -93,6 +95,15 @@ function App() {
     <div className="app-container">
       <CropAidCapture language={language} userId={userId} />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/home" element={<MainAppFlow />} />
+    </Routes>
   );
 }
 
