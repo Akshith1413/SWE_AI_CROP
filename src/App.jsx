@@ -30,9 +30,24 @@ function MainAppFlow() {
     setView("landing");
   }, []);
 
-  const handleGuestEntry = () => setView("consent");
+  const handleGuestEntry = () => {
+    // Determine if we need to set guest mode or just proceed
+    // The LandingPage 'Continue as Guest' should enable guest mode
+    import('./services/consentService').then(({ consentService }) => {
+      consentService.setGuestMode(true);
+    });
+    setView("consent");
+  };
+
   const handleAccountEntry = () => setView("login");
-  const handleConsent = () => setView("main");
+
+  const handleConsent = () => {
+    // Persist consent so CropDiagnosisApp doesn't show potential duplicate flows
+    import('./services/consentService').then(({ consentService }) => {
+      consentService.giveConsent();
+    });
+    setView("main");
+  };
 
   // Both login, skip, and consent lead to the main app flow
   const handleLoginCompletion = (user) => {
