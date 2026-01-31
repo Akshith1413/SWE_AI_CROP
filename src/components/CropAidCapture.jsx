@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import CropDiagnosisApp from './CropDiagnosisApp';
+import { useTranslation } from '../hooks/useTranslation';
 
 // ==================== TRANSLATIONS ====================
 const TRANSLATIONS = {
@@ -92,6 +92,66 @@ const TRANSLATIONS = {
     removeAll: 'அனைத்தையும் அகற்று',
     smartDiagnosis: 'ஸ்மார்ட் நோய் கண்டறிதல்',
     scanPlants: 'உடனடி பகுப்பாய்விற்கு தாவரங்களை ஸ்கேன் செய்யுங்கள்',
+  },
+  te: {
+    appName: 'క్రాప్‌డాక్',
+    appTagline: 'క్యాప్చర్ & విశ్లేషణ',
+    selectLanguage: 'భాషను ఎంచుకోండి',
+    capture: 'క్యాప్చర్',
+    history: 'చరిత్ర',
+    upload: 'అప్‌లోడ్',
+    online: 'ఆన్‌లైన్',
+    offline: 'ఆఫ్‌లైన్',
+    description: 'వివరణ',
+    voice: 'వాయిస్',
+    stop: 'ఆపు',
+    tapToRecord: 'రికార్డ్ చేయడానికి టాప్ చేయండి',
+    submitCapture: 'క్యాప్చర్ సమర్పించండి',
+    saveOffline: 'ఆఫ్‌లైన్‌లో సేవ్ చేయండి',
+    noCapturesYet: 'ఇంకా క్యాప్చర్‌లు లేవు',
+    descriptionPlaceholder: 'పంటలో మీరు గమనించినది వివరించండి...',
+    willSyncOnline: 'మీరు తిరిగి ఆన్‌లైన్‌లో వచ్చినప్పుడు స్వయంచాలకంగా సమకాలీకరించబడుతుంది',
+    captureWillBeSaved: 'మీ క్యాప్చర్ వెంటనే సేవ్ అవుతుంది',
+    pendingSync: 'క్యాప్చర్‌లు సమకాలీకరణ కోసం పెండింగ్‌లో ఉన్నాయి',
+    cropCapture: 'పంట క్యాప్చర్',
+    pending: 'పెండింగ్',
+    selectImages: 'చిత్రాలను ఎంచుకోండి',
+    dropImagesHere: 'చిత్రాలను ఇక్కడ డ్రాప్ చేయండి లేదా ఎంచుకోవడానికి క్లిక్ చేయండి',
+    uploadImages: 'చిత్రాలను అప్‌లోడ్ చేయండి',
+    imagesSelected: 'చిత్రాలు ఎంచుకోబడ్డాయి',
+    removeAll: 'అన్నీ తొలగించు',
+    smartDiagnosis: 'స్మార్ట్ డయాగ్నసిస్',
+    scanPlants: 'తక్షణ విశ్లేషణ కోసం మొక్కలను స్కాన్ చేయండి',
+  },
+  kn: {
+    appName: 'ಕ್ರಾಪ್‌ಡಾಕ್',
+    appTagline: 'ಕ್ಯಾಪ್ಚರ್ & ವಿಶ್ಲೇಷಣೆ',
+    selectLanguage: 'ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ',
+    capture: 'ಕ್ಯಾಪ್ಚರ್',
+    history: 'ಇತಿಹಾಸ',
+    upload: 'ಅಪ್‌ಲೋಡ್',
+    online: 'ಆನ್‌ಲೈನ್',
+    offline: 'ಆಫ್‌ಲೈನ್',
+    description: 'ವಿವರಣೆ',
+    voice: 'ಧ್ವನಿ',
+    stop: 'ನಿಲ್ಲಿಸು',
+    tapToRecord: 'ರೆಕಾರ್ಡ್ ಮಾಡಲು ಟ್ಯಾಪ್ ಮಾಡಿ',
+    submitCapture: 'ಕ್ಯಾಪ್ಚರ್ ಸಲ್ಲಿಸಿ',
+    saveOffline: 'ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿ ಉಳಿಸಿ',
+    noCapturesYet: 'ಇನ್ನೂ ಕ್ಯಾಪ್ಚರ್‌ಗಳಿಲ್ಲ',
+    descriptionPlaceholder: 'ಬೆಳೆಯಲ್ಲಿ ನೀವು ಗಮನಿಸಿದ್ದನ್ನು ವಿವರಿಸಿ...',
+    willSyncOnline: 'ನೀವು ಮತ್ತೆ ಆನ್‌ಲೈನ್‌ಗೆ ಬಂದಾಗ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಸಿಂಕ್ ಆಗುತ್ತದೆ',
+    captureWillBeSaved: 'ನಿಮ್ಮ ಕ್ಯಾಪ್ಚರ್ ತಕ್ಷಣ ಉಳಿಸಲಾಗುತ್ತದೆ',
+    pendingSync: 'ಕ್ಯಾಪ್ಚರ್‌ಗಳು ಸಿಂಕ್ ಆಗಲು ಬಾಕಿ ಇವೆ',
+    cropCapture: 'ಬೆಳೆ ಕ್ಯಾಪ್ಚರ್',
+    pending: 'ಬಾಕಿ',
+    selectImages: 'ಚಿತ್ರಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ',
+    dropImagesHere: 'ಚಿತ್ರಗಳನ್ನು ಇಲ್ಲಿ ಡ್ರಾಪ್ ಮಾಡಿ ಅಥವಾ ಆಯ್ಕೆ ಮಾಡಲು ಕ್ಲಿಕ್ ಮಾಡಿ',
+    uploadImages: 'ಚಿತ್ರಗಳನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ',
+    imagesSelected: 'ಚಿತ್ರಗಳು ಆಯ್ಕೆಯಾಗಿವೆ',
+    removeAll: 'ಎಲ್ಲವನ್ನೂ ತೆಗೆದುಹಾಕಿ',
+    smartDiagnosis: 'ಸ್ಮಾರ್ಟ್ ಡಯಾಗ್ನಸಿಸ್',
+    scanPlants: 'ತಕ್ಷಣ ವಿಶ್ಲೇಷಣೆಗಾಗಿ ಸಸ್ಯಗಳನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ',
   }
 };
 
@@ -99,7 +159,7 @@ const Icon = ({ name, size = 24, className = "" }) => {
   const icons = {
     leaf: <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Zm0 0c0-1.43.75-2.5 2-2.5 1.5 0 2.5 1 2.5 2.5M17.58 12.58C15.29 10.29 12.71 9 10 9" />,
     camera: <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />,
-    history: <><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>,
+    history: <><circle cx="12" cy="12" r="10" fill="black" /><polyline points="12 6 12 12 16 14" /></>,
     upload: <><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></>,
     image: <><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><circle cx="9" cy="9" r="2" /><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /></>,
     wifi: <path d="M5 13a10 10 0 0 1 14 0M8.5 16.5a5 5 0 0 1 7 0M12 20h.01" />,
@@ -119,7 +179,7 @@ const Icon = ({ name, size = 24, className = "" }) => {
     trash: <><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /></>,
     alert: <><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><path d="M12 9v4" /><path d="M12 17h.01" /></>,
     globe: <><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></>,
-    scan: <path d="M3 7V5a2 2 0 0 1 2-2h2m10 0h2a2 2 0 0 1 2 2v2m0 10v2a2 2 0 0 1-2 2h-2m-10 0H5a2 2 0 0 1-2-2v-2" />,
+    scan: <path d="M3 7V5a2 2 0 0 1 2-2h2m10 0h2a2 2 0 0 1 2 2v2m0 10v2a2 2 0 0 1-2 2h-2m-10 0H5a2 2 0 0 1-2-2v-2" stroke="black" />,
   };
 
   return (
@@ -251,7 +311,13 @@ const styles = `
     align-items: center;
     justify-content: center;
     border-radius: 1rem;
-    background: rgba(95, 183, 100, 0.1);
+    background: rgba(95, 183, 100, 0.15);
+    color: #2D7A3E;
+  }
+
+  .action-icon svg {
+    stroke: #2D7A3E;
+    stroke-width: 2;
   }
 
   .action-card.primary .action-icon {
@@ -952,10 +1018,7 @@ const NetworkStatus = ({ pendingCount, isSyncing, t }) => {
           <div className="brand-name">{t.appName}</div>
           <div className="brand-tagline">{t.appTagline}</div>
         </div>
-        <div className={`network-indicator ${isOnline ? 'online' : 'offline'}`}>
-          <Icon name={isOnline ? 'wifi' : 'wifiOff'} size={14} />
-          <span>{isOnline ? t.online : t.offline}</span>
-        </div>
+
       </div>
       {pendingCount > 0 && (
         <div style={{ marginTop: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8125rem', color: '#F57C00' }}>
@@ -1159,6 +1222,413 @@ const MediaGallery = ({ t }) => {
   );
 };
 
+// Camera Capture Component - For taking photos
+const CameraCapture = ({ onPendingCountChange, t, onComplete }) => {
+  const { isOnline } = useOnlineStatus();
+  const [capturedImage, setCapturedImage] = useState(null);
+  const [description, setDescription] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState({ visible: false, type: 'online', message: '' });
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  const canvasRef = useRef(null);
+
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+      setIsCameraActive(true);
+    } catch (err) {
+      console.error('Camera error:', err);
+    }
+  };
+
+  const capturePhoto = () => {
+    if (canvasRef.current && videoRef.current) {
+      const canvas = canvasRef.current;
+      const video = videoRef.current;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      const imageData = canvas.toDataURL('image/jpeg', 0.8);
+      setCapturedImage(imageData);
+      stopCamera();
+    }
+  };
+
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+    }
+    setIsCameraActive(false);
+  };
+
+  const retake = () => {
+    setCapturedImage(null);
+    startCamera();
+  };
+
+  const handleDescriptionChange = useCallback((text) => setDescription(text), []);
+
+  const handleSubmit = async () => {
+    if (!capturedImage) return;
+    setIsSubmitting(true);
+
+    // Convert base64 to blob
+    const response = await fetch(capturedImage);
+    const blob = await response.blob();
+
+    const id = `photo_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+
+    await savePendingMedia({
+      id,
+      blob,
+      blobUrl: capturedImage,
+      filename: `crop_photo_${Date.now()}.jpg`,
+      fileType: 'image',
+      mimeType: 'image/jpeg',
+      voiceTranscription: description || undefined,
+      createdAt: Date.now(),
+    });
+
+    setToast({
+      visible: true,
+      type: isOnline ? 'online' : 'offline',
+      message: isOnline ? 'Photo saved successfully!' : 'Saved offline - will sync when online'
+    });
+
+    const count = await getPendingCount();
+    onPendingCountChange?.(count);
+    setIsSubmitting(false);
+
+    setTimeout(() => onComplete?.(), 1500);
+  };
+
+  useEffect(() => {
+    return () => stopCamera();
+  }, []);
+
+  return (
+    <div>
+      <div className="card">
+        <div className="video-container">
+          {!capturedImage && !isCameraActive && (
+            <div className="video-placeholder" onClick={startCamera} style={{ cursor: 'pointer' }}>
+              <Icon name="camera" size={56} />
+              <span className="video-placeholder-text">Tap to start camera</span>
+            </div>
+          )}
+          {isCameraActive && !capturedImage && (
+            <>
+              <video ref={videoRef} className="video-preview" muted playsInline autoPlay />
+              <canvas ref={canvasRef} style={{ display: 'none' }} />
+            </>
+          )}
+          {capturedImage && (
+            <img src={capturedImage} alt="Captured" className="video-preview" />
+          )}
+        </div>
+
+        <div className="video-controls">
+          {isCameraActive && !capturedImage && (
+            <button onClick={capturePhoto} className="control-btn record-btn">
+              <Icon name="camera" size={24} />
+            </button>
+          )}
+          {capturedImage && (
+            <button onClick={retake} className="control-btn reset-btn">
+              <Icon name="rotateCcw" size={24} />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {capturedImage && (
+        <>
+          <div className="card">
+            <VoiceInput onTranscriptChange={handleDescriptionChange} placeholder={t.descriptionPlaceholder} t={t} />
+          </div>
+
+          <button onClick={handleSubmit} disabled={isSubmitting} className="submit-btn">
+            {isSubmitting ? (
+              <>
+                <Icon name="loader" size={20} className="animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Icon name="send" size={20} />
+                {isOnline ? 'Submit Photo' : 'Save Offline'}
+              </>
+            )}
+          </button>
+        </>
+      )}
+
+      <ConfirmationToast
+        isVisible={toast.visible}
+        type={toast.type}
+        message={toast.message}
+        onClose={() => setToast(prev => ({ ...prev, visible: false }))}
+      />
+    </div>
+  );
+};
+
+// Image Upload Component - For selecting from gallery
+const ImageUpload = ({ onPendingCountChange, t, onComplete }) => {
+  const { isOnline } = useOnlineStatus();
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [description, setDescription] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState({ visible: false, type: 'online', message: '' });
+  const fileInputRef = useRef(null);
+
+  const handleFileSelect = (e) => {
+    const files = Array.from(e.target.files);
+    const imageFiles = files.filter(f => f.type.startsWith('image/'));
+
+    const readers = imageFiles.map(file => {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve({ file, dataUrl: reader.result });
+        reader.readAsDataURL(file);
+      });
+    });
+
+    Promise.all(readers).then(results => {
+      setSelectedImages(results);
+    });
+  };
+
+  const removeImage = (index) => {
+    setSelectedImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleDescriptionChange = useCallback((text) => setDescription(text), []);
+
+  const handleSubmit = async () => {
+    if (selectedImages.length === 0) return;
+    setIsSubmitting(true);
+
+    for (const { file, dataUrl } of selectedImages) {
+      const id = `upload_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+
+      await savePendingMedia({
+        id,
+        blob: file,
+        blobUrl: dataUrl,
+        filename: file.name,
+        fileType: 'image',
+        mimeType: file.type,
+        voiceTranscription: description || undefined,
+        createdAt: Date.now(),
+      });
+    }
+
+    setToast({
+      visible: true,
+      type: isOnline ? 'online' : 'offline',
+      message: isOnline ? `${selectedImages.length} image(s) saved!` : 'Saved offline - will sync when online'
+    });
+
+    const count = await getPendingCount();
+    onPendingCountChange?.(count);
+    setIsSubmitting(false);
+
+    setTimeout(() => onComplete?.(), 1500);
+  };
+
+  return (
+    <div>
+      <div className="card">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleFileSelect}
+          style={{ display: 'none' }}
+        />
+
+        {selectedImages.length === 0 ? (
+          <div
+            className="video-container"
+            onClick={() => fileInputRef.current?.click()}
+            style={{ cursor: 'pointer' }}
+          >
+            <div className="video-placeholder">
+              <Icon name="upload" size={56} />
+              <span className="video-placeholder-text">Tap to select images</span>
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
+            {selectedImages.map((img, index) => (
+              <div key={index} style={{ position: 'relative', borderRadius: '0.75rem', overflow: 'hidden' }}>
+                <img src={img.dataUrl} alt={`Selected ${index + 1}`} style={{ width: '100%', height: '120px', objectFit: 'cover' }} />
+                <button
+                  onClick={() => removeImage(index)}
+                  style={{
+                    position: 'absolute',
+                    top: '0.5rem',
+                    right: '0.5rem',
+                    background: 'rgba(0,0,0,0.5)',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '24px',
+                    height: '24px',
+                    color: 'white',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <Icon name="x" size={14} />
+                </button>
+              </div>
+            ))}
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              style={{
+                height: '120px',
+                border: '2px dashed #E5E8E5',
+                borderRadius: '0.75rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                color: '#8B9B8E'
+              }}
+            >
+              <Icon name="upload" size={24} />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {selectedImages.length > 0 && (
+        <>
+          <div className="card">
+            <VoiceInput onTranscriptChange={handleDescriptionChange} placeholder={t.descriptionPlaceholder} t={t} />
+          </div>
+
+          <button onClick={handleSubmit} disabled={isSubmitting} className="submit-btn">
+            {isSubmitting ? (
+              <>
+                <Icon name="loader" size={20} className="animate-spin" />
+                Uploading...
+              </>
+            ) : (
+              <>
+                <Icon name="send" size={20} />
+                {isOnline ? `Upload ${selectedImages.length} Image(s)` : 'Save Offline'}
+              </>
+            )}
+          </button>
+        </>
+      )}
+
+      <ConfirmationToast
+        isVisible={toast.visible}
+        type={toast.type}
+        message={toast.message}
+        onClose={() => setToast(prev => ({ ...prev, visible: false }))}
+      />
+    </div>
+  );
+};
+
+// Voice Only Input Component - For describing symptoms via voice
+const VoiceOnlyInput = ({ onPendingCountChange, t, onComplete }) => {
+  const { isOnline } = useOnlineStatus();
+  const [description, setDescription] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState({ visible: false, type: 'online', message: '' });
+
+  const handleDescriptionChange = useCallback((text) => setDescription(text), []);
+
+  const handleSubmit = async () => {
+    if (!description.trim()) return;
+    setIsSubmitting(true);
+
+    const id = `voice_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+
+    await savePendingMedia({
+      id,
+      blob: null,
+      blobUrl: null,
+      filename: null,
+      fileType: 'voice',
+      mimeType: null,
+      voiceTranscription: description,
+      createdAt: Date.now(),
+    });
+
+    setToast({
+      visible: true,
+      type: isOnline ? 'online' : 'offline',
+      message: isOnline ? 'Description saved!' : 'Saved offline - will sync when online'
+    });
+
+    const count = await getPendingCount();
+    onPendingCountChange?.(count);
+    setIsSubmitting(false);
+
+    setTimeout(() => onComplete?.(), 1500);
+  };
+
+  return (
+    <div>
+      <div className="card">
+        <div style={{ textAlign: 'center', padding: '1rem 0', marginBottom: '1rem' }}>
+          <Icon name="mic" size={48} style={{ color: '#5FB764' }} />
+          <h3 style={{ marginTop: '0.5rem', color: '#2D3A2E' }}>Describe Your Plant</h3>
+          <p style={{ color: '#6B7B6E', fontSize: '0.875rem' }}>Use voice or type to describe symptoms</p>
+        </div>
+        <VoiceInput
+          onTranscriptChange={handleDescriptionChange}
+          placeholder="Describe what you observe in the plant... (e.g., Yellow spots on leaves, wilting stems)"
+          t={t}
+        />
+      </div>
+
+      <button onClick={handleSubmit} disabled={!description.trim() || isSubmitting} className="submit-btn">
+        {isSubmitting ? (
+          <>
+            <Icon name="loader" size={20} className="animate-spin" />
+            Saving...
+          </>
+        ) : (
+          <>
+            <Icon name="send" size={20} />
+            {isOnline ? 'Submit Description' : 'Save Offline'}
+          </>
+        )}
+      </button>
+
+      <p className="hint">
+        {isOnline ? 'Your description will be analyzed for plant issues' : 'Will sync automatically when online'}
+      </p>
+
+      <ConfirmationToast
+        isVisible={toast.visible}
+        type={toast.type}
+        message={toast.message}
+        onClose={() => setToast(prev => ({ ...prev, visible: false }))}
+      />
+    </div>
+  );
+};
+
 const CaptureForm = ({ onPendingCountChange, t }) => {
   const { isOnline } = useOnlineStatus();
   const [videoBlob, setVideoBlob] = useState(null);
@@ -1266,10 +1736,12 @@ const CaptureForm = ({ onPendingCountChange, t }) => {
 };
 
 // ==================== MAIN APP ====================
-function CropAidCapture({ language = 'en' }) {
+function CropAidCapture({ userId }) {
+  const { ts } = useTranslation();
+  const t = ts('cropCapture'); // Get all cropCapture translations as an object
+  const commonT = ts('common'); // Get common translations
   const [pendingCount, setPendingCount] = useState(0);
   const [view, setView] = useState('home'); // 'home', 'capture', 'history'
-  const t = TRANSLATIONS[language] || TRANSLATIONS.en;
 
   useEffect(() => {
     const init = async () => {
@@ -1289,28 +1761,49 @@ function CropAidCapture({ language = 'en' }) {
         {view === 'home' && (
           <div className="home-container">
             <div className="action-grid">
-              <div className="action-card primary" onClick={() => setView('capture')}>
+              {/* Smart Camera - AI-guided photo capture */}
+              <div className="action-card" onClick={() => setView('camera')}>
                 <div className="action-icon">
-                  <Icon name="video" size={32} />
+                  <Icon name="camera" size={28} />
                 </div>
-                <div className="action-title">{t.capture}</div>
-                <div className="action-subtitle">Record video with voice description</div>
+                <div className="action-title">{t.capture || 'Smart Camera'}</div>
+                <div className="action-subtitle">AI-guided photo capture</div>
               </div>
 
-              <div className="action-card" onClick={() => setView('history')}>
+              {/* Upload from gallery */}
+              <div className="action-card" onClick={() => setView('upload')}>
+                <div className="action-icon">
+                  <Icon name="upload" size={28} />
+                </div>
+                <div className="action-title">{t.upload || 'Upload'}</div>
+                <div className="action-subtitle">Select from gallery</div>
+              </div>
+
+              {/* Record Video */}
+              <div className="action-card" onClick={() => setView('capture')}>
+                <div className="action-icon">
+                  <Icon name="video" size={28} />
+                </div>
+                <div className="action-title">{t.recordVideo || 'Record Video'}</div>
+                <div className="action-subtitle">Show plant condition</div>
+              </div>
+
+              {/* Voice Input */}
+              <div className="action-card" onClick={() => setView('voice')}>
+                <div className="action-icon">
+                  <Icon name="mic" size={28} />
+                </div>
+                <div className="action-title">{t.voice || 'Voice Input'}</div>
+                <div className="action-subtitle">Describe symptoms</div>
+              </div>
+
+              {/* History - spans full width */}
+              <div className="action-card primary" onClick={() => setView('history')}>
                 <div className="action-icon">
                   <Icon name="history" size={28} />
                 </div>
-                <div className="action-title">{t.history}</div>
-                <div className="action-subtitle">View saved captures</div>
-              </div>
-
-              <div className="action-card" onClick={() => setView('diagnosis')}>
-                <div className="action-icon" style={{ background: 'rgba(59, 130, 246, 0.1)' }}>
-                  <Icon name="scan" size={28} style={{ color: '#3B82F6' }} />
-                </div>
-                <div className="action-title">{t.smartDiagnosis || 'Smart Diagnosis'}</div>
-                <div className="action-subtitle">{t.scanPlants || 'Scan plants for analysis'}</div>
+                <div className="action-title">{t.history || 'History'}</div>
+                <div className="action-subtitle">{t.viewSavedCaptures || 'View saved captures'}</div>
               </div>
             </div>
           </div>
@@ -1332,7 +1825,7 @@ function CropAidCapture({ language = 'en' }) {
                 gap: '0.5rem'
               }}
             >
-              ← Back to Home
+              {t.backToHome || '← Back to Home'}
             </button>
             <CaptureForm onPendingCountChange={setPendingCount} t={t} onComplete={() => setView('home')} />
           </div>
@@ -1354,14 +1847,76 @@ function CropAidCapture({ language = 'en' }) {
                 gap: '0.5rem'
               }}
             >
-              ← Back to Home
+              {t.backToHome || '← Back to Home'}
             </button>
             <div className="card"><MediaGallery t={t} /></div>
           </div>
         )}
 
-        {view === 'diagnosis' && (
-          <CropDiagnosisApp onBack={() => setView('home')} />
+        {view === 'camera' && (
+          <div className="tabs-container">
+            <button
+              onClick={() => setView('home')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#5FB764',
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}
+            >
+              ← Back to Home
+            </button>
+            <CameraCapture onPendingCountChange={setPendingCount} t={t} onComplete={() => setView('home')} />
+          </div>
+        )}
+
+        {view === 'upload' && (
+          <div className="tabs-container">
+            <button
+              onClick={() => setView('home')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#5FB764',
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}
+            >
+              ← Back to Home
+            </button>
+            <ImageUpload onPendingCountChange={setPendingCount} t={t} onComplete={() => setView('home')} />
+          </div>
+        )}
+
+        {view === 'voice' && (
+          <div className="tabs-container">
+            <button
+              onClick={() => setView('home')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#5FB764',
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}
+            >
+              ← Back to Home
+            </button>
+            <VoiceOnlyInput onPendingCountChange={setPendingCount} t={t} onComplete={() => setView('home')} />
+          </div>
         )}
       </div>
     </>

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import "./LoginScreen.css";
 
 import { speak } from "../utils/voice";
+import { useTranslation } from "../hooks/useTranslation";
 
 import { auth } from "../firebase";
 import {
@@ -10,6 +11,7 @@ import {
 } from "firebase/auth";
 
 function LoginScreen({ onLogin, onSkip }) {
+  const { t } = useTranslation();
 
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
@@ -25,7 +27,7 @@ function LoginScreen({ onLogin, onSkip }) {
   useEffect(() => {
 
     const enableVoice = () => {
-      speak("Welcome to CropAid. Please enter your mobile number.");
+      speak(t('loginScreen.brandDesc'));
       setVoiceEnabled(true);
 
       document.removeEventListener("click", enableVoice);
@@ -37,7 +39,7 @@ function LoginScreen({ onLogin, onSkip }) {
       document.removeEventListener("click", enableVoice);
     };
 
-  }, []);
+  }, [t]);
 
 
   // Send OTP
@@ -45,10 +47,10 @@ function LoginScreen({ onLogin, onSkip }) {
 
     if (phone.length !== 10) {
       if (voiceEnabled) {
-        speak("Please enter a valid ten digit number.");
+        speak(t('loginScreen.invalidPhone'));
       }
 
-      alert("Please enter valid 10-digit number");
+      alert(t('loginScreen.invalidPhone'));
       return;
     }
 
@@ -77,17 +79,17 @@ function LoginScreen({ onLogin, onSkip }) {
       setStep("otp");
 
       if (voiceEnabled) {
-        speak("OTP has been sent. Please enter the code.");
+        speak(t('loginScreen.otpSent'));
       }
 
     } catch (err) {
       console.error("OTP Error:", err);
 
       if (voiceEnabled) {
-        speak("Failed to send OTP. Please try again.");
+        speak(t('loginScreen.otpFailed'));
       }
 
-      alert("Failed to send OTP. Try again later.");
+      alert(t('loginScreen.otpFailed'));
     }
 
     setLoading(false);
@@ -100,10 +102,10 @@ function LoginScreen({ onLogin, onSkip }) {
     if (!confirmation) {
 
       if (voiceEnabled) {
-        speak("Please request OTP first.");
+        speak(t('loginScreen.requestOtpFirst'));
       }
 
-      alert("Please request OTP first");
+      alert(t('loginScreen.requestOtpFirst'));
       return;
     }
 
@@ -113,10 +115,10 @@ function LoginScreen({ onLogin, onSkip }) {
       await confirmation.confirm(otp);
 
       if (voiceEnabled) {
-        speak("Login successful. Welcome to CropAid.");
+        speak(t('loginScreen.loginSuccess'));
       }
 
-      alert("Login successful!");
+      alert(t('loginScreen.loginSuccess'));
 
       onLogin();
 
@@ -124,10 +126,10 @@ function LoginScreen({ onLogin, onSkip }) {
       console.error("Verify Error:", err);
 
       if (voiceEnabled) {
-        speak("Incorrect OTP. Please try again.");
+        speak(t('loginScreen.incorrectOtp'));
       }
 
-      alert("Incorrect OTP");
+      alert(t('loginScreen.incorrectOtp'));
     }
 
     setLoading(false);
@@ -139,12 +141,12 @@ function LoginScreen({ onLogin, onSkip }) {
 
       {/* LEFT SIDE */}
       <div className="login-left">
-        <h1>CropAid 🌾</h1>
+        <h1>{t('loginScreen.brandName')}</h1>
 
         <p>
-          Smart Crop Diagnosis & Farmer Support Platform.
+          {t('loginScreen.brandDesc')}
           <br /><br />
-          Get expert help, insights, and grow better.
+          {t('loginScreen.brandSubDesc')}
         </p>
       </div>
 
@@ -154,7 +156,7 @@ function LoginScreen({ onLogin, onSkip }) {
 
         <div className="login-card">
 
-          <h2>Farmer Login</h2>
+          <h2>{t('loginScreen.title')}</h2>
 
 
           {/* PHONE INPUT */}
@@ -162,7 +164,7 @@ function LoginScreen({ onLogin, onSkip }) {
             <>
               <input
                 type="tel"
-                placeholder="Enter Mobile Number"
+                placeholder={t('loginScreen.enterMobile')}
                 value={phone}
                 maxLength="10"
                 onChange={(e) =>
@@ -174,7 +176,7 @@ function LoginScreen({ onLogin, onSkip }) {
                 onClick={sendOtp}
                 disabled={loading}
               >
-                {loading ? "Sending..." : "Send OTP"}
+                {loading ? t('loginScreen.sending') : t('loginScreen.sendOtp')}
               </button>
             </>
           )}
@@ -185,7 +187,7 @@ function LoginScreen({ onLogin, onSkip }) {
             <>
               <input
                 type="number"
-                placeholder="Enter OTP"
+                placeholder={t('loginScreen.enterOtp')}
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
               />
@@ -194,7 +196,7 @@ function LoginScreen({ onLogin, onSkip }) {
                 onClick={verifyOtp}
                 disabled={loading}
               >
-                {loading ? "Verifying..." : "Verify & Login"}
+                {loading ? t('loginScreen.verifying') : t('loginScreen.verifyLogin')}
               </button>
             </>
           )}
@@ -202,7 +204,7 @@ function LoginScreen({ onLogin, onSkip }) {
 
           {/* SKIP */}
           <p className="skip" onClick={onSkip}>
-            Skip Login →
+            {t('loginScreen.skipLogin')}
           </p>
 
 

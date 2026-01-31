@@ -1,9 +1,11 @@
-import React from 'react';
 import { Leaf, User } from 'lucide-react';
+import { useTranslation } from '../hooks/useTranslation';
 
 const LandingPage = ({ onGuest, onLogin }) => {
+    const { t } = useTranslation();
+
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[#0f5132] to-[#2d6a4f] flex flex-col items-center justify-center p-6 text-center animate-fade-in text-white">
+        <div className="min-h-screen bg-gradient-to-br from-[#0f5132] to-[#2d6a4f] text-white flex flex-col items-center justify-center px-6 relative overflow-hidden">
 
             {/* Hero Visual */}
             <div className="mb-8 p-6 bg-white/10 backdrop-blur-md rounded-full shadow-lg transform hover:scale-105 transition duration-500 border border-white/20">
@@ -11,35 +13,34 @@ const LandingPage = ({ onGuest, onLogin }) => {
             </div>
 
             {/* Hero Text */}
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight drop-shadow-sm">
-                AI Plant Doctor
+            <h1 className="text-4xl md:text-5xl font-bold text-center mb-4">
+                {t('landingPage.title')}
             </h1>
-
-            <p className="text-lg text-nature-100 max-w-md mb-12 font-medium">
-                Scan plants, detect diseases, and get instant care recommendations.
+            <p className="text-lg opacity-90 text-center max-w-xs md:max-w-md mb-10">
+                {t('landingPage.subtitle')}
             </p>
 
-            {/* Actions */}
-            <div className="w-full max-w-xs space-y-4">
+            {/* Buttons */}
+            <div className="flex flex-col gap-4 w-full max-w-xs">
                 <button
                     onClick={onGuest}
-                    className="w-full bg-white text-[#0f5132] font-bold py-4 px-6 rounded-2xl shadow-lg hover:bg-nature-50 hover:shadow-xl transition-all flex items-center justify-center gap-3 active:scale-95 border-2 border-transparent"
+                    className="flex items-center justify-center gap-3 w-full py-4 bg-white text-[#0f5132] font-semibold rounded-full shadow-lg hover:scale-105 transition"
                 >
-                    <Leaf className="w-5 h-5" />
-                    <span>Continue as Guest</span>
+                    <Leaf size={20} />
+                    {t('landingPage.continueAsGuest')}
                 </button>
-
                 <button
                     onClick={onLogin}
-                    className="w-full bg-transparent text-white font-bold py-3 px-6 rounded-2xl border-2 border-white/40 hover:border-white hover:bg-white/10 transition-all flex items-center justify-center gap-3 active:scale-95"
+                    className="flex items-center justify-center gap-3 w-full py-4 bg-transparent border-2 border-white/40 rounded-full hover:bg-white/10 transition"
                 >
-                    <User className="w-5 h-5" />
-                    <span>Create Account</span>
+                    <User size={20} />
+                    {t('landingPage.createAccount')}
                 </button>
             </div>
 
-            <p className="mt-8 text-xs text-nature-200 opacity-80">
-                Empowering farmers with smart technology
+            {/* Footer Text */}
+            <p className="text-xs opacity-60 mt-8">
+                {t('landingPage.footer')}
             </p>
         </div>
     );

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
 
+import { LanguageProvider, useLanguage } from "./context/LanguageContext";
 import CropAidCapture from "./components/CropAidCapture";
 import LoginScreen from "./components/LoginScreen";
 import LanguageScreen from "./components/LanguageScreen";
@@ -13,18 +14,13 @@ import { audioService } from "./services/audioService";
 
 // Component for the main app flow (previously the default view)
 function MainAppFlow() {
+  const { language, rawLanguage, setLanguage } = useLanguage();
   const [view, setView] = useState("loading"); // 'loading', 'landing', 'consent', 'login', 'main'
-  const [language, setLanguage] = useState(null);
   const [userId, setUserId] = useState(null);
 
   // Load saved preferences on app launch
   useEffect(() => {
-    const savedLanguage = preferencesService.getLanguage();
     const savedUserId = preferencesService.getUserId();
-
-    if (savedLanguage) {
-      setLanguage(savedLanguage);
-    }
 
     if (savedUserId) {
       setUserId(savedUserId);
@@ -45,6 +41,15 @@ function MainAppFlow() {
       preferencesService.syncWithServer(user.id);
     }
     setView("main");
+  };
+
+  // Handle language selection from the LanguageScreen
+  const handleLanguageSelect = (lang) => {
+    setLanguage(lang);
+
+    // Audio confirmation
+    audioService.confirmAction('success');
+    audioService.speakLocalized('language_selected', lang);
   };
 
   if (view === "loading") {
@@ -75,35 +80,28 @@ function MainAppFlow() {
     );
   }
 
-  // Main Application Flow
-  if (!language) {
+  // Main Application Flow - Show language selection if not selected
+  if (!rawLanguage) {
     return (
-      <LanguageScreen
-        onSelect={(lang) => {
-          setLanguage(lang);
-          preferencesService.setLanguage(lang);
-
-          // Audio confirmation
-          audioService.confirmAction('success');
-          audioService.speakLocalized('language_selected', lang);
-        }}
-      />
+      <LanguageScreen onSelect={handleLanguageSelect} />
     );
   }
 
   return (
     <div className="app-container">
-      <CropAidCapture language={language} userId={userId} />
+      <CropAidCapture userId={userId} />
     </div>
   );
 }
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/home" element={<MainAppFlow />} />
-    </Routes>
+    <LanguageProvider>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/home" element={<MainAppFlow />} />
+      </Routes>
+    </LanguageProvider>
   );
 }
 
