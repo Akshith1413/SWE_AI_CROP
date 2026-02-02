@@ -23,6 +23,7 @@ import LandingPage from './LandingPage';
 import ConsentScreen from './ConsentScreen';
 import UserProfile from './UserProfile';
 import AudioSettingsPanel from './AudioSettingsPanel';
+import SettingsPanel from './SettingsPanel';
 import { cropService } from '../services/cropService';
 import { consentService } from '../services/consentService';
 import { audioService } from '../services/audioService';
@@ -163,6 +164,7 @@ const CropDiagnosisApp = ({ onBack }) => {
 
 const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceInfo, onBack }) => {
   const [showAudioSettings, setShowAudioSettings] = React.useState(false);
+  const [showSettings, setShowSettings] = React.useState(false);
   const { t } = useTranslation();
 
   // Dynamic greeting based on time of day
@@ -203,6 +205,15 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
             className="p-3 bg-white rounded-full text-gray-600 hover:bg-gray-100 transition active:scale-95 shadow-md"
           >
             <Volume2 className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => {
+              audioService.playClick();
+              setShowSettings(true);
+            }}
+            className="p-3 bg-white rounded-full text-gray-600 hover:bg-gray-100 transition active:scale-95 shadow-md"
+          >
+            <Settings className="w-5 h-5" />
           </button>
           <button
             onClick={() => {
@@ -365,6 +376,9 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
       {/* Audio Settings Modal */}
       {showAudioSettings && (
         <AudioSettingsPanel onClose={() => setShowAudioSettings(false)} />
+      )}
+      {showSettings && (
+        <SettingsPanel onClose={() => setShowSettings(false)} />
       )}
     </div>
   );

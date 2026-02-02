@@ -314,5 +314,9 @@
         "qualityWarningsDesc": "Alerts for blur, darkness, and other issues",
         "startSmartCamera": "Start Smart Camera",
         "getReady": "Get ready..."
+    },
+    "settings": {
+        "title": "Settings",
+        "language": "Language"
     }
 }
