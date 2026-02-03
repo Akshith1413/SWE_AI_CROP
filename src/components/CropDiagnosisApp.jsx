@@ -19,6 +19,8 @@ import {
   BellRing, BatteryCharging, Layers, Activity,
   History, AlertOctagon, ArrowRight
 } from 'lucide-react';
+import { Capacitor } from '@capacitor/core';
+import { Camera as CapacitorCamera, CameraResultType } from '@capacitor/camera';
 import LandingPage from './LandingPage';
 import ConsentScreen from './ConsentScreen';
 import UserProfile from './UserProfile';
@@ -878,6 +880,50 @@ const EnhancedCompleteCameraCapture = ({
     }, 1000);
   };
 
+  const takeNativePhoto = async () => {
+    try {
+      const image = await CapacitorCamera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.DataUrl
+      });
+
+      const photoData = image.dataUrl;
+      setCapturedPhoto(photoData);
+
+      // Stop any existing stream
+      stopCamera();
+
+      if (voiceInstructions) {
+        audioService.speak("Analyzing crop health. Please wait...", { rate: 1.0 });
+      }
+
+      // Perform AI Analysis
+      try {
+        const aiResult = await aiService.analyze(photoData, cropType || 'general');
+        setAnalysisResult(aiResult);
+        setShowConfirmation(true);
+        setTimeout(() => setShowConfirmation(false), 3000);
+
+        if (voiceInstructions) {
+          const severe = aiResult.severity === 'severe';
+          const msg = `Analysis complete. ${aiResult.diagnosis} detected with ${aiResult.confidence * 100} percent confidence. ${severe ? 'Immediate action required.' : aiResult.explanation}`;
+          audioService.speak(msg);
+        }
+
+        setTimeout(() => {
+          setCurrentStep('preparation');
+        }, 3000);
+
+      } catch (error) {
+        console.error("AI Analysis failed", error);
+        audioService.speak("Analysis failed. Please try again.");
+      }
+    } catch (e) {
+      console.log('User cancelled or error', e);
+    }
+  };
+
   const performCapture = async () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -1587,6 +1633,17 @@ const EnhancedCompleteCameraCapture = ({
                 >
                   <RotateCcw className="w-6 h-6" />
                 </button>
+
+                {/* Native Camera Button */}
+                {Capacitor.isNativePlatform() && (
+                  <button
+                    onClick={takeNativePhoto}
+                    className="p-4 rounded-full glass-card text-white hover:bg-white/10 transition"
+                    title="Use Native Camera"
+                  >
+                    <Smartphone className="w-6 h-6" />
+                  </button>
+                )}
               </div>
 
               <p className="text-xs text-gray-500 font-medium mt-2">
