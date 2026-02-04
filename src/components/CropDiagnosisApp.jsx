@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Camera, Upload, Video, Mic, X, Check, AlertCircle, RefreshCw,
   Image as ImageIcon, Wifi, WifiOff, Info, Sun, Moon, Focus,
@@ -306,6 +307,21 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
           </div>
           <span className="font-semibold text-gray-700 text-base">{t('homeView.history')}</span>
         </button>
+
+        {/* LLM Advice Demo */}
+        <button
+          onClick={() => {
+            audioService.playClick();
+            // Navigate to LLM demo with sample data
+            window.location.href = '/llm-advice?demo=true';
+          }}
+          className="bg-white p-5 rounded-2xl flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all shadow-md group border border-gray-100"
+        >
+          <div className="p-4 bg-gradient-to-br from-emerald-100 to-teal-50 rounded-2xl group-hover:from-emerald-200 group-hover:to-teal-100 transition">
+            <Sparkles className="w-8 h-8 text-emerald-600" />
+          </div>
+          <span className="font-semibold text-gray-700 text-base">LLM Advice</span>
+        </button>
       </div>
 
       {/* Disease Alert */}
@@ -394,6 +410,7 @@ const EnhancedCompleteCameraCapture = ({
   deviceInfo
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const detectionCanvasRef = useRef(null);
@@ -2006,30 +2023,52 @@ const EnhancedCompleteCameraCapture = ({
                 </ul>
               </div>
 
-              <div className="flex gap-4">
-                <button
-                  onClick={() => setView('home')}
-                  className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-xl font-bold hover:bg-gray-300 transition"
-                >
-                  Back to Home
-                </button>
+              <div className="flex flex-col gap-3">
+                {/* LLM Advice Button - Full Width & Primary */}
                 <button
                   onClick={() => {
-                    // Speak analysis results
-                    if (voiceInstructions) {
-                      const message = `Analysis complete. Health score is ${analysisResult.healthScore} percent. ` +
-                        `Healthy area is ${analysisResult.greenPercentage} percent. ` +
-                        `Browning is ${analysisResult.brownPercentage} percent. ` +
-                        `Photo quality was ${liveQuality.score} percent. ` +
-                        `Recommended actions: ${analysisResult.recommendations.join('. ')}`;
-                      speakGuidance(message);
-                    }
+                    // Navigate to LLM advice page with actual disease data
+                    navigate('/llm-advice', {
+                      state: {
+                        cropType: cropType || 'Unknown Crop',
+                        disease: analysisResult.issues.length > 0 ? analysisResult.issues.join(', ') : 'Leaf Disease',
+                        severity: analysisResult.healthScore >= 70 ? 'low' : analysisResult.healthScore >= 50 ? 'medium' : 'high',
+                        confidence: analysisResult.healthScore / 100
+                      }
+                    });
                   }}
-                  className="flex-1 bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 rounded-xl font-bold hover:shadow-lg transition flex items-center justify-center gap-2"
+                  className="w-full bg-gradient-to-r from-emerald-500 to-green-500 text-white py-4 px-6 rounded-xl font-bold hover:shadow-xl transition flex items-center justify-center gap-2"
                 >
-                  <Volume2 className="w-5 h-5" />
-                  Hear Analysis
+                  <Sparkles className="w-5 h-5" />
+                  Get Expert LLM Advice
                 </button>
+
+                {/* Secondary Buttons */}
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setView('home')}
+                    className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-xl font-bold hover:bg-gray-300 transition"
+                  >
+                    Back to Home
+                  </button>
+                  <button
+                    onClick={() => {
+                      // Speak analysis results
+                      if (voiceInstructions) {
+                        const message = `Analysis complete. Health score is ${analysisResult.healthScore} percent. ` +
+                          `Healthy area is ${analysisResult.greenPercentage} percent. ` +
+                          `Browning is ${analysisResult.brownPercentage} percent. ` +
+                          `Photo quality was ${liveQuality.score} percent. ` +
+                          `Recommended actions: ${analysisResult.recommendations.join('. ')}`;
+                        speakGuidance(message);
+                      }
+                    }}
+                    className="flex-1 bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 rounded-xl font-bold hover:shadow-lg transition flex items-center justify-center gap-2"
+                  >
+                    <Volume2 className="w-5 h-5" />
+                    Hear Analysis
+                  </button>
+                </div>
               </div>
             </div>
           </div>
