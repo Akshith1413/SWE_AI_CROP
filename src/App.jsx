@@ -9,6 +9,7 @@ import LanguageScreen from "./components/LanguageScreen";
 import LandingPage from "./components/LandingPage";
 import ConsentScreen from "./components/ConsentScreen";
 import HomePage from "./components/HomePage";
+import LLMAdvicePage from "./pages/LLMAdvicePage";
 import { preferencesService } from "./services/preferencesService";
 import { audioService } from "./services/audioService";
 
@@ -115,6 +116,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<MainAppFlow />} />
+        <Route path="/llm-advice" element={<LLMAdvicePage />} />
       </Routes>
     </LanguageProvider>
   );

@@ -2,567 +2,567 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Landing = () => {
-    const navigate = useNavigate();
-    const canvasRef = useRef(null);
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-    const [scrollProgress, setScrollProgress] = useState(0);
+  const navigate = useNavigate();
+  const canvasRef = useRef(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [scrollProgress, setScrollProgress] = useState(0);
 
-    useEffect(() => {
-        const handleScroll = () => {
-            const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
-            const currentProgress = (window.pageYOffset / totalScroll) * 100;
-            setScrollProgress(currentProgress);
-        };
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const currentProgress = (window.pageYOffset / totalScroll) * 100;
+      setScrollProgress(currentProgress);
+    };
 
-        const handleMouseMove = (e) => {
-            setMousePosition({
-                x: (e.clientX / window.innerWidth) * 2 - 1,
-                y: (e.clientY / window.innerHeight) * 2 - 1,
-            });
-        };
+    const handleMouseMove = (e) => {
+      setMousePosition({
+        x: (e.clientX / window.innerWidth) * 2 - 1,
+        y: (e.clientY / window.innerHeight) * 2 - 1,
+      });
+    };
 
-        window.addEventListener('scroll', handleScroll);
-        window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('mousemove', handleMouseMove);
 
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-            window.removeEventListener('mousemove', handleMouseMove);
-        };
-    }, []);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
 
-    // 3D Particle Animation
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
+  // 3D Particle Animation
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-        const particles = [];
-        const particleCount = 80;
+    const particles = [];
+    const particleCount = 80;
 
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.z = Math.random() * 1000;
-                this.vx = (Math.random() - 0.5) * 0.5;
-                this.vy = (Math.random() - 0.5) * 0.5;
-                this.vz = (Math.random() - 0.5) * 2;
-                this.radius = Math.random() * 2 + 1;
-                this.opacity = Math.random() * 0.5 + 0.3;
-            }
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.z = Math.random() * 1000;
+        this.vx = (Math.random() - 0.5) * 0.5;
+        this.vy = (Math.random() - 0.5) * 0.5;
+        this.vz = (Math.random() - 0.5) * 2;
+        this.radius = Math.random() * 2 + 1;
+        this.opacity = Math.random() * 0.5 + 0.3;
+      }
 
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                this.z += this.vz;
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.z += this.vz;
 
-                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-                if (this.z < 0 || this.z > 1000) this.vz *= -1;
-            }
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+        if (this.z < 0 || this.z > 1000) this.vz *= -1;
+      }
 
-            draw() {
-                const scale = 1000 / (1000 + this.z);
-                const x2d = this.x * scale + canvas.width / 2 * (1 - scale);
-                const y2d = this.y * scale + canvas.height / 2 * (1 - scale);
-                const r = this.radius * scale;
+      draw() {
+        const scale = 1000 / (1000 + this.z);
+        const x2d = this.x * scale + canvas.width / 2 * (1 - scale);
+        const y2d = this.y * scale + canvas.height / 2 * (1 - scale);
+        const r = this.radius * scale;
 
-                ctx.beginPath();
-                ctx.arc(x2d, y2d, r, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(74, 222, 128, ${this.opacity * scale})`;
-                ctx.fill();
-            }
-        }
+        ctx.beginPath();
+        ctx.arc(x2d, y2d, r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(74, 222, 128, ${this.opacity * scale})`;
+        ctx.fill();
+      }
+    }
 
-        for (let i = 0; i < particleCount; i++) {
-            particles.push(new Particle());
-        }
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
 
-        function animate() {
-            ctx.fillStyle = 'rgba(5, 10, 5, 0.1)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+    function animate() {
+      ctx.fillStyle = 'rgba(5, 10, 5, 0.1)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            particles.forEach((particle) => {
-                particle.update();
-                particle.draw();
-            });
+      particles.forEach((particle) => {
+        particle.update();
+        particle.draw();
+      });
 
-            requestAnimationFrame(animate);
-        }
+      requestAnimationFrame(animate);
+    }
 
-        animate();
+    animate();
 
-        const handleResize = () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        };
+    const handleResize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
 
-        window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize);
 
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
-    const features = [
-        {
-            icon: '🎯',
-            title: 'AI-Powered Precision',
-            description: 'Advanced computer vision analyzes crop images with 95%+ accuracy, detecting diseases before visible to human eye'
-        },
-        {
-            icon: '🌍',
-            title: 'Native Language Support',
-            description: 'Voice-first interface in 15+ languages with icon-based workflows for low-literacy farmers'
-        },
-        {
-            icon: '📡',
-            title: 'Offline-First Design',
-            description: 'Core functionality works without internet - critical for rural areas with poor connectivity'
-        },
-        {
-            icon: '🔒',
-            title: 'Privacy-Preserving AI',
-            description: 'Federated learning protects farmer data while continuously improving diagnostic models'
-        },
-        {
-            icon: '💊',
-            title: 'Complete Treatment Plans',
-            description: 'Step-by-step organic & chemical remediation with dosage, safety warnings, and prevention tips'
-        },
-        {
-            icon: '🌾',
-            title: 'Regional Intelligence',
-            description: 'Context-aware recommendations based on local climate, soil, and agronomic practices'
-        }
-    ];
+  const features = [
+    {
+      icon: '🎯',
+      title: 'AI-Powered Precision',
+      description: 'Advanced computer vision analyzes crop images with 95%+ accuracy, detecting diseases before visible to human eye'
+    },
+    {
+      icon: '🌍',
+      title: 'Native Language Support',
+      description: 'Voice-first interface in 15+ languages with icon-based workflows for low-literacy farmers'
+    },
+    {
+      icon: '📡',
+      title: 'Offline-First Design',
+      description: 'Core functionality works without internet - critical for rural areas with poor connectivity'
+    },
+    {
+      icon: '🔒',
+      title: 'Privacy-Preserving AI',
+      description: 'Federated learning protects farmer data while continuously improving diagnostic models'
+    },
+    {
+      icon: '💊',
+      title: 'Complete Treatment Plans',
+      description: 'Step-by-step organic & chemical remediation with dosage, safety warnings, and prevention tips'
+    },
+    {
+      icon: '🌾',
+      title: 'Regional Intelligence',
+      description: 'Context-aware recommendations based on local climate, soil, and agronomic practices'
+    }
+  ];
 
-    const techStack = [
-        { name: 'React.js', color: '#61DAFB' },
-        { name: 'Node.js', color: '#339933' },
-        { name: 'MongoDB', color: '#47A248' },
-        { name: 'Express.js', color: '#000000' },
-        { name: 'Python ML', color: '#3776AB' },
-        { name: 'TensorFlow', color: '#FF6F00' }
-    ];
+  const techStack = [
+    { name: 'React.js', color: '#61DAFB' },
+    { name: 'Node.js', color: '#339933' },
+    { name: 'MongoDB', color: '#47A248' },
+    { name: 'Express.js', color: '#000000' },
+    { name: 'Python ML', color: '#3776AB' },
+    { name: 'TensorFlow', color: '#FF6F00' }
+  ];
 
-    const uniqueness = [
-        {
-            title: 'Holistic Approach',
-            desc: 'Beyond disease labeling - complete decision support from detection to treatment to prevention'
-        },
-        {
-            title: 'True Accessibility',
-            desc: 'Designed for farmers with minimal education - not just translated, but reimagined for rural users'
-        },
-        {
-            title: 'Community-Centric',
-            desc: 'Connects farmers with local experts and peers, creating knowledge networks beyond individual diagnosis'
-        },
-        {
-            title: 'Cost-Conscious',
-            desc: 'Prioritizes affordable, locally available treatments - understanding economic constraints'
-        }
-    ];
+  const uniqueness = [
+    {
+      title: 'Holistic Approach',
+      desc: 'Beyond disease labeling - complete decision support from detection to treatment to prevention'
+    },
+    {
+      title: 'True Accessibility',
+      desc: 'Designed for farmers with minimal education - not just translated, but reimagined for rural users'
+    },
+    {
+      title: 'Community-Centric',
+      desc: 'Connects farmers with local experts and peers, creating knowledge networks beyond individual diagnosis'
+    },
+    {
+      title: 'Cost-Conscious',
+      desc: 'Prioritizes affordable, locally available treatments - understanding economic constraints'
+    }
+  ];
 
-    return (
-        <div className="landing-container">
-            {/* Progress Bar */}
-            <div className="progress-bar" style={{ width: `${scrollProgress}%` }} />
+  return (
+    <div className="landing-container">
+      {/* Progress Bar */}
+      <div className="progress-bar" style={{ width: `${scrollProgress}%` }} />
 
-            {/* 3D Background Canvas */}
-            <canvas ref={canvasRef} className="particle-canvas" />
+      {/* 3D Background Canvas */}
+      <canvas ref={canvasRef} className="particle-canvas" />
 
-            {/* Hero Section */}
-            <section className="hero-section">
-                <div className="hero-content">
-                    <div className="floating-badge">
-                        <span className="pulse-dot"></span>
-                        AI-Powered Agriculture
-                    </div>
+      {/* Hero Section */}
+      <section className="hero-section">
+        <div className="hero-content">
+          <div className="floating-badge">
+            <span className="pulse-dot"></span>
+            AI-Powered Agriculture
+          </div>
 
-                    <h1 className="hero-title">
-                        <span className="title-line">CropAId</span>
-                        <span className="title-subtitle">Smart Treatment Starts Here</span>
-                    </h1>
+          <h1 className="hero-title">
+            <span className="title-line">CropAId</span>
+            <span className="title-subtitle">Smart Treatment Starts Here</span>
+          </h1>
 
-                    <p className="hero-description">
-                        Empowering farmers with intelligent crop disease diagnosis and actionable remediation
-                        guidance through AI-driven insights, native language support, and offline-first accessibility.
-                    </p>
+          <p className="hero-description">
+            Empowering farmers with intelligent crop disease diagnosis and actionable remediation
+            guidance through AI-driven insights, native language support, and offline-first accessibility.
+          </p>
 
-                    <div className="cta-group">
-                        <button
-                            className="cta-primary"
-                            onClick={() => navigate('/home')}
-                            style={{
-                                transform: `perspective(1000px) rotateX(${mousePosition.y * 5}deg) rotateY(${mousePosition.x * 5}deg)`
-                            }}
-                        >
-                            <span className="cta-text">Launch Application</span>
-                            <span className="cta-arrow">→</span>
-                        </button>
+          <div className="cta-group">
+            <button
+              className="cta-primary"
+              onClick={() => navigate('/home')}
+              style={{
+                transform: `perspective(1000px) rotateX(${mousePosition.y * 5}deg) rotateY(${mousePosition.x * 5}deg)`
+              }}
+            >
+              <span className="cta-text">Launch Application</span>
+              <span className="cta-arrow">→</span>
+            </button>
 
-                        <button className="cta-secondary">
-                            <span>Watch Demo</span>
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                                <path d="M8 5v14l11-7z" />
-                            </svg>
-                        </button>
-                    </div>
+            <button className="cta-secondary">
+              <span>Watch Demo</span>
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </button>
+          </div>
 
-                    <div className="hero-stats">
-                        <div className="stat-item">
-                            <div className="stat-number">95%+</div>
-                            <div className="stat-label">Accuracy</div>
-                        </div>
-                        <div className="stat-divider"></div>
-                        <div className="stat-item">
-                            <div className="stat-number">15+</div>
-                            <div className="stat-label">Languages</div>
-                        </div>
-                        <div className="stat-divider"></div>
-                        <div className="stat-item">
-                            <div className="stat-number">24/7</div>
-                            <div className="stat-label">Offline Access</div>
-                        </div>
-                    </div>
+          <div className="hero-stats">
+            <div className="stat-item">
+              <div className="stat-number">95%+</div>
+              <div className="stat-label">Accuracy</div>
+            </div>
+            <div className="stat-divider"></div>
+            <div className="stat-item">
+              <div className="stat-number">15+</div>
+              <div className="stat-label">Languages</div>
+            </div>
+            <div className="stat-divider"></div>
+            <div className="stat-item">
+              <div className="stat-number">24/7</div>
+              <div className="stat-label">Offline Access</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="hero-visual">
+          <div className="floating-card card-1">
+            <div className="card-icon">🌱</div>
+            <div className="card-text">Disease Detected</div>
+            <div className="card-confidence">Confidence: 96%</div>
+          </div>
+
+          <div className="floating-card card-2">
+            <div className="card-icon">💊</div>
+            <div className="card-text">Treatment Ready</div>
+            <div className="card-confidence">3 Options Available</div>
+          </div>
+
+          <div className="floating-card card-3">
+            <div className="card-icon">📊</div>
+            <div className="card-text">Risk Analysis</div>
+            <div className="card-confidence">Severity: Moderate</div>
+          </div>
+
+          <div className="crop-circle">
+            <div className="crop-ring ring-1"></div>
+            <div className="crop-ring ring-2"></div>
+            <div className="crop-ring ring-3"></div>
+            <div className="crop-icon">🌾</div>
+          </div>
+        </div>
+      </section>
+
+      {/* Problem Statement */}
+      <section className="problem-section">
+        <div className="section-header">
+          <span className="section-tag">The Challenge</span>
+          <h2 className="section-title">
+            The Real-World Crisis
+          </h2>
+        </div>
+
+        <div className="problem-grid">
+          <div className="problem-card">
+            <div className="problem-icon">⏱️</div>
+            <h3>Delayed Detection</h3>
+            <p>Traditional methods rely on slow manual inspection or expert visits, leading to severe yield loss</p>
+          </div>
+
+          <div className="problem-card">
+            <div className="problem-icon">🌐</div>
+            <h3>Limited Access</h3>
+            <p>Smallholder farmers lack access to expert guidance and digital tools for timely intervention</p>
+          </div>
+
+          <div className="problem-card">
+            <div className="problem-icon">📱</div>
+            <h3>Connectivity Issues</h3>
+            <p>Unreliable internet in rural areas restricts access to real-time agricultural support systems</p>
+          </div>
+
+          <div className="problem-card">
+            <div className="problem-icon">📖</div>
+            <h3>Literacy Barriers</h3>
+            <p>Text-based advisory systems fail to reach farmers with low literacy and language constraints</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Solution Overview */}
+      <section className="solution-section">
+        <div className="solution-content">
+          <div className="solution-text">
+            <span className="section-tag">Our Innovation</span>
+            <h2 className="section-title">Intelligent Decision Support</h2>
+            <p className="solution-description">
+              CropAId transforms crop disease management by combining state-of-the-art computer vision
+              with agronomic intelligence. Our system doesn't just identify diseases - it provides complete
+              decision support from early detection through treatment to prevention, all accessible to
+              farmers regardless of literacy level or internet connectivity.
+            </p>
+
+            <div className="solution-points">
+              <div className="point-item">
+                <div className="point-icon">✓</div>
+                <div>
+                  <strong>Image & Video Analysis:</strong> Upload photos or short videos for instant AI-powered diagnosis
                 </div>
-
-                <div className="hero-visual">
-                    <div className="floating-card card-1">
-                        <div className="card-icon">🌱</div>
-                        <div className="card-text">Disease Detected</div>
-                        <div className="card-confidence">Confidence: 96%</div>
-                    </div>
-
-                    <div className="floating-card card-2">
-                        <div className="card-icon">💊</div>
-                        <div className="card-text">Treatment Ready</div>
-                        <div className="card-confidence">3 Options Available</div>
-                    </div>
-
-                    <div className="floating-card card-3">
-                        <div className="card-icon">📊</div>
-                        <div className="card-text">Risk Analysis</div>
-                        <div className="card-confidence">Severity: Moderate</div>
-                    </div>
-
-                    <div className="crop-circle">
-                        <div className="crop-ring ring-1"></div>
-                        <div className="crop-ring ring-2"></div>
-                        <div className="crop-ring ring-3"></div>
-                        <div className="crop-icon">🌾</div>
-                    </div>
+              </div>
+              <div className="point-item">
+                <div className="point-icon">✓</div>
+                <div>
+                  <strong>Severity Estimation:</strong> Understand disease progression with confidence indicators
                 </div>
-            </section>
-
-            {/* Problem Statement */}
-            <section className="problem-section">
-                <div className="section-header">
-                    <span className="section-tag">The Challenge</span>
-                    <h2 className="section-title">
-                        The Real-World Crisis
-                    </h2>
+              </div>
+              <div className="point-item">
+                <div className="point-icon">✓</div>
+                <div>
+                  <strong>Region-Specific Guidance:</strong> Tailored recommendations based on local practices and climate
                 </div>
-
-                <div className="problem-grid">
-                    <div className="problem-card">
-                        <div className="problem-icon">⏱️</div>
-                        <h3>Delayed Detection</h3>
-                        <p>Traditional methods rely on slow manual inspection or expert visits, leading to severe yield loss</p>
-                    </div>
-
-                    <div className="problem-card">
-                        <div className="problem-icon">🌐</div>
-                        <h3>Limited Access</h3>
-                        <p>Smallholder farmers lack access to expert guidance and digital tools for timely intervention</p>
-                    </div>
-
-                    <div className="problem-card">
-                        <div className="problem-icon">📱</div>
-                        <h3>Connectivity Issues</h3>
-                        <p>Unreliable internet in rural areas restricts access to real-time agricultural support systems</p>
-                    </div>
-
-                    <div className="problem-card">
-                        <div className="problem-icon">📖</div>
-                        <h3>Literacy Barriers</h3>
-                        <p>Text-based advisory systems fail to reach farmers with low literacy and language constraints</p>
-                    </div>
+              </div>
+              <div className="point-item">
+                <div className="point-icon">✓</div>
+                <div>
+                  <strong>Voice-First Interface:</strong> Native language support with audio instructions and icon-based workflows
                 </div>
-            </section>
+              </div>
+            </div>
+          </div>
 
-            {/* Solution Overview */}
-            <section className="solution-section">
-                <div className="solution-content">
-                    <div className="solution-text">
-                        <span className="section-tag">Our Innovation</span>
-                        <h2 className="section-title">Intelligent Decision Support</h2>
-                        <p className="solution-description">
-                            CropAId transforms crop disease management by combining state-of-the-art computer vision
-                            with agronomic intelligence. Our system doesn't just identify diseases - it provides complete
-                            decision support from early detection through treatment to prevention, all accessible to
-                            farmers regardless of literacy level or internet connectivity.
-                        </p>
+          <div className="solution-visual">
+            <div className="workflow-diagram">
+              <div className="workflow-step step-1">
+                <div className="step-number">1</div>
+                <div className="step-label">Capture</div>
+              </div>
+              <div className="workflow-arrow">→</div>
+              <div className="workflow-step step-2">
+                <div className="step-number">2</div>
+                <div className="step-label">Analyze</div>
+              </div>
+              <div className="workflow-arrow">→</div>
+              <div className="workflow-step step-3">
+                <div className="step-number">3</div>
+                <div className="step-label">Diagnose</div>
+              </div>
+              <div className="workflow-arrow">→</div>
+              <div className="workflow-step step-4">
+                <div className="step-number">4</div>
+                <div className="step-label">Treat</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-                        <div className="solution-points">
-                            <div className="point-item">
-                                <div className="point-icon">✓</div>
-                                <div>
-                                    <strong>Image & Video Analysis:</strong> Upload photos or short videos for instant AI-powered diagnosis
-                                </div>
-                            </div>
-                            <div className="point-item">
-                                <div className="point-icon">✓</div>
-                                <div>
-                                    <strong>Severity Estimation:</strong> Understand disease progression with confidence indicators
-                                </div>
-                            </div>
-                            <div className="point-item">
-                                <div className="point-icon">✓</div>
-                                <div>
-                                    <strong>Region-Specific Guidance:</strong> Tailored recommendations based on local practices and climate
-                                </div>
-                            </div>
-                            <div className="point-item">
-                                <div className="point-icon">✓</div>
-                                <div>
-                                    <strong>Voice-First Interface:</strong> Native language support with audio instructions and icon-based workflows
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+      {/* Features Grid */}
+      <section className="features-section">
+        <div className="section-header">
+          <span className="section-tag">Capabilities</span>
+          <h2 className="section-title">Powerful Features</h2>
+        </div>
 
-                    <div className="solution-visual">
-                        <div className="workflow-diagram">
-                            <div className="workflow-step step-1">
-                                <div className="step-number">1</div>
-                                <div className="step-label">Capture</div>
-                            </div>
-                            <div className="workflow-arrow">→</div>
-                            <div className="workflow-step step-2">
-                                <div className="step-number">2</div>
-                                <div className="step-label">Analyze</div>
-                            </div>
-                            <div className="workflow-arrow">→</div>
-                            <div className="workflow-step step-3">
-                                <div className="step-number">3</div>
-                                <div className="step-label">Diagnose</div>
-                            </div>
-                            <div className="workflow-arrow">→</div>
-                            <div className="workflow-step step-4">
-                                <div className="step-number">4</div>
-                                <div className="step-label">Treat</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+        <div className="features-grid">
+          {features.map((feature, index) => (
+            <div
+              key={index}
+              className="feature-card"
+              style={{
+                animationDelay: `${index * 0.1}s`
+              }}
+            >
+              <div className="feature-icon">{feature.icon}</div>
+              <h3 className="feature-title">{feature.title}</h3>
+              <p className="feature-description">{feature.description}</p>
+              <div className="feature-shine"></div>
+            </div>
+          ))}
+        </div>
+      </section>
 
-            {/* Features Grid */}
-            <section className="features-section">
-                <div className="section-header">
-                    <span className="section-tag">Capabilities</span>
-                    <h2 className="section-title">Powerful Features</h2>
-                </div>
+      {/* Uniqueness Section */}
+      <section className="uniqueness-section">
+        <div className="section-header">
+          <span className="section-tag">What Sets Us Apart</span>
+          <h2 className="section-title">Why CropAId is Different</h2>
+        </div>
 
-                <div className="features-grid">
-                    {features.map((feature, index) => (
-                        <div
-                            key={index}
-                            className="feature-card"
-                            style={{
-                                animationDelay: `${index * 0.1}s`
-                            }}
-                        >
-                            <div className="feature-icon">{feature.icon}</div>
-                            <h3 className="feature-title">{feature.title}</h3>
-                            <p className="feature-description">{feature.description}</p>
-                            <div className="feature-shine"></div>
-                        </div>
-                    ))}
-                </div>
-            </section>
+        <div className="uniqueness-grid">
+          {uniqueness.map((item, index) => (
+            <div key={index} className="uniqueness-card">
+              <div className="uniqueness-number">0{index + 1}</div>
+              <h3 className="uniqueness-title">{item.title}</h3>
+              <p className="uniqueness-desc">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-            {/* Uniqueness Section */}
-            <section className="uniqueness-section">
-                <div className="section-header">
-                    <span className="section-tag">What Sets Us Apart</span>
-                    <h2 className="section-title">Why CropAId is Different</h2>
-                </div>
+      {/* Tech Stack */}
+      <section className="tech-section">
+        <div className="section-header">
+          <span className="section-tag">Built With</span>
+          <h2 className="section-title">Modern Technology Stack</h2>
+        </div>
 
-                <div className="uniqueness-grid">
-                    {uniqueness.map((item, index) => (
-                        <div key={index} className="uniqueness-card">
-                            <div className="uniqueness-number">0{index + 1}</div>
-                            <h3 className="uniqueness-title">{item.title}</h3>
-                            <p className="uniqueness-desc">{item.desc}</p>
-                        </div>
-                    ))}
-                </div>
-            </section>
+        <div className="tech-grid">
+          {techStack.map((tech, index) => (
+            <div
+              key={index}
+              className="tech-card"
+              style={{
+                '--tech-color': tech.color,
+                animationDelay: `${index * 0.15}s`
+              }}
+            >
+              <div className="tech-glow" style={{ backgroundColor: tech.color }}></div>
+              <span className="tech-name">{tech.name}</span>
+            </div>
+          ))}
+        </div>
 
-            {/* Tech Stack */}
-            <section className="tech-section">
-                <div className="section-header">
-                    <span className="section-tag">Built With</span>
-                    <h2 className="section-title">Modern Technology Stack</h2>
-                </div>
+        <div className="tech-architecture">
+          <div className="arch-layer">
+            <div className="arch-label">Frontend</div>
+            <div className="arch-tech">React.js • HTML5 • CSS3</div>
+          </div>
+          <div className="arch-connector"></div>
+          <div className="arch-layer">
+            <div className="arch-label">Backend</div>
+            <div className="arch-tech">Node.js • Express.js • RESTful APIs</div>
+          </div>
+          <div className="arch-connector"></div>
+          <div className="arch-layer">
+            <div className="arch-label">Database</div>
+            <div className="arch-tech">MongoDB • Cloud Storage</div>
+          </div>
+          <div className="arch-connector"></div>
+          <div className="arch-layer">
+            <div className="arch-label">AI/ML</div>
+            <div className="arch-tech">Python • TensorFlow • Computer Vision</div>
+          </div>
+        </div>
+      </section>
 
-                <div className="tech-grid">
-                    {techStack.map((tech, index) => (
-                        <div
-                            key={index}
-                            className="tech-card"
-                            style={{
-                                '--tech-color': tech.color,
-                                animationDelay: `${index * 0.15}s`
-                            }}
-                        >
-                            <div className="tech-glow" style={{ backgroundColor: tech.color }}></div>
-                            <span className="tech-name">{tech.name}</span>
-                        </div>
-                    ))}
-                </div>
+      {/* Impact Section */}
+      <section className="impact-section">
+        <div className="impact-content">
+          <span className="section-tag">Real-World Impact</span>
+          <h2 className="section-title">Transforming Agriculture</h2>
 
-                <div className="tech-architecture">
-                    <div className="arch-layer">
-                        <div className="arch-label">Frontend</div>
-                        <div className="arch-tech">React.js • HTML5 • CSS3</div>
-                    </div>
-                    <div className="arch-connector"></div>
-                    <div className="arch-layer">
-                        <div className="arch-label">Backend</div>
-                        <div className="arch-tech">Node.js • Express.js • RESTful APIs</div>
-                    </div>
-                    <div className="arch-connector"></div>
-                    <div className="arch-layer">
-                        <div className="arch-label">Database</div>
-                        <div className="arch-tech">MongoDB • Cloud Storage</div>
-                    </div>
-                    <div className="arch-connector"></div>
-                    <div className="arch-layer">
-                        <div className="arch-label">AI/ML</div>
-                        <div className="arch-tech">Python • TensorFlow • Computer Vision</div>
-                    </div>
-                </div>
-            </section>
+          <div className="impact-metrics">
+            <div className="metric-card">
+              <div className="metric-icon">🌾</div>
+              <div className="metric-value">Early Detection</div>
+              <div className="metric-label">Prevents crop loss before visible symptoms</div>
+            </div>
 
-            {/* Impact Section */}
-            <section className="impact-section">
-                <div className="impact-content">
-                    <span className="section-tag">Real-World Impact</span>
-                    <h2 className="section-title">Transforming Agriculture</h2>
+            <div className="metric-card">
+              <div className="metric-icon">💰</div>
+              <div className="metric-value">Cost Reduction</div>
+              <div className="metric-label">Optimized treatment reduces chemical waste</div>
+            </div>
 
-                    <div className="impact-metrics">
-                        <div className="metric-card">
-                            <div className="metric-icon">🌾</div>
-                            <div className="metric-value">Early Detection</div>
-                            <div className="metric-label">Prevents crop loss before visible symptoms</div>
-                        </div>
+            <div className="metric-card">
+              <div className="metric-icon">🌱</div>
+              <div className="metric-value">Sustainable Farming</div>
+              <div className="metric-label">Promotes organic alternatives and prevention</div>
+            </div>
 
-                        <div className="metric-card">
-                            <div className="metric-icon">💰</div>
-                            <div className="metric-value">Cost Reduction</div>
-                            <div className="metric-label">Optimized treatment reduces chemical waste</div>
-                        </div>
+            <div className="metric-card">
+              <div className="metric-icon">👨‍🌾</div>
+              <div className="metric-value">Farmer Empowerment</div>
+              <div className="metric-label">Independent decision-making with expert support</div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-                        <div className="metric-card">
-                            <div className="metric-icon">🌱</div>
-                            <div className="metric-value">Sustainable Farming</div>
-                            <div className="metric-label">Promotes organic alternatives and prevention</div>
-                        </div>
+      {/* Final CTA */}
+      <section className="final-cta">
+        <div className="cta-content">
+          <h2 className="cta-title">Ready to Transform Your Farming?</h2>
+          <p className="cta-description">
+            Join thousands of farmers using AI to protect their crops and increase yields
+          </p>
 
-                        <div className="metric-card">
-                            <div className="metric-icon">👨‍🌾</div>
-                            <div className="metric-value">Farmer Empowerment</div>
-                            <div className="metric-label">Independent decision-making with expert support</div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+          <button
+            className="cta-launch"
+            onClick={() => navigate('/home')}
+          >
+            <span className="launch-text">Launch CropAId</span>
+            <span className="launch-icon">🚀</span>
+          </button>
 
-            {/* Final CTA */}
-            <section className="final-cta">
-                <div className="cta-content">
-                    <h2 className="cta-title">Ready to Transform Your Farming?</h2>
-                    <p className="cta-description">
-                        Join thousands of farmers using AI to protect their crops and increase yields
-                    </p>
+          <div className="cta-info">
+            <div className="info-item">
+              <span className="info-icon">✓</span>
+              <span>Free to use</span>
+            </div>
+            <div className="info-item">
+              <span className="info-icon">✓</span>
+              <span>No internet required</span>
+            </div>
+            <div className="info-item">
+              <span className="info-icon">✓</span>
+              <span>Available in 15+ languages</span>
+            </div>
+          </div>
+        </div>
 
-                    <button
-                        className="cta-launch"
-                        onClick={() => navigate('/home')}
-                    >
-                        <span className="launch-text">Launch CropAId</span>
-                        <span className="launch-icon">🚀</span>
-                    </button>
+        <div className="cta-background">
+          <div className="bg-circle circle-1"></div>
+          <div className="bg-circle circle-2"></div>
+          <div className="bg-circle circle-3"></div>
+        </div>
+      </section>
 
-                    <div className="cta-info">
-                        <div className="info-item">
-                            <span className="info-icon">✓</span>
-                            <span>Free to use</span>
-                        </div>
-                        <div className="info-item">
-                            <span className="info-icon">✓</span>
-                            <span>No internet required</span>
-                        </div>
-                        <div className="info-item">
-                            <span className="info-icon">✓</span>
-                            <span>Available in 15+ languages</span>
-                        </div>
-                    </div>
-                </div>
+      {/* Footer */}
+      <footer className="footer">
+        <div className="footer-content">
+          <div className="footer-brand">
+            <h3>CropAId</h3>
+            <p>Smart Treatment Starts Here</p>
+          </div>
 
-                <div className="cta-background">
-                    <div className="bg-circle circle-1"></div>
-                    <div className="bg-circle circle-2"></div>
-                    <div className="bg-circle circle-3"></div>
-                </div>
-            </section>
+          <div className="footer-links">
+            <div className="link-group">
+              <h4>Product</h4>
+              <a href="#features">Features</a>
+              <a href="#tech">Technology</a>
+              <a href="#impact">Impact</a>
+            </div>
 
-            {/* Footer */}
-            <footer className="footer">
-                <div className="footer-content">
-                    <div className="footer-brand">
-                        <h3>CropAId</h3>
-                        <p>Smart Treatment Starts Here</p>
-                    </div>
+            <div className="link-group">
+              <h4>Resources</h4>
+              <a href="#docs">Documentation</a>
+              <a href="#research">Research</a>
+              <a href="#support">Support</a>
+            </div>
 
-                    <div className="footer-links">
-                        <div className="link-group">
-                            <h4>Product</h4>
-                            <a href="#features">Features</a>
-                            <a href="#tech">Technology</a>
-                            <a href="#impact">Impact</a>
-                        </div>
+            <div className="link-group">
+              <h4>Team</h4>
+              <a href="https://github.com/Akshith1413/SWE_AI_CROP" target="_blank" rel="noopener noreferrer">Frontend Repo</a>
+              <a href="https://github.com/Akshith1413/SWE_AI_CROP_BACK" target="_blank" rel="noopener noreferrer">Backend Repo</a>
+            </div>
+          </div>
+        </div>
 
-                        <div className="link-group">
-                            <h4>Resources</h4>
-                            <a href="#docs">Documentation</a>
-                            <a href="#research">Research</a>
-                            <a href="#support">Support</a>
-                        </div>
+        <div className="footer-bottom">
+          <p>&copy; 2026 CropAId - Team 7 • Built with ❤️ for Farmers</p>
+          <p className="footer-course">Software Engineering Project • Amrita Vishwa Vidyapeetham</p>
+        </div>
+      </footer>
 
-                        <div className="link-group">
-                            <h4>Team</h4>
-                            <a href="https://github.com/Akshith1413/SWE_AI_CROP" target="_blank" rel="noopener noreferrer">Frontend Repo</a>
-                            <a href="https://github.com/Akshith1413/SWE_AI_CROP_BACK" target="_blank" rel="noopener noreferrer">Backend Repo</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="footer-bottom">
-                    <p>&copy; 2026 CropAId - Team 7 • Built with ❤️ for Farmers</p>
-                    <p className="footer-course">Software Engineering Project • Amrita Vishwa Vidyapeetham</p>
-                </div>
-            </footer>
-
-            <style jsx>{`
+      <style jsx>{`
         * {
           margin: 0;
           padding: 0;
@@ -1649,8 +1649,8 @@ const Landing = () => {
           }
         }
       `}</style>
-        </div>
-    );
+    </div>
+  );
 };
 
 export default Landing;
