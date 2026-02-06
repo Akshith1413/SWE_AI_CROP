@@ -1,63 +1,71 @@
-SWE_AI_CROP — AI Crop Disease Detection & Advisory System
-Overview
+# 🌱 SWE_AI_CROP — AI Crop Disease Detection & Advisory System
 
-SWE_AI_CROP is an AI-powered crop disease detection and advisory application designed to help farmers identify plant diseases and receive treatment recommendations. The system combines a React-based user interface, a CNN-based disease classification model, and an AI advisory module for remediation guidance.
+An AI-powered agriculture assistant that helps farmers detect crop diseases from leaf images and receive treatment recommendations using Computer Vision and AI.
 
-The application supports multilingual interaction, voice assistance, and mobile deployment through Capacitor.
+---
 
-Project Goal
+## 🚜 Overview
 
-The goal of this project is to build a practical AI-assisted agriculture support tool that:
+SWE_AI_CROP combines:
 
-Detects crop diseases from leaf images
+* 📱 Mobile/Web UI
+* 🧠 CNN disease detection model
+* 🤖 AI advisory system
+* 🌍 Multilingual support
+* 🔊 Voice assistance
 
-Provides treatment recommendations
+The system is designed for **real-world farmer usability**, including **low-literacy accessibility** and **offline-friendly workflows**.
 
-Supports low-literacy users with audio guidance
+---
 
-Works across web and Android platforms
+## 🎯 Project Goal
 
-Enables offline-first interaction when possible
+This project aims to build an intelligent agriculture support system that can:
 
-Tech Stack
-Frontend
+* 🌿 Detect crop diseases from images
+* 💊 Provide treatment recommendations
+* 🔊 Provide audio guidance
+* 🌍 Support multiple languages
+* 📱 Work on Android and Web
+* 📴 Support offline-first usage where possible
 
-React (Vite)
+---
 
-Tailwind CSS
+## 🧰 Tech Stack
 
-Context API
+### Frontend
 
-Capacitor (Android support)
+* React (Vite)
+* Tailwind CSS
+* Context API
+* Capacitor (Android)
+* i18n translations
 
-i18n translation system
+### AI / ML
 
-AI / ML
+* TensorFlow / Keras
+* EfficientNet CNN (Transfer Learning)
+* PlantVillage dataset
 
-TensorFlow / Keras
+### Backend (Planned)
 
-CNN (EfficientNet-based transfer learning)
+* FastAPI / Flask
+* CNN inference API
+* LLM advisory integration
 
-PlantVillage dataset
+### Deployment
 
-Backend (planned)
+* Vercel (Web)
+* Capacitor Android build
 
-FastAPI / Flask
+---
 
-TensorFlow inference API
+## 🏗️ Project Structure
 
-LLM integration for treatment recommendations
-
-Deployment
-
-Vercel (Web deployment)
-
-Android build via Capacitor
-
-Project Structure
+```
 SWE_AI_CROP
 │
-├── android/                # Capacitor Android project
+├── android/
 ├── public/
 ├── src/
 │   ├── assets/
@@ -76,139 +84,132 @@ SWE_AI_CROP
 ├── tailwind.config.js
 ├── vite.config.js
 └── README.md
+```
 
-Current Features
-User Access
+---
 
-Language selection
+## ✨ Current Features
 
-Consent screen
+### 👤 User Access
 
-Guest mode
+* Language selection
+* Consent screen
+* Guest mode
+* Login UI
+* User profile
 
-Login UI
+### 📸 Capture & Input
 
-User profile page
+* Camera capture interface
+* Image upload UI
+* Voice guidance hooks
+* Audio feedback
 
-Capture & Input
+### 🧠 Disease Detection (In Progress)
 
-Camera capture interface
+* CNN model training pipeline
+* Image preprocessing
+* Model export
 
-Image upload UI
+### 🤖 Advisory System
 
-Voice guidance hooks
+* LLM advice page
+* Crop advice cards
+* AI service layer
 
-Audio feedback components
+### 🌍 Localization
 
-Disease Detection (AI Pipeline — in progress)
+Supports:
+Hindi, English, Tamil, Telugu, Kannada, Marathi, Bengali, Gujarati, Punjabi, Malayalam, Odia, Urdu, Assamese, Nepali, Sanskrit
 
-CNN model training using PlantVillage dataset
+---
 
-Image preprocessing pipeline
+## 🚀 Deployment
 
-Model export for inference
-
-Advisory System
-
-LLM advice page
-
-Crop advice card components
-
-Service layer for AI responses
-
-Localization
-
-Multiple language support:
-
-Hindi
-
-English
-
-Tamil
-
-Telugu
-
-Kannada
-
-Marathi
-
-Bengali
-
-Gujarati
-
-Punjabi
-
-Malayalam
-
-Odia
-
-Urdu
-
-Assamese
-
-Nepali
-
-Sanskrit
-
-Deployment
-
-Web app:
-https://swe-ai-crop.vercel.app/
+Web App:
+[https://swe-ai-crop.vercel.app/](https://swe-ai-crop.vercel.app/)
 
 Android build supported via Capacitor.
 
-CNN Model Training
+---
 
-The disease detection model is trained using:
+## 🧪 CNN Model Training
 
-Dataset:
-PlantVillage Dataset
+Dataset: **PlantVillage**
+Architecture: **EfficientNetB0 (Transfer Learning)**
+Training: **Kaggle GPU / Colab GPU**
 
-Architecture:
-Transfer learning using EfficientNetB0
+Output model:
 
-Training environment:
-Kaggle GPU / Colab GPU
-
-Model output:
-
+```
 crop_disease_model.h5
+```
 
+---
 
-This model will be deployed through a backend inference API.
+## 🔄 System Architecture Flow
 
-Planned System Flow
-User captures image
-        ↓
-React uploads image
-        ↓
-Backend inference API
-        ↓
-CNN predicts disease
-        ↓
-Prediction passed to LLM module
-        ↓
-Treatment advice generated
-        ↓
-Advice displayed + audio playback
+```
+                ┌────────────────────┐
+                │      Farmer        │
+                │ Capture Leaf Image │
+                └─────────┬──────────┘
+                          │
+                          ▼
+                ┌────────────────────┐
+                │   React Frontend   │
+                │ Camera / Upload UI │
+                └─────────┬──────────┘
+                          │
+                          ▼
+                ┌────────────────────┐
+                │ Backend Inference  │
+                │   (FastAPI/Flask)  │
+                └─────────┬──────────┘
+                          │
+                          ▼
+                ┌────────────────────┐
+                │   CNN Model (TF)   │
+                │ Disease Prediction │
+                └─────────┬──────────┘
+                          │
+                          ▼
+                ┌────────────────────┐
+                │    LLM Advisory    │
+                │ Treatment Guidance │
+                └─────────┬──────────┘
+                          │
+                          ▼
+                ┌────────────────────┐
+                │   UI + Audio Tips  │
+                └────────────────────┘
+```
 
-How to Run the Project
+---
+
+## ▶️ Running the Project
 
 Install dependencies:
 
+```
 npm install
-
+```
 
 Run locally:
 
+```
 npm run dev
+```
 
+Build project:
 
-Build:
-
+```
 npm run build
+```
 
-Team Roles
+---
+
+## 👥 Team Roles
 
 Dhanuja — Backend Engineer
 Bhuvaneshwari — DevOps Engineer
@@ -216,18 +217,22 @@ Ramaroshinee — Frontend & Backend Developer
 Akshith — Frontend Developer
 Saketh — Testing Engineer
 
-Future Improvements
+---
 
-Real-time CNN inference API
+## 🔮 Future Improvements
 
-Offline model inference support
+* Real-time CNN inference API
+* Offline model inference
+* Region-specific recommendations
+* Push notifications
+* Farmer feedback loop
+* Model optimization
+* Dataset expansion
 
-Region-specific treatment recommendations
+---
 
-Push notifications
+## 🌾 Vision
 
-Farmer feedback loop
+Build an AI assistant that makes crop disease detection **accessible, fast, and understandable for farmers everywhere.**
 
-Model performance optimization
-
-Dataset expansion for local crops
+---
