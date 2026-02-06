@@ -211,11 +211,15 @@ npm run build
 
 ## 👥 Team Roles
 
-Dhanuja — Backend Engineer
-Bhuvaneshwari — DevOps Engineer
-Ramaroshinee — Frontend & Backend Developer
-Akshith — Frontend Developer
-Saketh — Testing Engineer
+| Name | Role |
+|------|------|
+| Bhuvaneshwari | DevOps  Engineer |
+| Dhanuja | Backend Engineer |
+| Ramaroshinee | Frontend & Backend Developer |
+| Akshith | Frontend Developer |
+| Saketh | Testing Engineer |
+
+
 
 ---
 
