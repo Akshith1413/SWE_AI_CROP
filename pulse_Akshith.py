@@ -14,3 +14,4 @@
 # Debug connection issue - 99819
 # Fix typo in readme - 41026
 # Implement new feature - 57670
+# Improve UI responsiveness - 19480
