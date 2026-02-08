@@ -1,0 +1,57 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.lang-wrapper {
+  height: 100vh;
+  width: 100%;
+  background: linear-gradient(135deg, #0f5132, #2d6a4f);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: "Segoe UI", sans-serif;
+  color: white;
+}
+
+
+/* TITLE */
+
+.lang-wrapper h2 {
+  font-size: 36px;
+  margin-bottom: 50px;
+  letter-spacing: 1px;
+}
+
+
+/* GRID */
+
+.lang-grid {
+  width: 60%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+}
+
+
+/* BUTTONS */
+
+.lang-grid button {
+  padding: 22px;
+  border: none;
+  background: white;
+  color: #0f5132;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+.lang-grid button:hover {
+  transform: translateY(-3px);
+  background: #d8f3dc;
+}
