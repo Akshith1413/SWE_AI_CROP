@@ -215,8 +215,8 @@ npm run build
 |------|------|
 | Bhuvaneshwari | DevOps  Engineer |
 | Dhanuja | Backend Engineer |
-| Ramaroshinee | Frontend & Backend Developer |
-| Akshith | Frontend Developer |
+| Rama Roshinee | Frontend  Developer |
+| Akshith | Frontend & Backend Developer |
 | Saketh | Testing Engineer |
 
 
