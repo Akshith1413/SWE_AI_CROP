@@ -314,5 +314,33 @@
         "qualityWarningsDesc": "धुंधलापन, अंधेरे और अन्य मुद्दों के लिए अलर्ट",
         "startSmartCamera": "स्मार्ट कैमरा शुरू करें",
         "getReady": "तैयार हो जाओ..."
+    },
+    "llmAdvice": {
+        "title": "AI फसल सलाहकार",
+        "poweredBy": "Gemini AI द्वारा संचालित",
+        "diagnosisInfo": "निदान जानकारी",
+        "cropType": "फसल प्रकार",
+        "disease": "रोग",
+        "severity": "गंभीरता",
+        "severityLow": "कम",
+        "severityMedium": "मध्यम",
+        "severityHigh": "उच्च",
+        "confidenceScore": "विश्वास स्कोर",
+        "editDetails": "विवरण संपादित करें",
+        "cancel": "रद्द करें",
+        "saveAndGenerate": "सहेजें और उत्पन्न करें",
+        "generating": "विशेषज्ञ सलाह उत्पन्न हो रही है...",
+        "analyzingPattern": "AI {crop} रोग पैटर्न का विश्लेषण कर रहा है",
+        "unableToGenerate": "सलाह उत्पन्न करने में असमर्थ",
+        "tryAgain": "पुनः प्रयास करें",
+        "rootCause": "मूल कारण",
+        "symptomsToWatch": "देखने योग्य लक्षण",
+        "immediateAction": "तत्काल कार्रवाई आवश्यक",
+        "chemicalTreatment": "रासायनिक उपचार",
+        "organicAlternative": "जैविक विकल्प",
+        "futurePrevention": "भविष्य में रोकथाम",
+        "generatedOn": "उत्पन्न हुआ",
+        "usingExpertDatabase": "विशेषज्ञ डेटाबेस का उपयोग करना",
+        "backToHome": "होम पर वापस जाएं"
     }
 }

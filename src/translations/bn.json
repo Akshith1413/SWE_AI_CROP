@@ -314,5 +314,33 @@
         "qualityWarningsDesc": "ঝাপসা, অন্ধকার এবং অন্যান্য সমস্যার জন্য সতর্কতা",
         "startSmartCamera": "স্মার্ট ক্যামেরা শুরু করুন",
         "getReady": "তৈরি হন..."
+    },
+    "llmAdvice": {
+        "title": "AI ফসল উপদেষ্টা",
+        "poweredBy": "Gemini AI দ্বারা চালিত",
+        "diagnosisInfo": "রোগ নির্ণয় তথ্য",
+        "cropType": "ফসলের ধরন",
+        "disease": "রোগ",
+        "severity": "তীব্রতা",
+        "severityLow": "কম",
+        "severityMedium": "মধ্যম",
+        "severityHigh": "উচ্চ",
+        "confidenceScore": "আত্মবিশ্বাস স্কোর",
+        "editDetails": "বিবরণ সম্পাদনা করুন",
+        "cancel": "বাতিল করুন",
+        "saveAndGenerate": "সংরক্ষণ এবং উৎপন্ন করুন",
+        "generating": "বিশেষজ্ঞ পরামর্শ তৈরি হচ্ছে...",
+        "analyzingPattern": "AI {crop} রোগের প্যাটার্ন বিশ্লেষণ করছে",
+        "unableToGenerate": "পরামর্শ তৈরি করতে অক্ষম",
+        "tryAgain": "আবার চেষ্টা করুন",
+        "rootCause": "মূল কারণ",
+        "symptomsToWatch": "পর্যবেক্ষণ করার লক্ষণ",
+        "immediateAction": "তাৎক্ষণিক পদক্ষেপ প্রয়োজন",
+        "chemicalTreatment": "রাসায়নিক চিকিৎসা",
+        "organicAlternative": "জৈব বিকল্প",
+        "futurePrevention": "ভবিষ্যত প্রতিরোধ",
+        "generatedOn": "উৎপন্ন হয়েছে",
+        "usingExpertDatabase": "বিশেষজ্ঞ ডাটাবেস ব্যবহার করছে",
+        "backToHome": "হোমে ফিরে যান"
     }
 }

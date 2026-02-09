@@ -314,5 +314,33 @@
         "qualityWarningsDesc": "બ્લર, અંધકાર અને અન્ય સમસ્યાઓ માટે ચેતવણીઓ",
         "startSmartCamera": "સ્માર્ટ કેમેરા શરૂ કરો",
         "getReady": "તૈયાર થાઓ..."
+    },
+    "llmAdvice": {
+        "title": "AI પાક સલાહકાર",
+        "poweredBy": "Gemini AI દ્વારા સંચાલિત",
+        "diagnosisInfo": "રોગ નિદાન માહિતી",
+        "cropType": "પાકનો પ્રકાર",
+        "disease": "રોગ",
+        "severity": "તીવ્રતા",
+        "severityLow": "ઓછું",
+        "severityMedium": "મધ્યમ",
+        "severityHigh": "વધુ",
+        "confidenceScore": "વિશ્વાસ સ્કોર",
+        "editDetails": "વિગતો સંપાદિત કરો",
+        "cancel": "રદ કરો",
+        "saveAndGenerate": "સાચવો અને જનરેટ કરો",
+        "generating": "નિષ્ણાત સલાહ જનરેટ કરી રહ્યું છે...",
+        "analyzingPattern": "AI {crop} રોગ પેટર્નનું વિશ્લેષણ કરી રહ્યું છે",
+        "unableToGenerate": "સલાહ જનરેટ કરવામાં અસમર્થ",
+        "tryAgain": "ફરીથી પ્રયાસ કરો",
+        "rootCause": "મૂળ કારણ",
+        "symptomsToWatch": "જોવા માટેના લક્ષણો",
+        "immediateAction": "તાત્કાલિક પગલાં જરૂરી",
+        "chemicalTreatment": "રાસાયણિક સારવાર",
+        "organicAlternative": "કાર્બનિક વિકલ્પ",
+        "futurePrevention": "ભવિષ્યમાં અટકાવવું",
+        "generatedOn": "જનરેટ થયેલ",
+        "usingExpertDatabase": "નિષ્ણાત ડેટાબેઝનો ઉપયોગ કરી રહ્યું છે",
+        "backToHome": "હોમ પર પાછા જાઓ"
     }
 }

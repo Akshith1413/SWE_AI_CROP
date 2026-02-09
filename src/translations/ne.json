@@ -314,5 +314,33 @@
         "qualityWarningsDesc": "धमिलो, अँध्यारो र अन्य समस्याहरूको लागि अलर्टहरू",
         "startSmartCamera": "स्मार्ट क्यामेरा सुरु गर्नुहोस्",
         "getReady": "तयार हुनुहोस्..."
+    },
+    "llmAdvice": {
+        "title": "AI बाली सल्लाहकार",
+        "poweredBy": "Gemini AI द्वारा संचालित",
+        "diagnosisInfo": "रोग निदान जानकारी",
+        "cropType": "बाली प्रकार",
+        "disease": "रोग",
+        "severity": "गम्भीरता",
+        "severityLow": "कम",
+        "severityMedium": "मध्यम",
+        "severityHigh": "उच्च",
+        "confidenceScore": "विश्वास स्कोर",
+        "editDetails": "विवरण सम्पादन गर्नुहोस्",
+        "cancel": "रद्द गर्नुहोस्",
+        "saveAndGenerate": "सुरक्षित गर्नुहोस् र उत्पन्न गर्नुहोस्",
+        "generating": "विशेषज्ञ सल्लाह उत्पन्न गरिँदै छ...",
+        "analyzingPattern": "AI {crop} रोग पद्धति विश्लेषण गर्दैछ",
+        "unableToGenerate": "सल्लाह उत्पन्न गर्न असमर्थ",
+        "tryAgain": "फेरि प्रयास गर्नुहोस्",
+        "rootCause": "मूल कारण",
+        "symptomsToWatch": "हेर्नुपर्ने लक्षणहरू",
+        "immediateAction": "तत्काल कारबाही आवश्यक",
+        "chemicalTreatment": "रासायनिक उपचार",
+        "organicAlternative": "जैविक विकल्प",
+        "futurePrevention": "भविष्य रोकथाम",
+        "generatedOn": "उत्पन्न भयो",
+        "usingExpertDatabase": "विशेषज्ञ डाटाबेस प्रयोग गर्दै",
+        "backToHome": "होम फर्कनुहोस्"
     }
 }

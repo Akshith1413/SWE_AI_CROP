@@ -314,5 +314,33 @@
         "qualityWarningsDesc": "மங்கலானது, இருள் மற்றும் பிற சிக்கல்களுக்கான விழிப்பூட்டல்கள்",
         "startSmartCamera": "ஸ்மார்ட் கேமராவைத் தொடங்கவும்",
         "getReady": "தயாராகுங்கள்..."
+    },
+    "llmAdvice": {
+        "title": "AI பயிர் ஆலோசகர்",
+        "poweredBy": "Gemini AI மூலம் இயக்கப்படுகிறது",
+        "diagnosisInfo": "நோய் கண்டறிதல் தகவல்",
+        "cropType": "பயிர் வகை",
+        "disease": "நோய்",
+        "severity": "தீவிரம்",
+        "severityLow": "குறைவு",
+        "severityMedium": "மத்திய",
+        "severityHigh": "அதிகம்",
+        "confidenceScore": "நம்பிக்கை மதிப்பெண்",
+        "editDetails": "விவரங்களைத் திருத்து",
+        "cancel": "ரத்து செய்",
+        "saveAndGenerate": "சேமித்து உருவாக்கு",
+        "generating": "நிபுணர் ஆலோசனையை உருவாக்குகிறது...",
+        "analyzingPattern": "AI {crop} நோய் முறைகளை பகுப்பாய்வு செய்கிறது",
+        "unableToGenerate": "ஆலோசனையை உருவாக்க முடியவில்லை",
+        "tryAgain": "மீண்டும் முயற்சிக்கவும்",
+        "rootCause": "மூல காரணம்",
+        "symptomsToWatch": "பார்க்க வேண்டிய அறிகுறிகள்",
+        "immediateAction": "உடனடி நடவடிக்கை தேவை",
+        "chemicalTreatment": "இரசாயன சிகிச்சை",
+        "organicAlternative": "இயற்கை மாற்று",
+        "futurePrevention": "எதிர்கால தடுப்பு",
+        "generatedOn": "உருவாக்கப்பட்டது",
+        "usingExpertDatabase": "நிபுணர் தரவுத்தளத்தைப் பயன்படுத்துதல்",
+        "backToHome": "முகப்புக்குத் திரும்பு"
     }
 }

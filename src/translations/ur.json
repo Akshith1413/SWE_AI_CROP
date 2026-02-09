@@ -314,5 +314,33 @@
         "qualityWarningsDesc": "دھندلاپن، اندھیرے اور دیگر مسائل کے لیے انتباہات",
         "startSmartCamera": "سمارٹ کیمرہ شروع کریں",
         "getReady": "تیار ہو جائیں..."
+    },
+    "llmAdvice": {
+        "title": "AI فصل مشیر",
+        "poweredBy": "Gemini AI سے تقویت یافتہ",
+        "diagnosisInfo": "تشخیص کی معلومات",
+        "cropType": "فصل کی قسم",
+        "disease": "بیماری",
+        "severity": "شدت",
+        "severityLow": "کم",
+        "severityMedium": "درمیانہ",
+        "severityHigh": "زیادہ",
+        "confidenceScore": "اعتماد سکور",
+        "editDetails": "تفصیلات میں ترمیم کریں",
+        "cancel": "منسوخ کریں",
+        "saveAndGenerate": "محفوظ کریں اور بنائیں",
+        "generating": "ماہر مشورہ تیار کیا جا رہا ہے...",
+        "analyzingPattern": "AI {crop} بیماری کے نمونوں کا تجزیہ کر رہا ہے",
+        "unableToGenerate": "مشورہ تیار کرنے میں ناکام",
+        "tryAgain": "دوبارہ کوشش کریں",
+        "rootCause": "بنیادی وجہ",
+        "symptomsToWatch": "دیکھنے کے لیے علامات",
+        "immediateAction": "فوری کارروائی کی ضرورت",
+        "chemicalTreatment": "کیمیائی علاج",
+        "organicAlternative": "نامیاتی متبادل",
+        "futurePrevention": "مستقبل کی روک تھام",
+        "generatedOn": "تیار کیا گیا",
+        "usingExpertDatabase": "ماہر ڈیٹا بیس استعمال کر رہا ہے",
+        "backToHome": "گھر واپس جائیں"
     }
 }

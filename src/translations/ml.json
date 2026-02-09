@@ -314,5 +314,33 @@
         "qualityWarningsDesc": "മങ്ങൽ, ഇരുട്ട്, മറ്റ് പ്രശ്നങ്ങൾ എന്നിവയ്ക്കുള്ള മുന്നറിയിപ്പുകൾ",
         "startSmartCamera": "സ്മാർട്ട് ക്യാമറ ആരംഭിക്കുക",
         "getReady": "തയ്യാറാവുക..."
+    },
+    "llmAdvice": {
+        "title": "AI വിള ഉപദേശകൻ",
+        "poweredBy": "Gemini AI പവർഡ്",
+        "diagnosisInfo": "രോഗനിർണയ വിവരങ്ങൾ",
+        "cropType": "വിള തരം",
+        "disease": "രോഗം",
+        "severity": "തീവ്രത",
+        "severityLow": "കുറവ്",
+        "severityMedium": "ഇടത്തരം",
+        "severityHigh": "ഉയർന്നത്",
+        "confidenceScore": "വിശ്വാസ സ്കോർ",
+        "editDetails": "വിശദാംശങ്ങൾ എഡിറ്റ് ചെയ്യുക",
+        "cancel": "റദ്ദാക്കുക",
+        "saveAndGenerate": "സേവ് ചെയ്ത് സൃഷ്ടിക്കുക",
+        "generating": "വിദഗ്ദ്ധ ഉപദേശം സൃഷ്ടിക്കുന്നു...",
+        "analyzingPattern": "AI {crop} രോഗ പാറ്റേൺ വിശകലനം ചെയ്യുന്നു",
+        "unableToGenerate": "ഉപദേശം സൃഷ്ടിക്കാൻ കഴിഞ്ഞില്ല",
+        "tryAgain": "വീണ്ടും ശ്രമിക്കുക",
+        "rootCause": "മൂല കാരണം",
+        "symptomsToWatch": "നിരീക്ഷിക്കേണ്ട ലക്ഷണങ്ങൾ",
+        "immediateAction": "അടിയന്തര നടപടി ആവശ്യമാണ്",
+        "chemicalTreatment": "രാസ ചികിത്സ",
+        "organicAlternative": "ജൈവ ബദൽ",
+        "futurePrevention": "ഭാവി പ്രതിരോധം",
+        "generatedOn": "സൃഷ്ടിച്ചത്",
+        "usingExpertDatabase": "വിദഗ്ദ്ധ ഡാറ്റാബേസ് ഉപയോഗിക്കുന്നു",
+        "backToHome": "ഹോമിലേക്ക് മടങ്ങുക"
     }
 }

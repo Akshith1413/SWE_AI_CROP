@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
+import { useTranslation } from '../hooks/useTranslation';
 import {
     ArrowLeft, Loader2, AlertCircle, CheckCircle2, Sparkles,
     Leaf, Bug, Droplet, Shield, FlaskConical, Sprout, AlertTriangle,
@@ -9,6 +11,8 @@ import {
 const LLMAdvicePage = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { language } = useLanguage(); // Get current selected language
+    const { t } = useTranslation(); // Get translation function
 
     // Check for query params (demo mode)
     const searchParams = new URLSearchParams(location.search);
@@ -68,7 +72,8 @@ const LLMAdvicePage = () => {
                     crop: cropType,
                     disease: disease,
                     severity: severity || 'unknown',
-                    confidence: parseFloat(confidence) || 0.0
+                    confidence: parseFloat(confidence) || 0.0,
+                    language: language || 'en'  // Include the selected language
                 })
             });
 
@@ -132,11 +137,11 @@ const LLMAdvicePage = () => {
                             </div>
                             <div>
                                 <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
-                                    AI Crop Advisor
+                                    {t('llmAdvice.title')}
                                 </h1>
                                 <p className="text-sm text-gray-500 flex items-center gap-1">
                                     <Zap className="w-3 h-3" />
-                                    Powered by Gemini AI
+                                    {t('llmAdvice.poweredBy')}
                                 </p>
                             </div>
                         </div>
@@ -148,7 +153,7 @@ const LLMAdvicePage = () => {
                             className="flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-emerald-200 text-emerald-600 rounded-xl font-semibold hover:bg-emerald-50 transition-all active:scale-95 shadow-md hover:shadow-lg"
                         >
                             <Edit3 className="w-4 h-4" />
-                            Edit Details
+                            {t('llmAdvice.editDetails')}
                         </button>
                     )}
                 </header>
@@ -160,7 +165,7 @@ const LLMAdvicePage = () => {
                             <div className="p-3 bg-gradient-to-br from-emerald-100 to-green-100 rounded-xl">
                                 <Leaf className="w-6 h-6 text-emerald-600" />
                             </div>
-                            <h2 className="text-xl font-bold text-gray-800">Diagnosis Information</h2>
+                            <h2 className="text-xl font-bold text-gray-800">{t('llmAdvice.diagnosisInfo')}</h2>
                         </div>
 
                         {editMode && (
@@ -189,7 +194,7 @@ const LLMAdvicePage = () => {
                         <div className="space-y-2">
                             <label className="text-sm font-semibold text-gray-600 flex items-center gap-2">
                                 <Leaf className="w-4 h-4 text-emerald-500" />
-                                Crop Type
+                                {t('llmAdvice.cropType')}
                             </label>
                             {editMode ? (
                                 <input
@@ -210,7 +215,7 @@ const LLMAdvicePage = () => {
                         <div className="space-y-2">
                             <label className="text-sm font-semibold text-gray-600 flex items-center gap-2">
                                 <Bug className="w-4 h-4 text-red-500" />
-                                Disease
+                                {t('llmAdvice.disease')}
                             </label>
                             {editMode ? (
                                 <input
@@ -231,7 +236,7 @@ const LLMAdvicePage = () => {
                         <div className="space-y-2">
                             <label className="text-sm font-semibold text-gray-600 flex items-center gap-2">
                                 <TrendingUp className="w-4 h-4 text-orange-500" />
-                                Severity
+                                {t('llmAdvice.severity')}
                             </label>
                             {editMode ? (
                                 <select
@@ -254,7 +259,7 @@ const LLMAdvicePage = () => {
                         <div className="space-y-2">
                             <label className="text-sm font-semibold text-gray-600 flex items-center gap-2">
                                 <Award className="w-4 h-4 text-blue-500" />
-                                Confidence Score
+                                {t('llmAdvice.confidenceScore')}
                             </label>
                             {editMode ? (
                                 <div className="space-y-1">
@@ -292,8 +297,8 @@ const LLMAdvicePage = () => {
                             <Loader2 className="w-20 h-20 text-emerald-500 animate-spin" />
                             <div className="absolute inset-0 w-20 h-20 border-4 border-emerald-200 rounded-full animate-ping"></div>
                         </div>
-                        <p className="text-2xl font-bold text-gray-800 mb-2 mt-6">Generating Expert Advice...</p>
-                        <p className="text-sm text-gray-500">AI is analyzing {cropType} disease patterns</p>
+                        <p className="text-2xl font-bold text-gray-800 mb-2 mt-6">{t('llmAdvice.generating')}</p>
+                        <p className="text-sm text-gray-500">{t('llmAdvice.analyzingPattern', { crop: cropType })}</p>
                         <div className="mt-4 flex gap-2">
                             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"></div>
                             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
@@ -310,7 +315,7 @@ const LLMAdvicePage = () => {
                                 <AlertCircle className="w-8 h-8 text-red-600" />
                             </div>
                             <div className="flex-1">
-                                <h3 className="text-xl font-bold text-red-800 mb-2">Unable to Generate Advice</h3>
+                                <h3 className="text-xl font-bold text-red-800 mb-2">{t('llmAdvice.unableToGenerate')}</h3>
                                 <p className="text-red-600">{error}</p>
                             </div>
                         </div>
@@ -320,7 +325,7 @@ const LLMAdvicePage = () => {
                             className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-red-500 to-red-600 text-white py-3 px-6 rounded-2xl font-semibold hover:shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <RefreshCw className="w-5 h-5" />
-                            Try Again
+                            {t('llmAdvice.tryAgain')}
                         </button>
                     </div>
                 )}
@@ -331,7 +336,7 @@ const LLMAdvicePage = () => {
                         {/* Cause */}
                         <AdviceCard
                             icon={<Bug className="w-6 h-6" />}
-                            title="Root Cause"
+                            title={t('llmAdvice.rootCause')}
                             content={advice.cause}
                             color="red"
                             index={0}
@@ -340,7 +345,7 @@ const LLMAdvicePage = () => {
                         {/* Symptoms */}
                         <AdviceCard
                             icon={<AlertTriangle className="w-6 h-6" />}
-                            title="Symptoms to Watch"
+                            title={t('llmAdvice.symptomsToWatch')}
                             content={advice.symptoms}
                             color="orange"
                             index={1}
@@ -349,7 +354,7 @@ const LLMAdvicePage = () => {
                         {/* Immediate Treatment */}
                         <AdviceCard
                             icon={<Shield className="w-6 h-6" />}
-                            title="Immediate Action Required"
+                            title={t('llmAdvice.immediateAction')}
                             content={advice.immediate}
                             color="blue"
                             index={2}
@@ -358,7 +363,7 @@ const LLMAdvicePage = () => {
                         {/* Chemical Solution */}
                         <AdviceCard
                             icon={<FlaskConical className="w-6 h-6" />}
-                            title="Chemical Treatment"
+                            title={t('llmAdvice.chemicalTreatment')}
                             content={advice.chemical}
                             color="purple"
                             index={3}
@@ -367,7 +372,7 @@ const LLMAdvicePage = () => {
                         {/* Organic Solution */}
                         <AdviceCard
                             icon={<Sprout className="w-6 h-6" />}
-                            title="Organic Alternative"
+                            title={t('llmAdvice.organicAlternative')}
                             content={advice.organic}
                             color="green"
                             index={4}
@@ -376,7 +381,7 @@ const LLMAdvicePage = () => {
                         {/* Prevention */}
                         <AdviceCard
                             icon={<CheckCircle2 className="w-6 h-6" />}
-                            title="Future Prevention"
+                            title={t('llmAdvice.futurePrevention')}
                             content={advice.prevention}
                             color="teal"
                             index={5}
@@ -402,7 +407,7 @@ const LLMAdvicePage = () => {
                             className="w-full bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 text-white py-4 px-6 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all active:scale-98 shadow-lg flex items-center justify-center gap-2 group"
                         >
                             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                            Back to Home
+                            {t('llmAdvice.backToHome')}
                         </button>
                     </div>
                 )}

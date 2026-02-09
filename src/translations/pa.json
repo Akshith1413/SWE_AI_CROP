@@ -314,5 +314,33 @@
         "qualityWarningsDesc": "ਧੁੰਦਲਾਪਨ, ਹਨੇਰੇ ਅਤੇ ਹੋਰ ਮੁੱਦਿਆਂ ਲਈ ਚੇਤਾਵਨੀਆਂ",
         "startSmartCamera": "ਸਮਾਰਟ ਕੈਮਰਾ ਸ਼ੁਰੂ ਕਰੋ",
         "getReady": "ਤਿਆਰ ਹੋ ਜਾਓ..."
+    },
+    "llmAdvice": {
+        "title": "AI ਫਸਲ ਸਲਾਹਕਾਰ",
+        "poweredBy": "Gemini AI ਦੁਆਰਾ ਸੰਚਾਲਿਤ",
+        "diagnosisInfo": "ਰੋਗ ਨਿਦਾਨ ਜਾਣਕਾਰੀ",
+        "cropType": "ਫਸਲ ਦੀ ਕਿਸਮ",
+        "disease": "ਬਿਮਾਰੀ",
+        "severity": "ਗੰਭੀਰਤਾ",
+        "severityLow": "ਘੱਟ",
+        "severityMedium": "ਮੱਧਮ",
+        "severityHigh": "ਉੱਚ",
+        "confidenceScore": "ਵਿਸ਼ਵਾਸ ਸਕੋਰ",
+        "editDetails": "ਵੇਰਵੇ ਸੋਧੋ",
+        "cancel": "ਰੱਦ ਕਰੋ",
+        "saveAndGenerate": "ਸੇਵ ਕਰੋ ਅਤੇ ਬਣਾਓ",
+        "generating": "ਮਾਹਰ ਸਲਾਹ ਬਣਾਈ ਜਾ ਰਹੀ ਹੈ...",
+        "analyzingPattern": "AI {crop} ਬਿਮਾਰੀ ਪੈਟਰਨ ਦਾ ਵਿਸ਼ਲੇਸ਼ਣ ਕਰ ਰਿਹਾ ਹੈ",
+        "unableToGenerate": "ਸਲਾਹ ਬਣਾਉਣ ਵਿੱਚ ਅਸਮਰੱਥ",
+        "tryAgain": "ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ",
+        "rootCause": "ਮੂਲ ਕਾਰਨ",
+        "symptomsToWatch": "ਵੇਖਣ ਲਈ ਲੱਛਣ",
+        "immediateAction": "ਤੁਰੰਤ ਕਾਰਵਾਈ ਦੀ ਲੋੜ",
+        "chemicalTreatment": "ਰਸਾਇਣਕ ਇਲਾਜ",
+        "organicAlternative": "ਜੈਵਿਕ ਵਿਕਲਪ",
+        "futurePrevention": "ਭਵਿੱਖ ਦੀ ਰੋਕਥਾਮ",
+        "generatedOn": "ਬਣਾਇਆ ਗਿਆ",
+        "usingExpertDatabase": "ਮਾਹਰ ਡੇਟਾਬੇਸ ਵਰਤ ਰਿਹਾ ਹੈ",
+        "backToHome": "ਹੋਮ ਤੇ ਵਾਪਸ ਜਾਓ"
     }
 }

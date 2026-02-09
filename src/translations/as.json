@@ -314,5 +314,33 @@
         "qualityWarningsDesc": "অস্পষ্টতা, আন্ধাৰ আৰু অন্যান্য সমস্যাৰ বাবে এলাৰ্ট",
         "startSmartCamera": "স্মাৰ্ট কেমেৰা আৰম্ভ কৰক",
         "getReady": "প্ৰস্তুত হওক..."
+    },
+    "llmAdvice": {
+        "title": "AI শস্য পৰামৰ্শদাতা",
+        "poweredBy": "Gemini AI দ্বাৰা চালিত",
+        "diagnosisInfo": "ৰোগ নিৰ্ণয় তথ্য",
+        "cropType": "শস্যৰ ধৰণ",
+        "disease": "ৰোগ",
+        "severity": "তীব্ৰতা",
+        "severityLow": "কম",
+        "severityMedium": "মধ্যম",
+        "severityHigh": "উচ্চ",
+        "confidenceScore": "বিশ্বাস স্কোৰ",
+        "editDetails": "বিৱৰণ সম্পাদনা কৰক",
+        "cancel": "বাতিল কৰক",
+        "saveAndGenerate": "সংৰক্ষণ আৰু সৃষ্টি কৰক",
+        "generating": "বিশেষজ্ঞ পৰামৰ্শ সৃষ্টি কৰি আছে...",
+        "analyzingPattern": "AI {crop} ৰোগৰ আৰ্হি বিশ্লেষণ কৰি আছে",
+        "unableToGenerate": "পৰামৰ্শ সৃষ্টি কৰিবলৈ অক্ষম",
+        "tryAgain": "পুনৰ চেষ্টা কৰক",
+        "rootCause": "মূল কাৰণ",
+        "symptomsToWatch": "চাবলগীয়া লক্ষণবোৰ",
+        "immediateAction": "তাৎক্ষণিক পদক্ষেপৰ প্ৰয়োজন",
+        "chemicalTreatment": "ৰাসায়নিক চিকিৎসা",
+        "organicAlternative": "জৈৱিক বিকল্প",
+        "futurePrevention": "ভৱিষ্যত প্ৰতিৰোধ",
+        "generatedOn": "সৃষ্টি হ'ল",
+        "usingExpertDatabase": "বিশেষজ্ঞ ডাটাবেছ ব্যৱহাৰ কৰি আছে",
+        "backToHome": "হোমলৈ ঘূৰি যাওক"
     }
 }

@@ -314,5 +314,33 @@
         "qualityWarningsDesc": "ଅସ୍ପଷ୍ଟ, ଅନ୍ଧାର ଏବଂ ଅନ୍ୟାନ୍ୟ ସମସ୍ୟା ପାଇଁ ଆଲର୍ଟ",
         "startSmartCamera": "ସ୍ମାର୍ଟ କ୍ୟାମେରା ଆରମ୍ଭ କରନ୍ତୁ",
         "getReady": "ପ୍ରସ୍ତୁତ ହୁଅନ୍ତୁ..."
+    },
+    "llmAdvice": {
+        "title": "AI ଫସଲ ପରାମର୍ଶଦାତା",
+        "poweredBy": "Gemini AI ଦ୍ୱାରା ଚାଳିତ",
+        "diagnosisInfo": "ରୋଗ ନିର୍ଣ୍ଣୟ ସୂଚନା",
+        "cropType": "ଫସଲ ପ୍ରକାର",
+        "disease": "ରୋଗ",
+        "severity": "ଗମ୍ଭୀରତା",
+        "severityLow": "କମ୍",
+        "severityMedium": "ମଧ୍ୟମ",
+        "severityHigh": "ଅଧିକ",
+        "confidenceScore": "ବିଶ୍ୱାସ ସ୍କୋର",
+        "editDetails": "ବିବରଣୀ ସଂପାଦନ କରନ୍ତୁ",
+        "cancel": "ବାତିଲ୍ କରନ୍ତୁ",
+        "saveAndGenerate": "ସଞ୍ଚୟ କରନ୍ତୁ ଏବଂ ସୃଷ୍ଟି କରନ୍ତୁ",
+        "generating": "ବିଶେଷଜ୍ଞ ପରାମର୍ଶ ସୃଷ୍ଟି ହେଉଛି...",
+        "analyzingPattern": "AI {crop} ରୋଗ ପ୍ରତିମାନ ବିଶ୍ଳେଷଣ କରୁଛି",
+        "unableToGenerate": "ପରାମର୍ଶ ସୃଷ୍ଟି କରିବାରେ ଅସମର୍ଥ",
+        "tryAgain": "ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ",
+        "rootCause": "ମୂଳ କାରଣ",
+        "symptomsToWatch": "ଦେଖିବାକୁ ଥିବା ଲକ୍ଷଣ",
+        "immediateAction": "ତୁରନ୍ତ କାର୍ଯ୍ୟ ଆବଶ୍ୟକ",
+        "chemicalTreatment": "ରାସାୟନିକ ଚିକିତ୍ସା",
+        "organicAlternative": "ଜୈବିକ ବିକଳ୍ପ",
+        "futurePrevention": "ଭବିଷ୍ୟତ ପ୍ରତିରୋଧ",
+        "generatedOn": "ସୃଷ୍ଟି କରାଯାଇଛି",
+        "usingExpertDatabase": "ବିଶେଷଜ୍ଞ ଡାଟାବେସ୍ ବ୍ୟବହାର କରୁଛି",
+        "backToHome": "ହୋମକୁ ଫେରନ୍ତୁ"
     }
 }

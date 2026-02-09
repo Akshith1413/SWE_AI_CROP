@@ -314,5 +314,33 @@
         "qualityWarningsDesc": "अस्पष्ट, अंधार आणि इतर समस्यांसाठी अलर्ट",
         "startSmartCamera": "स्मार्ट कॅमेरा सुरू करा",
         "getReady": "तयार व्हा..."
+    },
+    "llmAdvice": {
+        "title": "AI पीक सल्लागार",
+        "poweredBy": "Gemini AI द्वारे समर्थित",
+        "diagnosisInfo": "रोग निदान माहिती",
+        "cropType": "पीक प्रकार",
+        "disease": "रोग",
+        "severity": "तीव्रता",
+        "severityLow": "कमी",
+        "severityMedium": "मध्यम",
+        "severityHigh": "जास्त",
+        "confidenceScore": "विश्वास गुण",
+        "editDetails": "तपशील संपादित करा",
+        "cancel": "रद्द करा",
+        "saveAndGenerate": "जतन करा आणि तयार करा",
+        "generating": "तज्ञ सल्ला तयार करत आहे...",
+        "analyzingPattern": "AI {crop} रोग नमुन्यांचे विश्लेषण करत आहे",
+        "unableToGenerate": "सल्ला तयार करू शकत नाही",
+        "tryAgain": "पुन्हा प्रयत्न करा",
+        "rootCause": "मूळ कारण",
+        "symptomsToWatch": "पाहण्याची लक्षणे",
+        "immediateAction": "तात्काळ कारवाई आवश्यक",
+        "chemicalTreatment": "रासायनिक उपचार",
+        "organicAlternative": "सेंद्रिय पर्याय",
+        "futurePrevention": "भविष्य प्रतिबंध",
+        "generatedOn": "तयार केले",
+        "usingExpertDatabase": "तज्ञ डेटाबेस वापरत आहे",
+        "backToHome": "मुख्यपृष्ठावर परत या"
     }
 }

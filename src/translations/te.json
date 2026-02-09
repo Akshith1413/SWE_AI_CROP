@@ -314,5 +314,33 @@
         "qualityWarningsDesc": "బ్లర్, చీకటి మరియు ఇతర సమస్యల కోసం హెచ్చరికలు",
         "startSmartCamera": "స్మార్ట్ కెమెరా ప్రారంభించండి",
         "getReady": "సిద్ధంగా ఉండండి..."
+    },
+    "llmAdvice": {
+        "title": "AI పంట సలహాదారు",
+        "poweredBy": "Gemini AI ద్వారా శక్తివంతం",
+        "diagnosisInfo": "రోగ నిర్ధారణ సమాచారం",
+        "cropType": "పంట రకం",
+        "disease": "వ్యాధి",
+        "severity": "తీవ్రత",
+        "severityLow": "తక్కువ",
+        "severityMedium": "మధ్యస్థ",
+        "severityHigh": "అధిక",
+        "confidenceScore": "విశ్వాస స్కోరు",
+        "editDetails": "వివరాలను సవరించండి",
+        "cancel": "రద్దు చేయండి",
+        "saveAndGenerate": "సేవ్ చేసి ఉత్పత్తి చేయండి",
+        "generating": "నిపుణుల సలహా ఉత్పత్తి చేస్తోంది...",
+        "analyzingPattern": "AI {crop} వ్యాధి నమూనాలను విశ్లేషిస్తోంది",
+        "unableToGenerate": "సలహా ఉత్పత్తి చేయడం సాధ్యం కాలేదు",
+        "tryAgain": "మళ్ళీ ప్రయత్నించండి",
+        "rootCause": "మూల కారణం",
+        "symptomsToWatch": "చూడవలసిన లక్షణాలు",
+        "immediateAction": "తక్షణ చర్య అవసరం",
+        "chemicalTreatment": "రసాయన చికిత్స",
+        "organicAlternative": "సేంద్రీయ ప్రత్యామ్నాయం",
+        "futurePrevention": "భవిష్యత్తు నివారణ",
+        "generatedOn": "ఉత్పత్తి చేయబడింది",
+        "usingExpertDatabase": "నిపుణుల డేటాబేస్ ఉపయోగిస్తోంది",
+        "backToHome": "ముంగిలికి తిరిగి వెళ్ళండి"
     }
 }

@@ -314,5 +314,33 @@
         "qualityWarningsDesc": "ಮಬ್ಬು, ಕತ್ತಲೆ ಮತ್ತು ಇತರ ಸಮಸ್ಯೆಗಳಿಗೆ ಎಚ್ಚರಿಕೆಗಳು",
         "startSmartCamera": "ಸ್ಮಾರ್ಟ್ ಕ್ಯಾಮೆರಾ ಪ್ರಾರಂಭಿಸಿ",
         "getReady": "ಸಿದ್ಧರಾಗಿ..."
+    },
+    "llmAdvice": {
+        "title": "AI ಬೆಳೆ ಸಲಹೆಗಾರ",
+        "poweredBy": "Gemini AI ನಿಂದ ಚಾಲಿತ",
+        "diagnosisInfo": "ರೋಗ ನಿರ್ಣಯ ಮಾಹಿತಿ",
+        "cropType": "ಬೆಳೆ ಪ್ರಕಾರ",
+        "disease": "ರೋಗ",
+        "severity": "ತೀವ್ರತೆ",
+        "severityLow": "ಕಡಿಮೆ",
+        "severityMedium": "ಮಧ್ಯಮ",
+        "severityHigh": "ಹೆಚ್ಚು",
+        "confidenceScore": "ವಿಶ್ವಾಸ ಅಂಕ",
+        "editDetails": "ವಿವರಗಳನ್ನು ಸಂಪಾದಿಸಿ",
+        "cancel": "ರದ್ದುಮಾಡಿ",
+        "saveAndGenerate": "ಉಳಿಸಿ ಮತ್ತು ಉತ್ಪಾದಿಸಿ",
+        "generating": "ತಜ್ಞರ ಸಲಹೆಯನ್ನು ಉತ್ಪಾದಿಸಲಾಗುತ್ತಿದೆ...",
+        "analyzingPattern": "AI {crop} ರೋಗ ಮಾದರಿಗಳನ್ನು ವಿಶ್ಲೇಷಿಸುತ್ತಿದೆ",
+        "unableToGenerate": "ಸಲಹೆಯನ್ನು ಉತ್ಪಾದಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ",
+        "tryAgain": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+        "rootCause": "ಮೂಲ ಕಾರಣ",
+        "symptomsToWatch": "ವೀಕ್ಷಿಸಬೇಕಾದ ಲಕ್ಷಣಗಳು",
+        "immediateAction": "ತಕ್ಷಣದ ಕ್ರಮ ಅಗತ್ಯ",
+        "chemicalTreatment": "ರಾಸಾಯನಿಕ ಚಿಕಿತ್ಸೆ",
+        "organicAlternative": "ಸಾವಯವ ಪರ್ಯಾಯ",
+        "futurePrevention": "ಭವಿಷ್ಯದ ತಡೆಗಟ್ಟುವಿಕೆ",
+        "generatedOn": "ಉತ್ಪಾದಿಸಲಾಗಿದೆ",
+        "usingExpertDatabase": "ತಜ್ಞ ಡೇಟಾಬೇಸ್ ಬಳಸುತ್ತಿದೆ",
+        "backToHome": "ಮನೆಗೆ ಹಿಂತಿರುಗಿ"
     }
 }

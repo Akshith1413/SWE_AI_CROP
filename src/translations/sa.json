@@ -314,5 +314,33 @@
         "qualityWarningsDesc": "अस्पष्टता, अन्धकारः इत्यादिभ्यः सचेतनाः",
         "startSmartCamera": "स्मार्ट क्यामेरा आरभताम्",
         "getReady": "सज्जाः भवन्तु..."
+    },
+    "llmAdvice": {
+        "title": "AI शस्य परामर्शदाता",
+        "poweredBy": "Gemini AI संचालितम्",
+        "diagnosisInfo": "रोग निदान सूचना",
+        "cropType": "शस्य प्रकारः",
+        "disease": "रोगः",
+        "severity": "गाम्भीर्यम्",
+        "severityLow": "न्यूनम्",
+        "severityMedium": "मध्यमम्",
+        "severityHigh": "उच्चम्",
+        "confidenceScore": "विश्वास अङ्कः",
+        "editDetails": "विवरणानि सम्पादयतु",
+        "cancel": "निरस्तं कुरु",
+        "saveAndGenerate": "रक्षतु च जनयतु",
+        "generating": "विशेषज्ञ परामर्शम् जनयति...",
+        "analyzingPattern": "AI {crop} रोग प्रतिमानं विश्लेषयति",
+        "unableToGenerate": "परामर्शं जनयितुं असमर्थः",
+        "tryAgain": "पुनः प्रयतताम्",
+        "rootCause": "मूल कारणम्",
+        "symptomsToWatch": "द्रष्टव्यानि लक्षणानि",
+        "immediateAction": "तत्काल कार्यम् आवश्यकम्",
+        "chemicalTreatment": "रासायनिक चिकित्सा",
+        "organicAlternative": "जैविक विकल्पः",
+        "futurePrevention": "भविष्य निवारणम्",
+        "generatedOn": "जनितम्",
+        "usingExpertDatabase": "विशेषज्ञ डाटाबेसस्य उपयोगः",
+        "backToHome": "गृहं प्रति गच्छतु"
     }
 }

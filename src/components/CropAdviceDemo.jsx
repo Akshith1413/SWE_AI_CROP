@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Leaf, Loader, AlertCircle } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 import CropAdviceCard from './CropAdviceCard';
 import cropAdviceService from '../services/cropAdviceService';
 
@@ -8,6 +9,7 @@ import cropAdviceService from '../services/cropAdviceService';
  * This can be integrated into your existing disease detection flow
  */
 const CropAdviceDemo = () => {
+    const { language } = useLanguage(); // Get current selected language
     const [advice, setAdvice] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -39,9 +41,10 @@ const CropAdviceDemo = () => {
                 }
             }
 
-            // Add API key to request if provided
+            // Add API key and language to request
             const requestData = {
                 ...dataToSend,
+                language: language || 'en', // Include the selected language
                 ...(apiKey && { apiKey })
             };
 
