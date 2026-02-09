@@ -1,21 +1,67 @@
-const STORAGE_KEY = 'crop_diagnosis_user_crops';
+const DB_NAME = 'CropDocDB';
+const STORE_NAME = 'crop_diagnosis_history';
+
+const initDB = () => {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, 1);
+        request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+            }
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+};
 
 export const cropService = {
-    getCrops: () => {
+    getCrops: async () => {
         try {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            return stored ? JSON.parse(stored) : [];
+            const db = await initDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readonly');
+                const store = tx.objectStore(STORE_NAME);
+                const request = store.getAll();
+                request.onsuccess = () => resolve(request.result || []);
+                request.onerror = () => reject(request.error);
+            });
         } catch (e) {
-            console.error('Failed to load crops', e);
+            console.error('Failed to load crops from IndexedDB', e);
             return [];
         }
     },
 
-    saveCrops: (crops) => {
+    saveCapture: async (captureData) => {
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(crops));
+            const db = await initDB();
+            const id = captureData.id || `capture_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            const dataToSave = { ...captureData, id };
+
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                const request = store.put(dataToSave);
+                request.onsuccess = () => resolve(dataToSave);
+                request.onerror = () => reject(request.error);
+            });
         } catch (e) {
-            console.error('Failed to save crops', e);
+            console.error('Failed to save capture to IndexedDB', e);
+        }
+    },
+
+    deleteCapture: async (id) => {
+        try {
+            const db = await initDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                const request = store.delete(id);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        } catch (e) {
+            console.error('Failed to delete capture from IndexedDB', e);
         }
     },
 

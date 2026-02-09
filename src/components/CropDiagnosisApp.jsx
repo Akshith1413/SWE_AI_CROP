@@ -18,8 +18,9 @@ import {
   FileText, BookOpen, ShieldCheck, Wifi as WifiIcon,
   CloudRain, CloudSnow, Wind as WindIcon, Sunrise,
   Droplet, Thermometer as ThermometerIcon, UserCheck,
-  BellRing, BatteryCharging, Layers, Activity
+  BellRing, BatteryCharging, Layers, Activity, Trash2
 } from 'lucide-react';
+import { TRANSLATIONS } from '../utils/translations';
 import LandingPage from './LandingPage';
 import ConsentScreen from './ConsentScreen';
 import UserProfile from './UserProfile';
@@ -30,6 +31,7 @@ import { audioService } from '../services/audioService';
 
 const CropDiagnosisApp = () => {
   const [appState, setAppState] = useState('loading'); // loading, landing, consent, app
+  const [language, setLanguage] = useState('en');
   const [view, setView] = useState('home');
   const [capturedImages, setCapturedImages] = useState([]);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -42,8 +44,15 @@ const CropDiagnosisApp = () => {
   });
 
   useEffect(() => {
-    const initApp = () => {
+    const initApp = async () => {
       const hasConsent = consentService.hasConsent();
+
+      // Load stored crops
+      const stored = await cropService.getCrops();
+      if (stored && stored.length > 0) {
+        setCapturedImages(stored);
+      }
+
       if (hasConsent) {
         setAppState('app');
       } else {
@@ -96,6 +105,8 @@ const CropDiagnosisApp = () => {
     setAppState('app');
   };
 
+  const t = (key) => (TRANSLATIONS[language] && TRANSLATIONS[language][key]) || TRANSLATIONS['en'][key] || key;
+
   if (appState === 'loading') return <div className="min-h-screen bg-nature-50 flex items-center justify-center"><RefreshCw className="animate-spin text-nature-600" /></div>;
   if (appState === 'landing') return <LandingPage onGuest={handleGuestContinue} onLogin={handleLogin} />;
   if (appState === 'consent') return <ConsentScreen onConsent={handleConsentGiven} />;
@@ -110,6 +121,9 @@ const CropDiagnosisApp = () => {
           isOnline={isOnline}
           setShowTutorial={setShowTutorial}
           deviceInfo={deviceInfo}
+          language={language}
+          setLanguage={setLanguage}
+          t={t}
         />
       )}
       {view === 'camera' && (
@@ -121,6 +135,7 @@ const CropDiagnosisApp = () => {
           showTutorial={showTutorial}
           setShowTutorial={setShowTutorial}
           deviceInfo={deviceInfo}
+          t={t}
         />
       )}
       {view === 'upload' && (
@@ -129,6 +144,7 @@ const CropDiagnosisApp = () => {
           setCapturedImages={setCapturedImages}
           isOnline={isOnline}
           addToOfflineQueue={addToOfflineQueue}
+          t={t}
         />
       )}
       {view === 'video' && (
@@ -148,6 +164,7 @@ const CropDiagnosisApp = () => {
         <ImageAnalysis
           setView={setView}
           capturedImages={capturedImages}
+          setCapturedImages={setCapturedImages}
         />
       )}
       {view === 'profile' && (
@@ -159,146 +176,115 @@ const CropDiagnosisApp = () => {
   );
 };
 
-const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial }) => {
+const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, language, setLanguage, t }) => {
   const [showAudioSettings, setShowAudioSettings] = React.useState(false);
 
   return (
-    <div className="min-h-screen bg-[#1a1a1a] text-white flex flex-col items-center p-4">
+    <div className="min-h-screen bg-[#f5f7f4] flex flex-col items-center">
       {/* Header */}
-      <header className="w-full max-w-lg flex flex-col items-center mt-6 mb-8 relative">
-        <div className="absolute right-0 top-0 flex gap-2">
+      <header className="w-full bg-white px-6 py-8 shadow-sm relative">
+        <div className="flex flex-col items-center">
+          <div className="w-16 h-16 bg-gradient-to-br from-nature-500 to-nature-600 rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg">
+            <Leaf className="w-8 h-8" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-800 mb-1">{t('appName')}</h1>
+          <p className="text-nature-600 font-medium">{t('appTagline')}</p>
+        </div>
+
+        <div className="absolute left-4 top-4 flex flex-wrap gap-1 max-w-[140px]">
+          {['en', 'hi', 'ta', 'te', 'kn'].map(lang => (
+            <button
+              key={lang}
+              onClick={() => setLanguage(lang)}
+              className={`text-[10px] font-bold px-2 py-1 rounded transition border ${language === lang ? 'bg-nature-600 border-nature-600 text-white' : 'bg-white border-gray-200 text-gray-500'}`}
+            >
+              {lang.toUpperCase()}
+            </button>
+          ))}
+        </div>
+
+        <div className="absolute right-4 top-4 flex gap-2">
           <button
             onClick={() => {
               audioService.playClick();
               setShowAudioSettings(true);
             }}
-            className="p-2 bg-[#242424] rounded-full text-white hover:bg-[#2a2a2a] transition border border-white/5"
+            className="p-2 bg-gray-50 rounded-full text-gray-600 hover:bg-gray-100 transition border border-gray-100"
           >
             <Volume2 className="w-5 h-5" />
           </button>
-          <button
-            onClick={() => {
-              audioService.playClick();
-              setView('profile');
-            }}
-            className="p-2 bg-[#242424] rounded-full text-white hover:bg-[#2a2a2a] transition border border-white/5"
-          >
-            <UserCheck className="w-5 h-5" />
-          </button>
         </div>
-        <Camera className="w-8 h-8 text-white mb-4" />
-        <h1 className="text-3xl font-bold mb-2">AI Crop Diagnosis</h1>
-        <p className="text-gray-400 text-sm">Smart Disease Detection</p>
       </header>
 
-      {/* Audio Settings Modal */}
+      {/* Connection Status */}
+      <div className={`mt-4 px-4 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 shadow-sm ${isOnline ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
+        {isOnline ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
+        {isOnline ? 'Online' : 'Offline Mode'}
+      </div>
+
+      {/* Action Grid */}
+      <main className="w-full max-w-lg p-6 grid grid-cols-2 gap-4">
+        <button
+          onClick={() => { audioService.playClick(); setView('camera'); }}
+          className="col-span-2 bg-gradient-to-r from-nature-500 to-nature-600 p-6 rounded-3xl text-white shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-1 flex items-center gap-6"
+        >
+          <div className="bg-white/20 p-4 rounded-2xl">
+            <Camera className="w-8 h-8" />
+          </div>
+          <div className="text-left">
+            <h3 className="text-xl font-bold">Smart Camera</h3>
+            <p className="text-nature-100 text-sm">AI-guided photo capture</p>
+          </div>
+        </button>
+
+        <button
+          onClick={() => { audioService.playClick(); setView('upload'); }}
+          className="bg-white p-6 rounded-3xl shadow-md hover:shadow-lg transition-all border border-gray-50 flex flex-col items-center gap-3"
+        >
+          <div className="bg-blue-50 p-4 rounded-2xl text-blue-600">
+            <Upload className="w-6 h-6" />
+          </div>
+          <span className="font-bold text-gray-700">Upload</span>
+        </button>
+
+        <button
+          onClick={() => { audioService.playClick(); setView('video'); }}
+          className="bg-white p-6 rounded-3xl shadow-md hover:shadow-lg transition-all border border-gray-50 flex flex-col items-center gap-3"
+        >
+          <div className="bg-purple-50 p-4 rounded-2xl text-purple-600">
+            <Video className="w-6 h-6" />
+          </div>
+          <span className="font-bold text-gray-700">Video</span>
+        </button>
+
+        <button
+          onClick={() => { audioService.playClick(); setView('voice'); }}
+          className="bg-white p-6 rounded-3xl shadow-md hover:shadow-lg transition-all border border-gray-50 flex flex-col items-center gap-3"
+        >
+          <div className="bg-red-50 p-4 rounded-2xl text-red-600">
+            <Mic className="w-6 h-6" />
+          </div>
+          <span className="font-bold text-gray-700">Voice</span>
+        </button>
+
+        <button
+          onClick={() => { audioService.playClick(); setView('analysis'); }}
+          className="bg-white p-6 rounded-3xl shadow-md hover:shadow-lg transition-all border border-gray-50 flex flex-col items-center gap-3"
+        >
+          <div className="bg-orange-50 p-4 rounded-2xl text-orange-600">
+            <BarChart3 className="w-6 h-6" />
+          </div>
+          <span className="font-bold text-gray-700">History</span>
+        </button>
+      </main>
+
+      <div className="p-6 text-center text-gray-400 text-xs">
+        <p>© 2026 CropDoc - AI Diagnostics</p>
+      </div>
+
       {showAudioSettings && (
         <AudioSettingsPanel onClose={() => setShowAudioSettings(false)} />
       )}
-
-      {/* Connection Status */}
-      <div className="flex flex-col items-center mb-8">
-        <div className="p-3 bg-white/10 rounded-xl mb-2">
-          <Smartphone className="w-6 h-6 text-white" />
-        </div>
-        <div className="flex items-center gap-2 text-sm text-gray-300">
-          <Wifi className="w-4 h-4" />
-          <span>{isOnline ? 'Online' : 'Offline Mode'}</span>
-        </div>
-      </div>
-
-      {/* Main Actions Grid */}
-      <div className="grid grid-cols-4 gap-2 w-full max-w-lg mb-12">
-        <button
-          onClick={() => {
-            audioService.playClick();
-            setShowTutorial(true);
-            setView('camera');
-          }}
-          className="col-span-1 bg-[#242424] p-4 rounded-xl flex flex-col items-center justify-center gap-2 border border-white/5 hover:bg-[#2a2a2a] transition relative group"
-        >
-          <div className="absolute top-2 left-2 text-[10px] bg-white/10 px-1.5 py-0.5 rounded text-gray-300">New</div>
-          <Camera className="w-6 h-6 text-white group-hover:scale-110 transition" />
-          <span className="text-xs font-medium text-center">Smart Camera</span>
-          <span className="text-[10px] text-gray-500 text-center leading-tight">AI-guided photo capture</span>
-        </button>
-
-        <button
-          onClick={() => {
-            audioService.playClick();
-            setView('upload');
-          }}
-          className="col-span-1 bg-[#1a1a1a] p-4 rounded-xl flex flex-col items-center justify-center gap-2 hover:bg-[#242424] transition"
-        >
-          <Upload className="w-6 h-6 text-white" />
-          <span className="text-xs font-medium text-center">Upload</span>
-          <span className="text-[10px] text-gray-500 text-center leading-tight">Select from gallery</span>
-        </button>
-
-        <button
-          onClick={() => {
-            audioService.playClick();
-            setView('video');
-          }}
-          className="col-span-1 bg-[#1a1a1a] p-4 rounded-xl flex flex-col items-center justify-center gap-2 hover:bg-[#242424] transition"
-        >
-          <Video className="w-6 h-6 text-white" />
-          <span className="text-xs font-medium text-center">Record Video</span>
-          <span className="text-[10px] text-gray-500 text-center leading-tight">Show plant condition</span>
-        </button>
-
-        <button
-          onClick={() => {
-            audioService.playClick();
-            setView('voice');
-          }}
-          className="col-span-1 bg-[#1a1a1a] p-4 rounded-xl flex flex-col items-center justify-center gap-2 hover:bg-[#242424] transition"
-        >
-          <Mic className="w-6 h-6 text-white" />
-          <span className="text-xs font-medium text-center">Voice Input</span>
-          <span className="text-[10px] text-gray-500 text-center leading-tight">Describe symptoms</span>
-        </button>
-      </div>
-
-      {/* Features List */}
-      <div className="w-full max-w-lg text-center mb-12">
-        <Lightbulb className="w-5 h-5 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold mb-6">Smart Camera Features</h3>
-        <ul className="space-y-4 text-sm text-gray-400 text-left pl-8">
-          <li className="flex items-center gap-3">
-            <Focus className="w-5 h-5 text-gray-300" />
-            <span>Real-time Quality Analysis - <span className="text-gray-500">Checks for blur, darkness, and focus</span></span>
-          </li>
-          <li className="flex items-center gap-3">
-            <Volume2 className="w-5 h-5 text-gray-300" />
-            <span>Voice Guidance - <span className="text-gray-500">Audio instructions for perfect photos</span></span>
-          </li>
-          <li className="flex items-center gap-3">
-            <AlertTriangle className="w-5 h-5 text-gray-300" />
-            <span>Instant Warnings - <span className="text-gray-500">Alerts for poor lighting or blur</span></span>
-          </li>
-          <li className="flex items-center gap-3">
-            <CheckCircle className="w-5 h-5 text-gray-300" />
-            <span>Device Optimization - <span className="text-gray-500">Works on all phone models</span></span>
-          </li>
-        </ul>
-      </div>
-
-      {/* Compatibility Test */}
-      <div className="w-full max-w-lg text-center mb-8">
-        <Camera className="w-5 h-5 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold mb-4">Camera Compatibility Test</h3>
-        <button
-          onClick={() => setView('camera')}
-          className="bg-[#242424] text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-[#2a2a2a] transition"
-        >
-          Test Now
-        </button>
-      </div>
-
-      <p className="text-xs text-gray-600 text-center max-w-xs">
-        Test your camera with our AI guidance system. We'll help you take perfect crop photos!
-      </p>
     </div>
   );
 };
@@ -358,7 +344,20 @@ const EnhancedCompleteCameraCapture = ({
   const [showWarningAlert, setShowWarningAlert] = useState(false);
   const [warningMessage, setWarningMessage] = useState('');
   const [showSaveConsent, setShowSaveConsent] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [aiResult, setAiResult] = useState(null);
 
+  // Initialize from storage
+  useEffect(() => {
+    const loadData = async () => {
+      const stored = await cropService.getCrops();
+      if (stored && stored.length > 0) {
+        setCapturedImages(stored);
+      }
+      setAppState('app');
+    };
+    loadData();
+  }, []);
   // Initialize camera immediately
   useEffect(() => {
     startCamera();
@@ -847,7 +846,45 @@ const EnhancedCompleteCameraCapture = ({
       // Move to preparation step after delay
       setTimeout(() => {
         setCurrentStep('preparation');
+        // Trigger AI analysis if online
+        if (isOnline) {
+          fetchAIPrediction(photoData);
+        }
       }, 3000);
+    }
+  };
+
+  const fetchAIPrediction = async (photoData) => {
+    setIsAnalyzing(true);
+    setAiResult(null);
+    try {
+      // Convert base64 to blob
+      const res = await fetch(photoData);
+      const blob = await res.blob();
+
+      const formData = new FormData();
+      formData.append('image', blob, 'capture.jpg');
+
+      console.log('Fetching AI prediction from backend...');
+      const response = await fetch('http://localhost:5000/api/predict-crop', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error('AI analysis failed');
+
+      const data = await response.json();
+      console.log('AI Prediction received:', data);
+      setAiResult(data);
+
+      if (voiceInstructions) {
+        speakGuidance(`AI diagnosis complete. Detected ${data.disease} with ${data.confidence} percent confidence.`);
+      }
+    } catch (err) {
+      console.error('AI Prediction error:', err);
+      setAiResult({ error: 'AI Analysis unavailable' });
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
@@ -929,8 +966,13 @@ const EnhancedCompleteCameraCapture = ({
   const confirmSave = () => {
     if (capturedPhoto && analysisResult) {
       const captureData = {
+        id: `capture_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         data: capturedPhoto,
-        analysis: analysisResult,
+        analysis: {
+          ...analysisResult,
+          aiDiagnosis: aiResult?.disease,
+          aiConfidence: aiResult?.confidence
+        },
         metadata: {
           cropType,
           diseaseSymptoms,
@@ -943,7 +985,11 @@ const EnhancedCompleteCameraCapture = ({
         }
       };
 
-      setCapturedImages(prev => [...prev, captureData]);
+      setCapturedImages(prev => {
+        const updated = [...prev, captureData];
+        cropService.saveCapture(captureData);
+        return updated;
+      });
 
       if (!isOnline) {
         addToOfflineQueue(captureData);
@@ -1965,6 +2011,44 @@ const EnhancedCompleteCameraCapture = ({
                 </div>
               </div>
 
+              {/* AI Diagnosis Result */}
+              {(isAnalyzing || aiResult) && (
+                <div className={`p-6 rounded-2xl border ${isAnalyzing ? 'bg-gray-50 border-gray-200 animate-pulse' : 'bg-emerald-50 border-emerald-200'}`}>
+                  <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <Activity className={`w-5 h-5 ${isAnalyzing ? 'text-blue-500 animate-spin' : 'text-emerald-600'}`} />
+                    AI Deep Diagnosis
+                  </h3>
+                  {isAnalyzing ? (
+                    <div className="flex items-center gap-3 text-gray-600">
+                      <RefreshCw className="w-5 h-5 animate-spin" />
+                      <span>Consulting AI Expert...</span>
+                    </div>
+                  ) : aiResult?.error ? (
+                    <div className="flex items-center gap-2 text-red-600">
+                      <AlertTriangle className="w-5 h-5" />
+                      <span>{aiResult.error}</span>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-700">Detected Disease:</span>
+                        <span className="font-bold text-emerald-700 text-lg">{aiResult.disease.replace(/___/g, ' ').replace(/_/g, ' ')}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-700">AI Confidence:</span>
+                        <span className="font-bold text-emerald-600">{aiResult.confidence}%</span>
+                      </div>
+                      <div className="h-2 bg-white rounded-full overflow-hidden border border-emerald-100">
+                        <div
+                          className="h-full bg-emerald-500 transition-all duration-1000"
+                          style={{ width: `${aiResult.confidence}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
                 <h3 className="font-bold text-blue-900 mb-4 flex items-center gap-2">
                   <Sparkles className="w-5 h-5" />
@@ -2141,23 +2225,48 @@ const MultiImageUpload = ({ setView, setCapturedImages, isOnline, addToOfflineQu
       uploadedPreviewImages.map(async (imgData, index) => {
         return new Promise((resolve) => {
           const reader = new FileReader();
-          reader.onload = (e) => {
+          reader.onload = async (e) => {
+            const photoData = e.target.result;
+            let aiAnalysis = null;
+
+            try {
+              if (isOnline) {
+                const res = await fetch(photoData);
+                const blob = await res.blob();
+                const formData = new FormData();
+                formData.append('image', blob, 'upload.jpg');
+
+                const response = await fetch('http://localhost:5000/api/predict-crop', {
+                  method: 'POST',
+                  body: formData,
+                });
+
+                if (response.ok) {
+                  aiAnalysis = await response.json();
+                }
+              }
+            } catch (err) {
+              console.error('Batch AI prediction error:', err);
+            }
+
             // Create a simple analysis for each image
             const analysis = {
-              healthScore: Math.floor(Math.random() * 40) + 60,
+              healthScore: aiAnalysis ? aiAnalysis.confidence : Math.floor(Math.random() * 40) + 60,
               greenPercentage: Math.floor(Math.random() * 30) + 50,
               brownPercentage: Math.floor(Math.random() * 20) + 5,
               yellowPercentage: Math.floor(Math.random() * 15) + 5,
               diseasePercentage: Math.floor(Math.random() * 10) + 2,
               spotDensity: Math.floor(Math.random() * 10),
-              issues: ['Sample analysis - upload complete'],
+              issues: ['Batch processing complete'],
+              aiDiagnosis: aiAnalysis ? aiAnalysis.disease : 'N/A',
+              aiConfidence: aiAnalysis ? aiAnalysis.confidence : 0,
               recommendations: ['Review each image for detailed diagnosis', 'Consider professional consultation if needed'],
               timestamp: new Date().toISOString(),
               qualityScore: 85
             };
 
             resolve({
-              data: e.target.result,
+              data: photoData,
               analysis,
               metadata: {
                 filename: imgData.file.name,
@@ -2402,107 +2511,333 @@ const MultiImageUpload = ({ setView, setCapturedImages, isOnline, addToOfflineQu
   );
 };
 
-const VideoRecorder = ({ setView }) => (
-  <div className="min-h-screen bg-nature-50 flex flex-col">
-    <div className="bg-nature-600 p-4 text-white shadow-lg">
-      <div className="max-w-4xl mx-auto flex items-center gap-3">
-        <button onClick={() => setView('home')} className="p-2 hover:bg-white/20 rounded-full transition">
-          <ChevronRight className="w-6 h-6 rotate-180" />
-        </button>
-        <h1 className="text-xl font-bold">Video Analysis</h1>
-      </div>
-    </div>
+const VideoRecorder = ({ setView }) => {
+  const [isRecording, setIsRecording] = useState(false);
+  const [videoBlob, setVideoBlob] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const mediaRecorderRef = useRef(null);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
 
-    <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-      <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-nature-100">
-        <div className="bg-purple-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-          <Video className="w-10 h-10 text-purple-600" />
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      streamRef.current = stream;
+      if (videoRef.current) videoRef.current.srcObject = stream;
+
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      const chunks = [];
+
+      mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/mp4' });
+        setVideoBlob(blob);
+        if (videoRef.current) videoRef.current.srcObject = null;
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      audioService.playClick();
+    } catch (err) {
+      console.error('Error starting video recording:', err);
+      alert('Camera/Microphone access denied');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current) mediaRecorderRef.current.stop();
+    if (streamRef.current) streamRef.current.getTracks().forEach(track => track.stop());
+    setIsRecording(false);
+    audioService.playClick();
+  };
+
+  const handleUpload = async () => {
+    if (!videoBlob) return;
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('video', videoBlob, 'assessment.mp4');
+
+      const response = await fetch('http://localhost:5000/api/upload-video', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        audioService.playSuccess();
+        alert('Video uploaded successfully for analysis');
+        setView('home');
+      } else {
+        throw new Error('Upload failed');
+      }
+    } catch (err) {
+      console.error('Video upload error:', err);
+      alert('Failed to upload video');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-nature-50 flex flex-col">
+      <div className="bg-nature-600 p-4 text-white shadow-lg">
+        <div className="max-w-4xl mx-auto flex items-center gap-3">
+          <button onClick={() => setView('home')} className="p-2 hover:bg-white/20 rounded-full transition">
+            <ChevronRight className="w-6 h-6 rotate-180" />
+          </button>
+          <h1 className="text-xl font-bold">Video Analysis</h1>
         </div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Record Video</h2>
-        <p className="text-gray-500 mb-8">Record a short video of the plant to analyze motion-based symptoms.</p>
-
-        <button className="w-full bg-purple-600 text-white py-4 rounded-xl font-bold hover:bg-purple-700 transition shadow-lg shadow-purple-200 mb-3">
-          Start Recording
-        </button>
-        <button onClick={() => setView('home')} className="w-full bg-gray-100 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-200 transition">
-          Cancel
-        </button>
       </div>
-    </div>
-  </div>
-);
 
-const VoiceInput = ({ setView }) => (
-  <div className="min-h-screen bg-nature-50 flex flex-col">
-    <div className="bg-nature-600 p-4 text-white shadow-lg">
-      <div className="max-w-4xl mx-auto flex items-center gap-3">
-        <button onClick={() => setView('home')} className="p-2 hover:bg-white/20 rounded-full transition">
-          <ChevronRight className="w-6 h-6 rotate-180" />
-        </button>
-        <h1 className="text-xl font-bold">Voice Assistant</h1>
-      </div>
-    </div>
-
-    <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-      <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-nature-100">
-        <div className="bg-red-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
-          <Mic className="w-10 h-10 text-red-600" />
-        </div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Listening...</h2>
-        <p className="text-gray-500 mb-8">Describe the symptoms you see on the plant.</p>
-
-        <button onClick={() => setView('home')} className="w-full bg-gray-100 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-200 transition">
-          Stop Listening
-        </button>
-      </div>
-    </div>
-  </div>
-);
-
-const ImageAnalysis = ({ setView, capturedImages }) => (
-  <div className="min-h-screen bg-nature-50 flex flex-col">
-    <div className="bg-nature-600 p-4 text-white shadow-lg">
-      <div className="max-w-4xl mx-auto flex items-center gap-3">
-        <button onClick={() => setView('home')} className="p-2 hover:bg-white/20 rounded-full transition">
-          <ChevronRight className="w-6 h-6 rotate-180" />
-        </button>
-        <h1 className="text-xl font-bold">Analysis History</h1>
-      </div>
-    </div>
-
-    <div className="max-w-4xl mx-auto p-6 w-full">
-      {capturedImages.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-3xl shadow-sm">
-          <div className="bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <BarChart3 className="w-8 h-8 text-gray-400" />
+      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+        <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-nature-100">
+          <div className="mb-6 rounded-2xl overflow-hidden bg-black aspect-video flex items-center justify-center">
+            {videoBlob ? (
+              <video src={URL.createObjectURL(videoBlob)} controls className="w-full h-full" />
+            ) : isRecording ? (
+              <video ref={videoRef} autoPlay muted className="w-full h-full object-cover" />
+            ) : (
+              <Video className="w-16 h-16 text-gray-600" />
+            )}
           </div>
-          <h3 className="text-xl font-bold text-gray-700">No Analysis Yet</h3>
-          <p className="text-gray-500 mt-2">Use the camera to diagnose your first plant.</p>
+
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            {videoBlob ? 'Video Recorded' : isRecording ? 'Recording...' : 'Record Video'}
+          </h2>
+          <p className="text-gray-500 mb-8">
+            {videoBlob ? 'Review your recording before submitting.' : 'Show plant condition from multiple angles.'}
+          </p>
+
+          {!videoBlob ? (
+            <button
+              onClick={isRecording ? stopRecording : startRecording}
+              className={`w-full py-4 rounded-xl font-bold transition shadow-lg mb-3 flex items-center justify-center gap-2 ${isRecording ? 'bg-red-500 hover:bg-red-600' : 'bg-purple-600 hover:bg-purple-700'
+                } text-white`}
+            >
+              {isRecording ? <SquareIcon className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+              {isRecording ? 'Stop Recording' : 'Start Recording'}
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={handleUpload}
+                disabled={isUploading}
+                className="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold hover:bg-emerald-700 transition shadow-lg mb-3 flex items-center justify-center gap-2"
+              >
+                {isUploading ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
+                {isUploading ? 'Uploading...' : 'Submit for Analysis'}
+              </button>
+              <button
+                onClick={() => setVideoBlob(null)}
+                className="w-full bg-gray-100 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-200 transition"
+              >
+                Retake
+              </button>
+            </>
+          )}
+          {!isUploading && (
+            <button onClick={() => setView('home')} className="w-full text-gray-500 py-2 mt-2 hover:underline">
+              Cancel
+            </button>
+          )}
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {capturedImages.map((img, idx) => (
-            <div key={idx} className="bg-white p-4 rounded-2xl shadow-md flex gap-4 border border-gray-100">
-              <img src={img.data} className="w-24 h-24 rounded-xl object-cover" alt="Captured" />
-              <div className="flex-1">
-                <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-bold text-gray-800">Analysis #{idx + 1}</h4>
-                  <span className="text-xs text-gray-500">{new Date(img.metadata?.timestamp).toLocaleDateString()}</span>
-                </div>
-                <div className="flex items-center gap-2 mb-3">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${img.analysis?.healthScore > 70 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                    }`}>
-                    Score: {img.analysis?.healthScore}%
-                  </span>
-                </div>
-                <button className="text-nature-600 text-sm font-bold hover:underline">View Full Report</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
+
+const VoiceInput = ({ setView }) => {
+  const [isListening, setIsListening] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const recognitionRef = useRef(null);
+
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+
+      recognition.onstart = () => setIsListening(true);
+      recognition.onresult = (event) => {
+        let currentTranscript = '';
+        currentTranscript = Array.from(event.results)
+          .map(result => result[0])
+          .map(result => result.transcript)
+          .join('');
+        setTranscript(currentTranscript);
+      };
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error', event.error);
+        setIsListening(false);
+      };
+      recognition.onend = () => setIsListening(false);
+      recognitionRef.current = recognition;
+    }
+  }, []);
+
+  const toggleListening = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      audioService.playClick();
+    } else {
+      setTranscript('');
+      recognitionRef.current?.start();
+      audioService.playClick();
+    }
+  };
+
+  const handleSave = async () => {
+    if (!transcript) return;
+
+    const captureData = {
+      id: `voice_${Date.now()}`,
+      data: null,
+      analysis: {
+        healthScore: 50,
+        issues: ['Voice description gathered'],
+        recommendations: ['AI analysis pending for voice description']
+      },
+      metadata: {
+        cropType: 'Voice Input',
+        diseaseSymptoms: transcript,
+        environmentalData: {},
+        deviceInfo: {},
+        timestamp: Date.now()
+      }
+    };
+
+    await cropService.saveCapture(captureData);
+    audioService.playSuccess();
+    alert('Symptom description saved to history');
+    setView('home');
+  };
+
+  return (
+    <div className="min-h-screen bg-nature-50 flex flex-col">
+      <div className="bg-nature-600 p-4 text-white shadow-lg">
+        <div className="max-w-4xl mx-auto flex items-center gap-3">
+          <button onClick={() => setView('home')} className="p-2 hover:bg-white/20 rounded-full transition">
+            <ChevronRight className="w-6 h-6 rotate-180" />
+          </button>
+          <h1 className="text-xl font-bold">Voice Assistant</h1>
+        </div>
+      </div>
+
+      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+        <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-nature-100">
+          <div className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 transition-all duration-500 ${isListening ? 'bg-red-50 animate-pulse scale-110' : 'bg-nature-50'}`}>
+            <Mic className={`w-10 h-10 ${isListening ? 'text-red-600' : 'text-nature-600'}`} />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            {isListening ? 'Listening...' : 'Record Symptoms'}
+          </h2>
+          <p className="text-gray-500 mb-8">
+            {isListening ? 'Describe the symptoms you see on the plant.' : 'Tap the button below and describe the plant condition.'}
+          </p>
+
+          <div className="bg-gray-50 p-4 rounded-xl min-h-[100px] mb-8 text-left text-gray-700 italic border border-gray-100">
+            {transcript || 'Your description will appear here...'}
+          </div>
+
+          <button
+            onClick={toggleListening}
+            className={`w-full py-4 rounded-xl font-bold transition shadow-lg mb-3 flex items-center justify-center gap-2 ${isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-nature-600 hover:bg-nature-700'
+              } text-white`}
+          >
+            {isListening ? <SquareIcon className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+            {isListening ? 'Stop Listening' : 'Start Listening'}
+          </button>
+
+          {transcript && !isListening && (
+            <button
+              onClick={handleSave}
+              className="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold hover:bg-emerald-700 transition shadow-lg flex items-center justify-center gap-2"
+            >
+              <Check className="w-5 h-5" />
+              Save Symptoms
+            </button>
+          )}
+
+          {!isListening && (
+            <button onClick={() => setView('home')} className="w-full text-gray-500 py-2 mt-4 hover:underline">
+              Cancel
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ImageAnalysis = ({ setView, capturedImages, setCapturedImages }) => {
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this analysis?')) {
+      await cropService.deleteCapture(id);
+      setCapturedImages(prev => prev.filter(img => img.id !== id));
+      audioService.playClick();
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-nature-50 flex flex-col">
+      <div className="bg-nature-600 p-4 text-white shadow-lg">
+        <div className="max-w-4xl mx-auto flex items-center gap-3">
+          <button onClick={() => setView('home')} className="p-2 hover:bg-white/20 rounded-full transition">
+            <ChevronRight className="w-6 h-6 rotate-180" />
+          </button>
+          <h1 className="text-xl font-bold">Analysis History</h1>
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto p-6 w-full">
+        {capturedImages.length === 0 ? (
+          <div className="text-center py-20 bg-white rounded-3xl shadow-sm">
+            <div className="bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <BarChart3 className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-700">No Analysis Yet</h3>
+            <p className="text-gray-500 mt-2">Use the camera to diagnose your first plant.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {capturedImages.map((img, idx) => (
+              <div key={img.id || idx} className="bg-white p-4 rounded-2xl shadow-md flex gap-4 border border-gray-100 relative group">
+                <img src={img.data} className="w-24 h-24 rounded-xl object-cover" alt="Captured" />
+                <div className="flex-1">
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-bold text-gray-800">Analysis #{capturedImages.length - idx}</h4>
+                    <span className="text-xs text-gray-500">{new Date(img.metadata?.timestamp).toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 mb-3">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${img.analysis?.healthScore > 70 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                      }`}>
+                      Score: {img.analysis?.healthScore}%
+                    </span>
+                    {img.analysis?.aiDiagnosis && (
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700">
+                        AI: {img.analysis.aiDiagnosis.replace(/___/g, ' ').replace(/_/g, ' ')} ({img.analysis.aiConfidence}%)
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <button className="text-nature-600 text-sm font-bold hover:underline">View Full Report</button>
+                    <button
+                      onClick={() => handleDelete(img.id)}
+                      className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default CropDiagnosisApp;
