@@ -1,3 +1,23 @@
+/**
+ * CropDiagnosisApp Component
+ * Main application component for crop disease diagnosis
+ * 
+ * Features:
+ * - Multi-view camera capture (photo/video)
+ * - AI-powered disease analysis
+ * - Offline support with sync queue
+ * - Guest mode and authenticated mode
+ * - Multi-language support
+ * - Audio feedback system
+ * - Device capability detection
+ * - Tutorial system for first-time users
+ * 
+ * App Flow:
+ * 1. Loading → checks for consent
+ * 2. Landing → if no consent
+ * 3. Consent → user accepts terms
+ * 4. App → main diagnosis interface
+ */
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -37,62 +57,109 @@ import { offlineStorageService } from '../services/offlineStorageService';
 import { useTranslation } from '../hooks/useTranslation';
 
 const CropDiagnosisApp = ({ onBack, onUpgradeFromGuest }) => {
-  const [appState, setAppState] = useState('loading'); // loading, landing, consent, app
-  const [view, setView] = useState('home');
-  const [capturedImages, setCapturedImages] = useState([]);
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [offlineQueue, setOfflineQueue] = useState([]);
-  const [showTutorial, setShowTutorial] = useState(false);
+  // App-level state management
+  const [appState, setAppState] = useState('loading'); // Tracks: loading, landing, consent, app
+  const [view, setView] = useState('home');            // Current view within app
+  const [capturedImages, setCapturedImages] = useState([]);  // Array of captured/uploaded images
+
+  // Network and offline mode
+  const [isOnline, setIsOnline] = useState(navigator.onLine);  // Real-time network status
+  const [offlineQueue, setOfflineQueue] = useState([]);        // Queue for offline operations
+
+  // UI state
+  const [showTutorial, setShowTutorial] = useState(false);     // First-time user tutorial
+
+  // Device capability detection
+  // Used to adapt UI and features based on device type
   const [deviceInfo, setDeviceInfo] = useState({
     isMobile: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent),
     isAndroid: /Android/i.test(navigator.userAgent),
     isIOS: /iPhone|iPad|iPod/i.test(navigator.userAgent)
   });
 
+  /**
+   * App Initialization Effect
+   * Runs once on component mount to:
+   * - Check for existing user consent
+   * - Set up network status listeners
+   * - Test camera capabilities
+   */
   useEffect(() => {
+    // Initialize app state based on consent status
     const initApp = () => {
       const hasConsent = consentService.hasConsent();
       if (hasConsent) {
+        // User has previously given consent - go straight to app
         setAppState('app');
       } else {
+        // No consent - show landing page first
         setAppState('landing');
       }
     };
     initApp();
 
+    // Set up real-time network status monitoring
+    // Updates `isOnline` state when connection changes
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
+    // Check what camera capabilities are available
     testCameraCapabilities();
 
+    // Cleanup: remove event listeners on unmount
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
   }, []);
 
+  /**
+   * Test Camera Capabilities
+   * Enumerates available video input devices (cameras)
+   * Helpful for debugging camera issues and adapting UI
+   */
   const testCameraCapabilities = async () => {
     try {
+      // Get list of all media devices
       const devices = await navigator.mediaDevices.enumerateDevices();
+
+      // Filter for video input devices (cameras)
       const videoDevices = devices.filter(device => device.kind === 'videoinput');
+
       console.log(`Camera test: ${videoDevices.length} camera(s) detected`);
     } catch (err) {
+      // Some browsers/devices don't support enumeration
       console.log('Camera enumeration not supported');
     }
   };
 
+  /**
+   * Add item to offline queue
+   * Stores operations to be synced when connection is restored
+   * @param {Object} data - Operation data to queue
+   */
   const addToOfflineQueue = (data) => {
     setOfflineQueue(prev => [...prev, data]);
   };
 
+  /**
+   * Handle guest mode continuation
+   * User chooses to continue without logging in
+   * Sets guest mode flag and proceeds to consent screen
+   */
   const handleGuestContinue = () => {
     consentService.setGuestMode(true);
     setAppState('consent');
   };
 
+  /**
+   * Handle user login
+   * Currently simulated - would connect to actual auth in production
+   * Disables guest mode and proceeds to consent screen
+   */
   const handleLogin = () => {
     // Simulate login for now
     consentService.setGuestMode(false);
@@ -338,7 +405,7 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
           <div className="p-4 bg-gradient-to-br from-emerald-100 to-teal-50 rounded-2xl group-hover:from-emerald-200 group-hover:to-teal-100 transition">
             <Sparkles className="w-8 h-8 text-emerald-600" />
           </div>
-          <span className="font-semibold text-gray-700 text-base">LLM Advice</span>
+          <span className="font-semibold text-gray-700 text-base">{t('cropAdvice.llmAdvice')}</span>
         </button>
       </div>
 
@@ -2113,7 +2180,7 @@ const EnhancedCompleteCameraCapture = ({
                   className="w-full bg-gradient-to-r from-emerald-500 to-green-500 text-white py-4 px-6 rounded-xl font-bold hover:shadow-xl transition flex items-center justify-center gap-2"
                 >
                   <Sparkles className="w-5 h-5" />
-                  Get Expert LLM Advice
+                  {t('cropAdvice.getExpertAdvice')}
                 </button>
 
                 {/* Secondary Buttons */}
@@ -2702,8 +2769,8 @@ const VideoRecorder = ({ setView, isOnline, addToOfflineQueue }) => {
               onClick={isRecording ? stopRecording : startRecording}
               disabled={!cameraReady}
               className={`w-20 h-20 rounded-full border-4 flex items-center justify-center transition-all ${isRecording
-                  ? 'border-red-500 bg-red-500/20'
-                  : 'border-white bg-white/10 hover:bg-white/20'
+                ? 'border-red-500 bg-red-500/20'
+                : 'border-white bg-white/10 hover:bg-white/20'
                 }`}
             >
               {isRecording ? (
@@ -2856,8 +2923,8 @@ const VoiceInput = ({ setView, isOnline }) => {
             <button
               onClick={toggleListening}
               className={`w-24 h-24 rounded-full flex items-center justify-center transition-all shadow-lg ${isListening
-                  ? 'bg-red-500 shadow-red-200 animate-pulse scale-110'
-                  : 'bg-emerald-500 shadow-emerald-200 hover:scale-105'
+                ? 'bg-red-500 shadow-red-200 animate-pulse scale-110'
+                : 'bg-emerald-500 shadow-emerald-200 hover:scale-105'
                 }`}
             >
               <Mic className="w-10 h-10 text-white" />

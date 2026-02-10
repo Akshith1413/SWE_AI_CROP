@@ -314,5 +314,23 @@
         "qualityWarningsDesc": "బ్లర్, చీకటి మరియు ఇతర సమస్యల కోసం హెచ్చరికలు",
         "startSmartCamera": "స్మార్ట్ కెమెరా ప్రారంభించండి",
         "getReady": "సిద్ధంగా ఉండండి..."
+    },
+    "cropAdvice": {
+        "llmAdvice": "LLM సలహా",
+        "getExpertAdvice": "నిపుణుల LLM సలహా పొందండి",
+        "aiGeneratedAdvice": "AI ఉత్పత్తి సలహా",
+        "rootCause": "మూల కారణం",
+        "symptomsToWatch": "గమనించవలసిన లక్షణాలు",
+        "immediateAction": "తక్షణ చర్య అవసరం",
+        "chemicalTreatment": "రసాయన చికిత్స",
+        "organicAlternative": "సేంద్రీయ ప్రత్యామ్నాయం",
+        "futurePrevention": "భవిష్యత్తు నివారణ",
+        "severity": "తీవ్రత",
+        "confidence": "నమ్మకం",
+        "copy": "కాపీ చేయండి",
+        "copied": "కాపీ అయింది!",
+        "urgent": "తక్షణ",
+        "important": "ముఖ్యమైనది:",
+        "disclaimerText": "ఈ సలహా AI ద్వారా ఉత్పత్తి చేయబడింది మరియు మార్గదర్శకంగా ఉపయోగించాలి. తీవ్రమైన సందర్భాలు లేదా నిరంతర సమస్యల కోసం, దయచేసి స్థానిక వ్యవసాయ నిపుణుడు లేదా విస్తరణ అధికారిని సంప్రదించండి."
     }
 }

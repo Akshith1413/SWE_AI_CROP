@@ -1,98 +1,140 @@
+// Import consent service to check guest mode status
 import { consentService } from './consentService';
 
 /**
  * Audio Service
- * Provides audio feedback for user actions including sound effects and voice confirmation
+ * Provides comprehensive audio feedback for user actions including:
+ * - Sound effects (beeps, clicks, success/error tones)
+ * - Text-to-speech voice confirmations
+ * - Multilingual voice support
  */
 
 class AudioService {
     constructor() {
+        // Web Audio API context for generating sound effects
         this.audioContext = null;
-        this.soundEnabled = true;
-        this.voiceEnabled = true;
-        this.isSpeaking = false;
-        this.currentUtterance = null;
 
-        // Initialize Web Audio API
+        // User preference flags
+        this.soundEnabled = true;      // Enable/disable sound effects
+        this.voiceEnabled = true;      // Enable/disable text-to-speech
+
+        // Speech tracking
+        this.isSpeaking = false;       // Track if TTS is currently speaking
+        this.currentUtterance = null;  // Reference to current speech utterance
+
+        // Initialize Web Audio API for sound generation
         this.initAudioContext();
 
-        // Load preferences
+        // Load user's saved audio preferences from storage
         this.loadPreferences();
     }
 
     /**
-     * Initialize Audio Context
+     * Initialize Web Audio API context for generating sound effects
+     * Uses browser-specific AudioContext (handles webkit prefix for Safari)
      */
     initAudioContext() {
         try {
+            // Get AudioContext (standard or webkit-prefixed)
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             this.audioContext = new AudioContext();
+            console.log('AudioService: Web Audio API initialized successfully');
         } catch (e) {
+            // Gracefully handle browsers that don't support Web Audio API
             console.warn('Web Audio API not supported:', e);
+            this.audioContext = null;
         }
     }
 
     /**
      * Load audio preferences from localStorage
+     * Guest users always get default settings without persistence
      */
     loadPreferences() {
-        // Guests always start with default settings (true/true)
+        // Guest mode: use defaults without loading from storage
+        // Guests always start with audio enabled for better accessibility
         if (consentService.isGuest()) {
             this.soundEnabled = true;
             this.voiceEnabled = true;
             return;
         }
 
+        // Regular users: load saved preferences
         try {
             const prefs = localStorage.getItem('cropai_audio_preferences');
             if (prefs) {
                 const parsed = JSON.parse(prefs);
+                // Use saved values or default to true if not set
                 this.soundEnabled = parsed.soundEnabled !== undefined ? parsed.soundEnabled : true;
                 this.voiceEnabled = parsed.voiceEnabled !== undefined ? parsed.voiceEnabled : true;
+                console.log('AudioService: Preferences loaded', { soundEnabled: this.soundEnabled, voiceEnabled: this.voiceEnabled });
             }
         } catch (e) {
             console.warn('Error loading audio preferences:', e);
+            // Fall back to defaults on error
+            this.soundEnabled = true;
+            this.voiceEnabled = true;
         }
     }
 
     /**
-     * Save audio preferences
+     * Save current audio preferences to localStorage
+     * Skipped for guest users to respect privacy
      */
     savePreferences() {
-        // Don't save for guests
+        // Don't persist preferences for guests (privacy-first approach)
         if (consentService.isGuest()) {
+            console.log('AudioService: Guest mode - preferences not saved');
             return;
         }
 
+        // Save preferences for regular users
         try {
             const prefs = {
                 soundEnabled: this.soundEnabled,
-                voiceEnabled: this.voiceEnabled
+                voiceEnabled: thisVoiceEnabled
             };
             localStorage.setItem('cropai_audio_preferences', JSON.stringify(prefs));
+            console.log('AudioService: Preferences saved');
         } catch (e) {
             console.warn('Error saving audio preferences:', e);
         }
     }
 
     /**
-     * Toggle sound effects
+     * Toggle sound effects on/off
+     * Automatically saves preference for non-guest users
+     * @returns {boolean} - New sound enabled state
      */
     toggleSound() {
+        // Flip the current state
         this.soundEnabled = !this.soundEnabled;
+
+        // Persist the new setting
         this.savePreferences();
+
+        console.log('AudioService: Sound effects', this.soundEnabled ? 'enabled' : 'disabled');
         return this.soundEnabled;
     }
 
     /**
-     * Toggle voice feedback
+     * Toggle voice feedback on/off
+     * If turning off voice, stops any currently playing speech
+     * @returns {boolean} - New voice enabled state
      */
     toggleVoice() {
+        // Flip the current state
         this.voiceEnabled = !this.voiceEnabled;
+
+        // Persist the new setting
         this.savePreferences();
+
+        // If disabling voice, stop any ongoing speech immediately
         if (!this.voiceEnabled) {
             this.stopSpeaking();
         }
+
+        console.log('AudioService: Voice feedback', this.voiceEnabled ? 'enabled' : 'disabled');
         return this.voiceEnabled;
     }
 

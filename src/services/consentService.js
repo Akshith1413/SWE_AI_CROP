@@ -1,12 +1,17 @@
+// Service for managing user consent and guest mode status
+// Handles consent tracking, revocation, and guest mode storage
+
 const CONSENT_KEY = 'crop_diagnosis_consent';
 const CONSENT_RECORD_KEY = 'crop_diagnosis_consent_record';
 const GUEST_KEY = 'crop_diagnosis_is_guest';
 
 export const consentService = {
+    // Check if user has given consent
     hasConsent: () => {
         return localStorage.getItem(CONSENT_KEY) === 'true';
     },
 
+    // Record user consent with timestamp and metadata
     giveConsent: () => {
         try {
             localStorage.setItem(CONSENT_KEY, 'true');
@@ -45,6 +50,7 @@ export const consentService = {
         }
     },
 
+    // Retrieve all consent records from storage
     getConsentRecords: () => {
         try {
             const stored = localStorage.getItem(CONSENT_RECORD_KEY);
@@ -60,10 +66,12 @@ export const consentService = {
         return records.length > 0 ? records[records.length - 1] : null;
     },
 
+    // Check if user is in guest mode
     isGuest: () => {
         return localStorage.getItem(GUEST_KEY) === 'true';
     },
 
+    // Enable or disable guest mode
     setGuestMode: (isGuest) => {
         if (isGuest) {
             localStorage.setItem(GUEST_KEY, 'true');

@@ -1,6 +1,8 @@
+// Firebase authentication setup for user management
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
+// Firebase project configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAOTDqxHcTAHBGC_XzkqRLOyUu9mCOvR90",
   authDomain: "cropaid-e1101.firebaseapp.com",
@@ -14,6 +16,7 @@ const firebaseConfig = {
 let app = null;
 let auth = null;
 
+// Initialize Firebase with error handling to prevent app crashes
 try {
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
@@ -22,7 +25,7 @@ try {
   console.error('Firebase initialization failed:', error.message);
   console.warn('App will continue without Firebase authentication.');
 
-  // Create a mock auth object so the app doesn't crash
+  // Provide mock auth object to allow app to function without Firebase
   auth = {
     currentUser: null,
     onAuthStateChanged: (callback) => {

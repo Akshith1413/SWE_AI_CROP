@@ -1,3 +1,4 @@
+// Component for Firebase phone authentication with OTP verification
 import { useState, useEffect, useRef, useCallback } from "react";
 import "./LoginScreen.css";
 
@@ -11,7 +12,7 @@ import {
   signInWithPhoneNumber
 } from "firebase/auth";
 
-// OTP expiry timer in seconds
+// OTP expiry duration (2 minutes)
 const OTP_EXPIRY_SECONDS = 120;
 
 function LoginScreen({ onLogin, onSkip }) {
@@ -37,7 +38,7 @@ function LoginScreen({ onLogin, onSkip }) {
   const [otpDigits, setOtpDigits] = useState(["", "", "", "", "", ""]);
   const otpInputRefs = useRef([]);
 
-  /* 🔊 Enable Voice After First Click */
+  // Enable voice feature after user's first click interaction
   useEffect(() => {
     const enableVoice = () => {
       setVoiceEnabled(true);
@@ -53,7 +54,7 @@ function LoginScreen({ onLogin, onSkip }) {
     };
   }, [t, autoPlayVoice]);
 
-  // Voice guidance on step change
+  // Provide voice guidance when authentication step changes
   useEffect(() => {
     if (voiceEnabled && autoPlayVoice) {
       if (step === "phone") {
@@ -64,7 +65,7 @@ function LoginScreen({ onLogin, onSkip }) {
     }
   }, [step, voiceEnabled, autoPlayVoice, t]);
 
-  // Get voice language code
+  // Map language codes to voice recognition language codes
   const getVoiceLang = useCallback(() => {
     const langMap = {
       en: 'en-IN', hi: 'hi-IN', ta: 'ta-IN', te: 'te-IN',
@@ -75,7 +76,7 @@ function LoginScreen({ onLogin, onSkip }) {
     return langMap[language] || 'en-IN';
   }, [language]);
 
-  // OTP Timer logic
+  // Countdown timer for OTP expiry
   useEffect(() => {
     if (otpTimer > 0) {
       timerRef.current = setInterval(() => {
@@ -111,10 +112,11 @@ function LoginScreen({ onLogin, onSkip }) {
     audioService.playClick();
   };
 
-  // Send OTP
+  // Send OTP to entered phone number via Firebase
   const sendOtp = async () => {
     setError("");
 
+    // Validate 10-digit phone number
     if (phone.length !== 10) {
       const msg = t('loginScreen.invalidPhone');
       setError(msg);

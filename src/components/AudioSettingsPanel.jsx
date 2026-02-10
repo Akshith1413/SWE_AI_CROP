@@ -1,39 +1,67 @@
+/**
+ * AudioSettingsPanel Component
+ * Modal panel providing UI controls for audio feedback settings
+ * Allows users to toggle sound effects and voice guidance on/off
+ * Settings are persisted via audioService to localStorage
+ */
 import React, { useState, useEffect } from 'react';
 import { Volume2, VolumeX, Music, Settings, X } from 'lucide-react';
 import { audioService } from '../services/audioService';
 import { useTranslation } from '../hooks/useTranslation';
 
-/**
- * AudioSettingsPanel Component
- * Provides UI controls for audio feedback settings
- */
 const AudioSettingsPanel = ({ onClose }) => {
     const { t } = useTranslation();
+
+    // Local state mirrors audioService state for responsive UI updates
     const [soundEnabled, setSoundEnabled] = useState(audioService.isSoundEnabled());
     const [voiceEnabled, setVoiceEnabled] = useState(audioService.isVoiceEnabled());
 
+    /**
+     * Toggle sound effects on/off
+     * Updates both audioService state and local UI state
+     * Plays confirmation click if enabling sound
+     */
     const handleToggleSound = () => {
+        // Toggle sound in audioService (persists to localStorage)
         const newState = audioService.toggleSound();
+
+        // Update local state to reflect change in UI
         setSoundEnabled(newState);
 
-        // Play confirmation if enabling
+        // Provide audio confirmation when enabling (users can hear it working)
         if (newState) {
             audioService.playClick();
         }
     };
 
+    /**
+     * Toggle voice feedback on/off
+     * Updates both audioService state and local UI state
+     * Speaks confirmation message if enabling voice
+     */
     const handleToggleVoice = () => {
+        // Toggle voice in audioService (persists to localStorage)
         const newState = audioService.toggleVoice();
+
+        // Update local state to reflect change in UI
         setVoiceEnabled(newState);
 
-        // Speak confirmation if enabling
+        // Speak confirmation when enabling (users can hear it working)
         if (newState) {
             audioService.speak(t('audioSettings.voiceFeedbackEnabledSpeak'));
         }
     };
 
+    /**
+     * Test audio functionality
+     * Plays a success sound followed by a voice message
+     * Helps users verify their audio settings are working
+     */
     const testSounds = () => {
+        // Play success sound effect
         audioService.playSuccess();
+
+        // Speak test message after a short delay (prevents overlap)
         setTimeout(() => audioService.speak(t('audioSettings.audioTestSuccess')), 500);
     };
 

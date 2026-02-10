@@ -18,11 +18,6 @@ class PreferencesService {
      * @returns {Object} User preferences
      */
     loadPreferences() {
-        // Return default preferences for guest users (don't load from storage)
-        if (consentService.isGuest()) {
-            return this.getDefaultPreferences();
-        }
-
         try {
             const stored = localStorage.getItem(PREFERENCES_KEY);
             if (stored) {
@@ -64,11 +59,6 @@ class PreferencesService {
      * Save preferences to localStorage
      */
     savePreferences() {
-        // Don't save preferences for guest users
-        if (consentService.isGuest()) {
-            return;
-        }
-
         try {
             this.preferences.updatedAt = new Date().toISOString();
             localStorage.setItem(PREFERENCES_KEY, JSON.stringify(this.preferences));

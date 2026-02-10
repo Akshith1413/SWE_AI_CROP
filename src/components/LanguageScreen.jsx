@@ -1,3 +1,4 @@
+// Component for language selection with voice-based language detection
 import { useState, useEffect, useRef } from "react";
 import "./LanguageScreen.css";
 import { useLanguage } from "../context/LanguageContext";
@@ -12,7 +13,7 @@ function LanguageScreen({ onSelect }) {
   const [autoPlayVoice, setAutoPlayVoice] = useState(true);
   const recognitionRef = useRef(null);
 
-  // Voice guidance on mount
+  // Provide voice guidance on component mount
   useEffect(() => {
     if (autoPlayVoice) {
       const timer = setTimeout(() => {
@@ -26,7 +27,7 @@ function LanguageScreen({ onSelect }) {
     }
   }, [autoPlayVoice]);
 
-  // Replay audio guidance
+  // Replay audio instructions for accessibility
   const replayAudio = () => {
     try {
       audioService.speak('Please select your preferred language. You can also speak in your language to auto-detect it.');
@@ -36,7 +37,7 @@ function LanguageScreen({ onSelect }) {
     }
   };
 
-  // Filter languages based on search query
+  // Filter languages based on search input
   const filteredLanguages = supportedLanguages.filter((lang) => {
     const query = searchQuery.toLowerCase();
     return (
@@ -46,7 +47,7 @@ function LanguageScreen({ onSelect }) {
     );
   });
 
-  // Initialize Speech Recognition
+  // Initialize Web Speech API for voice recognition
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -55,6 +56,7 @@ function LanguageScreen({ onSelect }) {
       recognitionRef.current.continuous = false;
       recognitionRef.current.interimResults = false;
 
+      // Handle speech recognition results
       recognitionRef.current.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         const detectedLangCode = event.results[0][0].lang || detectLanguageFromSpeech(event);
@@ -86,7 +88,7 @@ function LanguageScreen({ onSelect }) {
     };
   }, []);
 
-  // Detect language from speech recognition event
+  // Extract language code from speech recognition event
   const detectLanguageFromSpeech = (event) => {
     // Check if the recognition result has language info
     if (event.results[0] && event.results[0][0]) {
@@ -97,7 +99,7 @@ function LanguageScreen({ onSelect }) {
     return null;
   };
 
-  // Match spoken text or detected language code to supported languages
+  // Match spoken text or language code against supported languages
   const matchLanguageFromSpeech = (transcript, detectedLangCode) => {
     const lowerTranscript = transcript.toLowerCase();
 

@@ -1,3 +1,9 @@
+/**
+ * LLM Advice Page Component
+ * Displays AI-generated crop treatment advice using Gemini LLM
+ * Supports editable disease information and demo mode for testing
+ * Provides structured advice including cause, symptoms, treatments, and prevention
+ */
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -5,18 +11,23 @@ import {
     Leaf, Bug, Droplet, Shield, FlaskConical, Sprout, AlertTriangle,
     Edit3, RefreshCw, Save, X, TrendingUp, Award, Zap
 } from 'lucide-react';
+import { useTranslation } from '../hooks/useTranslation';
 
 const LLMAdvicePage = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { t, language } = useTranslation();
 
-    // Check for query params (demo mode)
+    // Check URL query parameters to enable demo mode
+    // Demo mode allows testing without actual disease detection
     const searchParams = new URLSearchParams(location.search);
     const isDemo = searchParams.get('demo') === 'true';
 
-    // Get data from navigation state or use demo data
+    // Get disease data from navigation state (passed from diagnosis page)
+    // Or use fallback demo data if in demo mode
     let stateData = location.state || {};
     if (isDemo && !stateData.cropType) {
+        // Provide default demo data for testing
         stateData = {
             cropType: 'Tomato',
             disease: 'Early Blight',
@@ -68,7 +79,8 @@ const LLMAdvicePage = () => {
                     crop: cropType,
                     disease: disease,
                     severity: severity || 'unknown',
-                    confidence: parseFloat(confidence) || 0.0
+                    confidence: parseFloat(confidence) || 0.0,
+                    language: language  // Send user's selected language to backend
                 })
             });
 
@@ -132,11 +144,11 @@ const LLMAdvicePage = () => {
                             </div>
                             <div>
                                 <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
-                                    AI Crop Advisor
+                                    {t('llmAdvice.title')}
                                 </h1>
                                 <p className="text-sm text-gray-500 flex items-center gap-1">
                                     <Zap className="w-3 h-3" />
-                                    Powered by Gemini AI
+                                    {t('llmAdvice.poweredBy')}
                                 </p>
                             </div>
                         </div>
@@ -148,7 +160,7 @@ const LLMAdvicePage = () => {
                             className="flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-emerald-200 text-emerald-600 rounded-xl font-semibold hover:bg-emerald-50 transition-all active:scale-95 shadow-md hover:shadow-lg"
                         >
                             <Edit3 className="w-4 h-4" />
-                            Edit Details
+                            {t('llmAdvice.editDetails')}
                         </button>
                     )}
                 </header>

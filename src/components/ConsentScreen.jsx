@@ -1,3 +1,4 @@
+// Component for displaying data consent information and collecting user agreement
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Cloud, Database, Check, Volume2 } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
@@ -9,7 +10,7 @@ const ConsentScreen = ({ onConsent }) => {
     const [agreed, setAgreed] = useState(false);
     const [voiceAutoPlay, setVoiceAutoPlay] = useState(true);
 
-    // Voice guidance on mount
+    // Provide voice guidance when screen loads
     useEffect(() => {
         if (voiceAutoPlay) {
             try {
@@ -23,8 +24,9 @@ const ConsentScreen = ({ onConsent }) => {
         }
     }, [t, voiceAutoPlay]);
 
+    // Handle user consent submission
     const handleConsent = () => {
-        if (!agreed) return; // Block if not checked
+        if (!agreed) return; // Require checkbox to be checked
 
         // Log timestamped consent
         consentService.giveConsent();
@@ -33,6 +35,7 @@ const ConsentScreen = ({ onConsent }) => {
         onConsent();
     };
 
+    // Replay audio instructions for accessibility
     const replayAudio = () => {
         try {
             audioService.speak(t('consentScreen.voiceGuide'));

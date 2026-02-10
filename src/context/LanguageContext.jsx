@@ -1,10 +1,11 @@
+// Language context for managing multi-language support across the app
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { preferencesService } from '../services/preferencesService';
 
-// Create the context
+// Create the language context for provider/consumer pattern
 const LanguageContext = createContext(null);
 
-// Supported languages with BCP47 codes for speech recognition
+// List of supported languages with BCP47 speech recognition codes for voice features
 export const SUPPORTED_LANGUAGES = [
     { code: 'en', name: 'English', nativeName: 'English', speechCode: 'en-IN' },
     { code: 'hi', name: 'Hindi', nativeName: 'हिंदी', speechCode: 'hi-IN' },

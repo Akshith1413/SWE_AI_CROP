@@ -1,13 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Leaf, Loader, AlertCircle } from 'lucide-react';
 import CropAdviceCard from './CropAdviceCard';
 import cropAdviceService from '../services/cropAdviceService';
+import { useLanguage } from '../context/LanguageContext';
 
 /**
  * Example component showing how to use the Crop Advice system
  * This can be integrated into your existing disease detection flow
  */
 const CropAdviceDemo = () => {
+    const { language, rawLanguage, getCurrentLanguageInfo } = useLanguage();
+
+    // DEBUG: Log language on component mount and whenever it changes
+    useEffect(() => {
+        console.log('🔍 DEBUG - CropAdviceDemo Language:', {
+            language,
+            rawLanguage,
+            languageInfo: getCurrentLanguageInfo(),
+            localStorage: localStorage.getItem('cropai_user_preferences')
+        });
+    }, [language, rawLanguage]);
     const [advice, setAdvice] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -39,11 +51,17 @@ const CropAdviceDemo = () => {
                 }
             }
 
-            // Add API key to request if provided
+            // Get the selected language from context
+            console.log('🌐 Using language from context:', language);
+
+            // Add API key and language to request
             const requestData = {
                 ...dataToSend,
+                language: language,  // Include the selected language from context
                 ...(apiKey && { apiKey })
             };
+
+            console.log('📤 Sending request with language:', requestData.language);
 
             const result = await cropAdviceService.getCropAdvice(requestData);
             setAdvice(result);

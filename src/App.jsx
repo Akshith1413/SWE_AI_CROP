@@ -1,3 +1,4 @@
+// Main application component - handles routing and user flow
 import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
@@ -15,10 +16,10 @@ import { preferencesService } from "./services/preferencesService";
 import { audioService } from "./services/audioService";
 import { consentService } from "./services/consentService";
 
-// Component for the main app flow (previously the default view)
+// Component managing the main app flow after landing page
 function MainAppFlow() {
   const { language, rawLanguage, setLanguage } = useLanguage();
-  const [view, setView] = useState("loading"); // 'loading', 'landing', 'consent', 'login', 'main'
+  const [view, setView] = useState("loading"); // Tracks current step in user onboarding
   const [userId, setUserId] = useState(null);
 
   // Load saved preferences on app launch
