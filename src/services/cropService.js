@@ -1,8 +1,10 @@
+// Service for managing user crop preferences and selections
 import { consentService } from './consentService';
 
 const STORAGE_KEY = 'crop_diagnosis_user_crops';
 
 export const cropService = {
+    // Retrieve user's saved crop selections from storage
     getCrops: () => {
         if (consentService.isGuest()) {
             return [];
@@ -16,6 +18,7 @@ export const cropService = {
         }
     },
 
+    // Save crop selections to local storage
     saveCrops: (crops) => {
         if (consentService.isGuest()) {
             console.log('Guest mode: crop preferences not saved');
@@ -29,7 +32,7 @@ export const cropService = {
         }
     },
 
-    // Sync crops with server (stub - logs to console)
+    // Sync crops with server (placeholder for future backend integration)
     syncCropsWithServer: async () => {
         try {
             const crops = cropService.getCrops();
@@ -41,6 +44,7 @@ export const cropService = {
         }
     },
 
+    // Get list of all available crop types with icons
     getAllCrops: () => [
         { id: 'wheat', name: 'Wheat', icon: '🌾' },
         { id: 'rice', name: 'Rice', icon: '🍚' },

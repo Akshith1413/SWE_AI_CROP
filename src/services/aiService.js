@@ -4,7 +4,10 @@
  * Provides diagnostics, confidence scores, severity estimation, and plain language explanations.
  */
 
+// Mock disease database containing crop-specific and general diseases
+// Each disease has symptoms, treatments, severity level, and AI explanation
 const DISEASE_DATABASE = {
+    // Tomato-specific diseases
     tomato: [
         {
             name: "Early Blight",
@@ -23,6 +26,7 @@ const DISEASE_DATABASE = {
             explanation: "Analysis reveals rapidly spreading dark lesions suggesting Late Blight, a serious condition requiring immediate action."
         }
     ],
+    // Corn-specific diseases
     corn: [
         {
             name: "Common Rust",
@@ -33,6 +37,7 @@ const DISEASE_DATABASE = {
             explanation: "Pustules found on leaf surfaces match Common Rust patterns. Usually manageable unless infection is widespread."
         }
     ],
+    // General crop issues applicable to any plant
     general: [
         {
             name: "Healthy",
@@ -58,66 +63,93 @@ export const aiService = {
      */
     analyze: async (imageData, cropContext = null) => {
         return new Promise((resolve) => {
+            // Simulate AI processing delay (2 seconds)
             setTimeout(() => {
-                // Simulate processing time
+                // Randomly determine if plant is healthy (60% chance of disease)
                 const isHealthy = Math.random() > 0.4;
+
+                // Select disease database based on crop context
+                // If crop type is provided and exists in database, use crop-specific diseases
+                // Otherwise fall back to general diseases
                 const diseases = cropContext && DISEASE_DATABASE[cropContext.toLowerCase()]
                     ? DISEASE_DATABASE[cropContext.toLowerCase()]
                     : DISEASE_DATABASE.general;
 
                 let diagnosis;
                 if (isHealthy) {
+                    // Plant is healthy - use the "Healthy" entry from general database
                     diagnosis = DISEASE_DATABASE.general[0];
                 } else {
-                    // Pick random disease from context or general
+                    // Plant has disease - randomly select one from available diseases
                     diagnosis = diseases[Math.floor(Math.random() * diseases.length)];
-                    // Fallback to general deficiency if unhealthy but no specific disease found
+
+                    // Safety check: if we randomly picked "Healthy" but isHealthy is false,
+                    // default to nitrogen deficiency to ensure we show a problem
                     if (diagnosis.name === 'Healthy') diagnosis = DISEASE_DATABASE.general[1];
                 }
 
-                // Simulate confidence
-                const confidence = 0.70 + (Math.random() * 0.28); // 70% - 98%
+                // Generate random confidence score between 70% and 98%
+                // Higher confidence makes the diagnosis appear more reliable
+                const confidence = 0.70 + (Math.random() * 0.28);
 
-                // Simulate bounding boxes (normalized coordinates 0-1)
+                // Generate heatmap points showing affected areas on the plant
+                // Heatmap uses normalized coordinates (0-1) for position and intensity
                 const heatmap = [];
                 if (diagnosis.name !== "Healthy") {
+                    // Create 3 random hotspots indicating disease locations
                     for (let i = 0; i < 3; i++) {
                         heatmap.push({
-                            x: 0.2 + Math.random() * 0.6,
-                            y: 0.2 + Math.random() * 0.6,
-                            radius: 0.1 + Math.random() * 0.15,
-                            intensity: 0.5 + Math.random() * 0.5
+                            x: 0.2 + Math.random() * 0.6,        // X position (20-80% of image width)
+                            y: 0.2 + Math.random() * 0.6,        // Y position (20-80% of image height)
+                            radius: 0.1 + Math.random() * 0.15,  // Size of affected area (10-25%)
+                            intensity: 0.5 + Math.random() * 0.5 // Severity of infection (50-100%)
                         });
                     }
                 }
 
-                // Calculate synthetic scores based on diagnosis
+                // Calculate visual analysis scores based on plant health status
+                // Healthy plants: 80-100% health score, minimal disease/browning
+                // Unhealthy plants: 20-70% health score, significant disease/browning
                 const healthScore = isHealthy ? Math.floor(80 + Math.random() * 20) : Math.floor(20 + Math.random() * 50);
                 const diseasePercentage = isHealthy ? Math.floor(Math.random() * 5) : Math.floor(10 + Math.random() * 40);
                 const brownPercentage = isHealthy ? Math.floor(Math.random() * 10) : Math.floor(5 + Math.random() * 20);
+
+                // Calculate green percentage (remaining healthy tissue)
+                // Total must equal 100%: green + disease + brown = 100
                 const greenPercentage = 100 - diseasePercentage - brownPercentage;
 
+                // Return comprehensive analysis results
                 resolve({
-                    diagnosis: diagnosis.name,
-                    scientificName: diagnosis.scientificName,
-                    confidence: parseFloat(confidence.toFixed(2)),
-                    severity: diagnosis.severity, // mild, moderate, severe, none
-                    symptoms: diagnosis.symptoms || [],
-                    explanation: diagnosis.explanation,
-                    treatments: diagnosis.treatments || [],
-                    heatmap: heatmap,
-                    timestamp: new Date().toISOString(),
-                    // New fields expected by CameraView
-                    healthScore: healthScore,
-                    greenPercentage: greenPercentage,
-                    brownPercentage: brownPercentage,
-                    diseasePercentage: diseasePercentage,
-                    issues: diagnosis.symptoms || [],
-                    recommendations: diagnosis.treatments || [],
-                    // Multi-label simulation (other possibilities)
+                    // Primary diagnosis information
+                    diagnosis: diagnosis.name,                          // Disease name
+                    scientificName: diagnosis.scientificName,           // Scientific/Latin name
+                    confidence: parseFloat(confidence.toFixed(2)),      // Confidence score (0-1)
+                    severity: diagnosis.severity,                       // Severity: mild, moderate, severe, none
+
+                    // Clinical details
+                    symptoms: diagnosis.symptoms || [],                 // Observable symptoms
+                    explanation: diagnosis.explanation,                 // AI's reasoning
+                    treatments: diagnosis.treatments || [],             // Recommended treatments
+
+                    // Visual analysis data
+                    heatmap: heatmap,                                  // Affected area coordinates
+                    timestamp: new Date().toISOString(),               // Analysis timestamp
+
+                    // Health metrics for UI display
+                    healthScore: healthScore,                          // Overall health (0-100)
+                    greenPercentage: greenPercentage,                  // Healthy tissue %
+                    brownPercentage: brownPercentage,                  // Dead tissue %
+                    diseasePercentage: diseasePercentage,              // Diseased tissue %
+
+                    // Alternative field names for backwards compatibility
+                    issues: diagnosis.symptoms || [],                   // Same as symptoms
+                    recommendations: diagnosis.treatments || [],        // Same as treatments
+
+                    // Alternative diagnoses (multi-label classification simulation)
+                    // Only shown for diseased plants to suggest other possible causes
                     otherPossibilities: !isHealthy ? [
-                        { name: "Nutrient Deficiency", confidence: 0.15 },
-                        { name: "Water Stress", confidence: 0.08 }
+                        { name: "Nutrient Deficiency", confidence: 0.15 },  // 15% chance
+                        { name: "Water Stress", confidence: 0.08 }           // 8% chance
                     ] : []
                 });
             }, 2000); // 2 second mock delay

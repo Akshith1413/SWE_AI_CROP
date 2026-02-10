@@ -1,3 +1,17 @@
+/**
+ * GuestBanner Component
+ * Displays a persistent banner encouraging guest users to create an account
+ * 
+ * Features:
+ * - Sticky bottom position
+ * - Gradient styling for attention
+ * - Optional dismiss button
+ * - Translatable content
+ * 
+ * Props:
+ * @param {function} onUpgrade - Callback when user clicks upgrade button
+ * @param {function} onDismiss - Optional callback for dismiss action
+ */
 import React from 'react';
 import { UserPlus, X } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
@@ -6,11 +20,17 @@ const GuestBanner = ({ onUpgrade, onDismiss }) => {
     const { t } = useTranslation();
 
     return (
+        // Fixed positioned banner at bottom of screen
+        // Slides up animation on mount
         <div className="fixed bottom-4 left-4 right-4 z-50 animate-slide-up">
+            {/* Gradient background for visual prominence */}
             <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl shadow-2xl p-4 flex items-center gap-3 max-w-lg mx-auto">
+                {/* Icon container with semi-transparent background */}
                 <div className="bg-white/20 p-2 rounded-full flex-shrink-0">
                     <UserPlus className="w-5 h-5 text-white" />
                 </div>
+
+                {/* Text content - truncates if too long */}
                 <div className="flex-1 min-w-0">
                     <p className="text-white font-semibold text-sm">
                         {t('guestBanner.title')}
@@ -19,12 +39,16 @@ const GuestBanner = ({ onUpgrade, onDismiss }) => {
                         {t('guestBanner.description')}
                     </p>
                 </div>
+
+                {/* Upgrade CTA button - high contrast for conversion */}
                 <button
                     onClick={onUpgrade}
                     className="bg-white text-amber-600 font-semibold text-xs px-3 py-2 rounded-xl hover:bg-amber-50 transition-colors flex-shrink-0"
                 >
                     {t('guestBanner.upgradeButton')}
                 </button>
+
+                {/* Optional dismiss button */}
                 {onDismiss && (
                     <button
                         onClick={onDismiss}

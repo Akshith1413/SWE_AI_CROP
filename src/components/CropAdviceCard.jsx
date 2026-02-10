@@ -3,13 +3,22 @@ import {
     AlertCircle, Leaf, Droplets, Spray, Target, Shield,
     CheckCircle, Info, ExternalLink, Copy, Check
 } from 'lucide-react';
+import { useTranslation } from '../hooks/useTranslation';
 
 /**
- * CropAdviceCard Component
+ * CropAdviceCard Component - Updated to support i18n translations
  * Displays AI-generated crop disease advice in a farmer-friendly format
  */
 const CropAdviceCard = ({ advice, diseaseData, onClose }) => {
+    const { t } = useTranslation();
     const [copied, setCopied] = React.useState(false);
+
+    // DEBUG: Check if translation is working
+    console.log('🔍 CropAdviceCard Translation Debug:', {
+        rootCause: t('cropAdvice.rootCause'),
+        symptomsToWatch: t('cropAdvice.symptomsToWatch'),
+        translations: t
+    });
 
     if (!advice) {
         return null;
@@ -66,7 +75,7 @@ PREVENTION: ${prevention}
                             </div>
                             <div>
                                 <h2 className="text-2xl font-bold">{crop}</h2>
-                                <p className="text-emerald-100 text-sm">AI-Generated Advice</p>
+                                <p className="text-emerald-100 text-sm">{t('cropAdvice.aiGeneratedAdvice')}</p>
                             </div>
                         </div>
 
@@ -94,22 +103,22 @@ PREVENTION: ${prevention}
                                 {copied ? (
                                     <>
                                         <Check className="w-4 h-4" />
-                                        <span>Copied!</span>
+                                        <span>{t('cropAdvice.copied')}</span>
                                     </>
                                 ) : (
                                     <>
                                         <Copy className="w-4 h-4" />
-                                        <span>Copy</span>
+                                        <span>{t('cropAdvice.copy')}</span>
                                     </>
                                 )}
                             </button>
                         </div>
                         <div className="flex gap-3 text-sm">
                             <span className={`px-3 py-1 rounded-full font-medium ${getSeverityColor(severity)}`}>
-                                {severity || 'Unknown'} Severity
+                                {severity || 'Unknown'} {t('cropAdvice.severity')}
                             </span>
                             <span className={`px-3 py-1 rounded-full font-medium bg-white/20 ${getConfidenceColor(confidence)}`}>
-                                {((confidence || 0) * 100).toFixed(0)}% Confidence
+                                {((confidence || 0) * 100).toFixed(0)}% {t('cropAdvice.confidence')}
                             </span>
                         </div>
                     </div>
@@ -121,7 +130,7 @@ PREVENTION: ${prevention}
                     {/* Cause */}
                     <AdviceSection
                         icon={<Info className="w-6 h-6 text-blue-600" />}
-                        title="Cause"
+                        title={t('cropAdvice.rootCause')}
                         content={cause}
                         bgColor="bg-blue-50"
                         borderColor="border-blue-200"
@@ -130,7 +139,7 @@ PREVENTION: ${prevention}
                     {/* Symptoms */}
                     <AdviceSection
                         icon={<Target className="w-6 h-6 text-purple-600" />}
-                        title="Symptoms to Look For"
+                        title={t('cropAdvice.symptomsToWatch')}
                         content={symptoms}
                         bgColor="bg-purple-50"
                         borderColor="border-purple-200"
@@ -139,17 +148,18 @@ PREVENTION: ${prevention}
                     {/* Immediate Treatment */}
                     <AdviceSection
                         icon={<AlertCircle className="w-6 h-6 text-red-600" />}
-                        title="Immediate Action"
+                        title={t('cropAdvice.immediateAction')}
                         content={immediate}
                         bgColor="bg-red-50"
                         borderColor="border-red-200"
                         highlight
+                        urgentLabel={t('cropAdvice.urgent')}
                     />
 
                     {/* Chemical Solution */}
                     <AdviceSection
                         icon={<Spray className="w-6 h-6 text-orange-600" />}
-                        title="Chemical Solution"
+                        title={t('cropAdvice.chemicalTreatment')}
                         content={chemical}
                         bgColor="bg-orange-50"
                         borderColor="border-orange-200"
@@ -158,7 +168,7 @@ PREVENTION: ${prevention}
                     {/* Organic Solution */}
                     <AdviceSection
                         icon={<Droplets className="w-6 h-6 text-green-600" />}
-                        title="Organic/Natural Remedy"
+                        title={t('cropAdvice.organicAlternative')}
                         content={organic}
                         bgColor="bg-green-50"
                         borderColor="border-green-200"
@@ -167,7 +177,7 @@ PREVENTION: ${prevention}
                     {/* Prevention */}
                     <AdviceSection
                         icon={<Shield className="w-6 h-6 text-teal-600" />}
-                        title="Prevention Tips"
+                        title={t('cropAdvice.futurePrevention')}
                         content={prevention}
                         bgColor="bg-teal-50"
                         borderColor="border-teal-200"
@@ -180,8 +190,7 @@ PREVENTION: ${prevention}
                         <Info className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                         <div className="flex-1">
                             <p className="text-sm text-amber-800">
-                                <strong>Important:</strong> This advice is AI-generated and should be used as a guide.
-                                For severe cases or persistent problems, please consult with a local agricultural expert or extension officer.
+                                <strong>{t('cropAdvice.important')}</strong> {t('cropAdvice.disclaimerText')}
                             </p>
                         </div>
                     </div>
@@ -198,7 +207,7 @@ PREVENTION: ${prevention}
 };
 
 // Reusable advice section component
-const AdviceSection = ({ icon, title, content, bgColor, borderColor, highlight }) => {
+const AdviceSection = ({ icon, title, content, bgColor, borderColor, highlight, urgentLabel }) => {
     return (
         <div className={`${bgColor} border ${borderColor} rounded-2xl p-4 ${highlight ? 'ring-2 ring-offset-2 ring-red-300' : ''}`}>
             <div className="flex items-start gap-3">
@@ -208,7 +217,7 @@ const AdviceSection = ({ icon, title, content, bgColor, borderColor, highlight }
                 <div className="flex-1">
                     <h4 className="font-bold text-gray-800 mb-1 flex items-center gap-2">
                         {title}
-                        {highlight && <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">URGENT</span>}
+                        {highlight && <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">{urgentLabel}</span>}
                     </h4>
                     <p className="text-gray-700 text-sm leading-relaxed">
                         {content}

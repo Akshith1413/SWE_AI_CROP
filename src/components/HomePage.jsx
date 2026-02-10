@@ -1,100 +1,169 @@
+/**
+ * HomePage Component (Landing Page)
+ * Premium landing page for CropAId with:
+ * - 3D particle animation background
+ * - Scroll progress tracking
+ * - Mouse-parallax effects
+ * - Animated sections showcasing features, tech stack, and impact
+ * - Responsive design with modern aesthetics
+ */
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Landing = () => {
   const navigate = useNavigate();
+
+  // Ref for canvas element (3D particle animation)
   const canvasRef = useRef(null);
+
+  // Track mouse position for parallax effects
+  // Values range from -1 to 1 (normalized coordinates)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  // Track page scroll progress (0-100%)
   const [scrollProgress, setScrollProgress] = useState(0);
 
+  // Setup scroll and mouse tracking event listeners
   useEffect(() => {
+    // Calculate scroll progress percentage
     const handleScroll = () => {
       const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
       const currentProgress = (window.pageYOffset / totalScroll) * 100;
       setScrollProgress(currentProgress);
     };
 
+    // Track mouse position and normalize to -1 to 1 range
+    // Used for parallax tilt effects on CTA button
     const handleMouseMove = (e) => {
       setMousePosition({
-        x: (e.clientX / window.innerWidth) * 2 - 1,
-        y: (e.clientY / window.innerHeight) * 2 - 1,
+        x: (e.clientX / window.innerWidth) * 2 - 1,   // Normalize X to -1 to 1
+        y: (e.clientY / window.innerHeight) * 2 - 1,  // Normalize Y to -1 to 1
       });
     };
 
+    // Attach event listeners
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('mousemove', handleMouseMove);
 
+    // Cleanup on component unmount
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
 
-  // 3D Particle Animation
+  // 3D Particle Animation System
+  // Creates an animated background with floating particles in 3D space
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) return;  // Exit if canvas ref not ready
 
+    // Get 2D rendering context for drawing
     const ctx = canvas.getContext('2d');
+
+    // Set canvas size to match window dimensions
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
+    // Array to store all particle objects
     const particles = [];
-    const particleCount = 80;
+    const particleCount = 80;  // Total number of particles to create
 
+    /**
+     * Particle Class
+     * Represents a single particle in 3D space with position, velocity, and appearance
+     */
     class Particle {
       constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.z = Math.random() * 1000;
-        this.vx = (Math.random() - 0.5) * 0.5;
-        this.vy = (Math.random() - 0.5) * 0.5;
-        this.vz = (Math.random() - 0.5) * 2;
-        this.radius = Math.random() * 2 + 1;
-        this.opacity = Math.random() * 0.5 + 0.3;
+        // Random initial position in 3D space
+        this.x = Math.random() * canvas.width;   // X position (0 to canvas width)
+        this.y = Math.random() * canvas.height;  // Y position (0 to canvas height)
+        this.z = Math.random() * 1000;           // Z position (depth: 0-1000)
+
+        // Random velocity for natural movement
+        this.vx = (Math.random() - 0.5) * 0.5;   // X velocity (-0.25 to 0.25)
+        this.vy = (Math.random() - 0.5) * 0.5;   // Y velocity (-0.25 to 0.25)
+        this.vz = (Math.random() - 0.5) * 2;     // Z velocity (-1 to 1, more variation)
+
+        // Visual properties
+        this.radius = Math.random() * 2 + 1;     // Particle size (1-3 pixels)
+        this.opacity = Math.random() * 0.5 + 0.3;  // Transparency (0.3-0.8)
       }
 
+      /**
+       * Update particle position based on velocity
+       * Implements boundary reflection for continuous animation
+       */
       update() {
+        // Move particle by velocity
         this.x += this.vx;
         this.y += this.vy;
         this.z += this.vz;
 
+        // Bounce off horizontal edges
         if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+
+        // Bounce off vertical edges
         if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+
+        // Bounce off depth boundaries (keeps particles in 3D space)
         if (this.z < 0 || this.z > 1000) this.vz *= -1;
       }
 
+      /**
+       * Draw particle to canvas with 3D perspective projection
+       * Creates depth effect by scaling based on Z position
+       */
       draw() {
+        // Calculate perspective scale (objects farther away appear smaller)
+        // Formula: scale = focalLength / (focalLength + depth)
         const scale = 1000 / (1000 + this.z);
+
+        // Project 3D position to 2D screen coordinates
+        // Closer objects (low z) have scale near 1, farther objects (high z) have smaller scale
         const x2d = this.x * scale + canvas.width / 2 * (1 - scale);
         const y2d = this.y * scale + canvas.height / 2 * (1 - scale);
-        const r = this.radius * scale;
+        const r = this.radius * scale;  // Scale radius based on depth
 
+        // Draw the particle as a circle
         ctx.beginPath();
         ctx.arc(x2d, y2d, r, 0, Math.PI * 2);
+
+        // Green glow effect with opacity affected by distance
         ctx.fillStyle = `rgba(74, 222, 128, ${this.opacity * scale})`;
         ctx.fill();
       }
     }
 
+    // Initialize particle array with new Particle instances
     for (let i = 0; i < particleCount; i++) {
       particles.push(new Particle());
     }
 
+    /**
+     * Animation loop - runs continuously at ~60fps
+     * Updates and redraws all particles every frame
+     */
     function animate() {
+      // Apply semi-transparent dark overlay (creates motion trail effect)
+      // Low alpha (0.1) creates longer trails, high alpha creates sharper animation
       ctx.fillStyle = 'rgba(5, 10, 5, 0.1)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+      // Update and draw each particle
       particles.forEach((particle) => {
-        particle.update();
-        particle.draw();
+        particle.update();  // Move particle
+        particle.draw();    // Render particle
       });
 
+      // Schedule next frame (creates smooth animation loop)
       requestAnimationFrame(animate);
     }
 
+    // Start the animation
     animate();
 
+    // Handle window resize - update canvas dimensions
     const handleResize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -102,11 +171,17 @@ const Landing = () => {
 
     window.addEventListener('resize', handleResize);
 
+    // Cleanup: remove event listener on component unmount
     return () => {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
 
+  /**
+   * Features Array
+   * Defines the 6 key features displayed in the features section
+   * Each feature has an emoji icon, title, and detailed description
+   */
   const features = [
     {
       icon: '🎯',
@@ -140,15 +215,25 @@ const Landing = () => {
     }
   ];
 
+  /**
+   * Tech Stack Configuration
+   * Defines technologies used with their brand colors
+   * Colors are used for glow effects in the tech section
+   */
   const techStack = [
-    { name: 'React.js', color: '#61DAFB' },
-    { name: 'Node.js', color: '#339933' },
-    { name: 'MongoDB', color: '#47A248' },
-    { name: 'Express.js', color: '#000000' },
-    { name: 'Python ML', color: '#3776AB' },
-    { name: 'TensorFlow', color: '#FF6F00' }
+    { name: 'React.js', color: '#61DAFB' },      // Cyan - React's brand color
+    { name: 'Node.js', color: '#339933' },      // Green - Node.js brand
+    { name: 'MongoDB', color: '#47A248' },      // Green - MongoDB brand
+    { name: 'Express.js', color: '#000000' },   // Black - Express minimal branding
+    { name: 'Python ML', color: '#3776AB' },    // Blue - Python brand
+    { name: 'TensorFlow', color: '#FF6F00' }    // Orange - TensorFlow brand
   ];
 
+  /**
+   * Uniqueness points - What sets CropAId apart from competitors
+   * Highlights the holistic approach and farmer-centric design philosophy
+   * Each point emphasizes a competitive advantage
+   */
   const uniqueness = [
     {
       title: 'Holistic Approach',

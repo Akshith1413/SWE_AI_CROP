@@ -314,5 +314,23 @@
         "qualityWarningsDesc": "धुंधलापन, अंधेरे और अन्य मुद्दों के लिए अलर्ट",
         "startSmartCamera": "स्मार्ट कैमरा शुरू करें",
         "getReady": "तैयार हो जाओ..."
+    },
+    "cropAdvice": {
+        "llmAdvice": "LLM सलाह",
+        "getExpertAdvice": "विशेषज्ञ LLM सलाह प्राप्त करें",
+        "aiGeneratedAdvice": "AI-जनित सलाह",
+        "rootCause": "मूल कारण",
+        "symptomsToWatch": "देखने योग्य लक्षण",
+        "immediateAction": "तत्काल कार्रवाई आवश्यक",
+        "chemicalTreatment": "रासायनिक उपचार",
+        "organicAlternative": "जैविक विकल्प",
+        "futurePrevention": "भविष्य की रोकथाम",
+        "severity": "गंभीरता",
+        "confidence": "विश्वास",
+        "copy": "कॉपी करें",
+        "copied": "कॉपी हो गया!",
+        "urgent": "तत्काल",
+        "important": "महत्वपूर्ण:",
+        "disclaimerText": "यह सलाह AI-जनित है और मार्गदर्शिका के रूप में उपयोग की जानी चाहिए। गंभीर मामलों या लगातार समस्याओं के लिए, कृपया स्थानीय कृषि विशेषज्ञ या विस्तार अधिकारी से परामर्श करें।"
     }
 }
