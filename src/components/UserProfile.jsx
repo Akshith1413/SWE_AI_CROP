@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Save, ArrowLeft, Search } from 'lucide-react';
+import { Save, ArrowLeft, Search, CheckCircle2 } from 'lucide-react';
 import { cropService } from '../services/cropService';
 import { useTranslation } from '../hooks/useTranslation';
+import { audioService } from '../services/audioService';
+import { consentService } from '../services/consentService';
+import { showToast } from './ConfirmationToast';
 
 const UserProfile = ({ onBack }) => {
     const { t } = useTranslation();
@@ -10,6 +13,7 @@ const UserProfile = ({ onBack }) => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [saved, setSaved] = useState(false);
+    const isGuest = consentService.isGuest();
 
     useEffect(() => {
         loadData();
@@ -20,9 +24,6 @@ const UserProfile = ({ onBack }) => {
         const userCrops = cropService.getCrops();
 
         setCrops(allCrops);
-        // Ensure userCrops is an array of IDs or objects, handling potential legacy data
-        // Assuming cropService.getCrops() returns array of crop objects or IDs
-        // We will store just full objects for simplicity based on cropService
         setSelectedCrops(userCrops.map(c => c.id || c));
         setLoading(false);
     };
@@ -36,12 +37,36 @@ const UserProfile = ({ onBack }) => {
             }
         });
         setSaved(false);
+        audioService.playClick();
+    };
+
+    const selectAll = () => {
+        setSelectedCrops(crops.map(c => c.id));
+        setSaved(false);
+        audioService.playClick();
+    };
+
+    const clearAll = () => {
+        setSelectedCrops([]);
+        setSaved(false);
+        audioService.playClick();
     };
 
     const handleSave = () => {
+        if (isGuest) {
+            showToast(t('guestMode.profileRestricted'), { type: 'warning' });
+            return;
+        }
+
         const cropsToSave = crops.filter(c => selectedCrops.includes(c.id));
         cropService.saveCrops(cropsToSave);
         setSaved(true);
+        audioService.confirmAction('success', t('confirmation.cropsSaved'));
+        showToast(t('confirmation.cropsSaved'), { type: 'success', voiceMessage: t('confirmation.cropsSaved') });
+
+        // Try to sync with server
+        cropService.syncCropsWithServer();
+
         setTimeout(() => setSaved(false), 2000);
     };
 
@@ -80,11 +105,18 @@ const UserProfile = ({ onBack }) => {
                                 : 'bg-white text-black hover:bg-gray-200'
                                 }`}
                         >
-                            <Save className="w-4 h-4" />
+                            {saved ? <CheckCircle2 className="w-4 h-4" /> : <Save className="w-4 h-4" />}
                             {saved ? t('profileView.saved') : t('profileView.save')}
                         </button>
                     </div>
                 </div>
+
+                {/* Guest Warning */}
+                {isGuest && (
+                    <div className="bg-amber-900/30 border border-amber-500/30 rounded-xl p-3 mb-4 text-center">
+                        <p className="text-amber-300 text-sm">{t('guestMode.profileRestricted')}</p>
+                    </div>
+                )}
 
                 {/* Content */}
                 <div className="space-y-6">
@@ -97,19 +129,40 @@ const UserProfile = ({ onBack }) => {
                         </div>
 
                         {/* Search */}
-                        <div className="relative mb-6">
+                        <div className="relative mb-4">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <input
                                 type="text"
                                 placeholder={t('profileView.searchCrops')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-green-500 transition"
+                                className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-green-500 transition text-white"
                             />
                         </div>
 
+                        {/* Select/Clear All + Count */}
+                        <div className="flex items-center justify-between mb-4">
+                            <span className="text-sm text-gray-400">
+                                {selectedCrops.length} {t('profileView.cropsSelected')}
+                            </span>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={selectAll}
+                                    className="text-xs text-green-400 hover:text-green-300 transition px-2 py-1 rounded border border-green-500/30 hover:bg-green-900/20"
+                                >
+                                    {t('profileView.selectAll')}
+                                </button>
+                                <button
+                                    onClick={clearAll}
+                                    className="text-xs text-red-400 hover:text-red-300 transition px-2 py-1 rounded border border-red-500/30 hover:bg-red-900/20"
+                                >
+                                    {t('profileView.clearAll')}
+                                </button>
+                            </div>
+                        </div>
+
                         {/* Grid */}
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                             {filteredCrops.map(crop => {
                                 const isSelected = selectedCrops.includes(crop.id);
                                 return (
@@ -117,7 +170,7 @@ const UserProfile = ({ onBack }) => {
                                         key={crop.id}
                                         onClick={() => toggleCrop(crop)}
                                         className={`relative p-4 rounded-xl border transition-all flex flex-col items-center gap-3 group ${isSelected
-                                            ? 'bg-green-900/20 border-green-500/50'
+                                            ? 'bg-green-900/20 border-green-500/50 shadow-lg shadow-green-900/20'
                                             : 'bg-[#1a1a1a] border-white/5 hover:border-white/20'
                                             }`}
                                     >

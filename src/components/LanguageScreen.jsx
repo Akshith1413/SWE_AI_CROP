@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import "./LanguageScreen.css";
 import { useLanguage } from "../context/LanguageContext";
+import { audioService } from "../services/audioService";
 
 function LanguageScreen({ onSelect }) {
   const { supportedLanguages } = useLanguage();
@@ -8,7 +9,32 @@ function LanguageScreen({ onSelect }) {
   const [isListening, setIsListening] = useState(false);
   const [detectedLanguage, setDetectedLanguage] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [autoPlayVoice, setAutoPlayVoice] = useState(true);
   const recognitionRef = useRef(null);
+
+  // Voice guidance on mount
+  useEffect(() => {
+    if (autoPlayVoice) {
+      const timer = setTimeout(() => {
+        try {
+          audioService.speak('Please select your preferred language. You can also speak in your language to auto-detect it.');
+        } catch (e) {
+          console.error('LanguageScreen: Voice error:', e);
+        }
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [autoPlayVoice]);
+
+  // Replay audio guidance
+  const replayAudio = () => {
+    try {
+      audioService.speak('Please select your preferred language. You can also speak in your language to auto-detect it.');
+      audioService.playClick();
+    } catch (e) {
+      console.error('LanguageScreen: Voice replay error:', e);
+    }
+  };
 
   // Filter languages based on search query
   const filteredLanguages = supportedLanguages.filter((lang) => {
@@ -251,6 +277,21 @@ function LanguageScreen({ onSelect }) {
           </div>
         </div>
       )}
+
+      {/* Voice Controls */}
+      <div className="lang-voice-controls">
+        <button onClick={replayAudio} className="lang-replay-btn">
+          🔊 Replay Instructions
+        </button>
+        <label className="lang-autoplay-toggle">
+          <input
+            type="checkbox"
+            checked={autoPlayVoice}
+            onChange={(e) => setAutoPlayVoice(e.target.checked)}
+          />
+          <span>Auto-play audio</span>
+        </label>
+      </div>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 const CONSENT_KEY = 'crop_diagnosis_consent';
+const CONSENT_RECORD_KEY = 'crop_diagnosis_consent_record';
 const GUEST_KEY = 'crop_diagnosis_is_guest';
 
 export const consentService = {
@@ -7,11 +8,56 @@ export const consentService = {
     },
 
     giveConsent: () => {
-        localStorage.setItem(CONSENT_KEY, 'true');
+        try {
+            localStorage.setItem(CONSENT_KEY, 'true');
+            // Log timestamped consent record
+            const record = {
+                consentGiven: true,
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                version: '1.0'
+            };
+            const existingRecords = consentService.getConsentRecords();
+            existingRecords.push(record);
+            localStorage.setItem(CONSENT_RECORD_KEY, JSON.stringify(existingRecords));
+            console.log('Consent recorded at:', record.timestamp);
+        } catch (e) {
+            console.error('Failed to save consent:', e);
+        }
     },
 
     revokeConsent: () => {
-        localStorage.removeItem(CONSENT_KEY);
+        try {
+            localStorage.removeItem(CONSENT_KEY);
+            // Log revocation
+            const record = {
+                consentGiven: false,
+                consentRevoked: true,
+                timestamp: new Date().toISOString(),
+                version: '1.0'
+            };
+            const existingRecords = consentService.getConsentRecords();
+            existingRecords.push(record);
+            localStorage.setItem(CONSENT_RECORD_KEY, JSON.stringify(existingRecords));
+            console.log('Consent revoked at:', record.timestamp);
+        } catch (e) {
+            console.error('Failed to revoke consent:', e);
+        }
+    },
+
+    getConsentRecords: () => {
+        try {
+            const stored = localStorage.getItem(CONSENT_RECORD_KEY);
+            return stored ? JSON.parse(stored) : [];
+        } catch (e) {
+            console.error('Failed to load consent records:', e);
+            return [];
+        }
+    },
+
+    getLatestConsentRecord: () => {
+        const records = consentService.getConsentRecords();
+        return records.length > 0 ? records[records.length - 1] : null;
     },
 
     isGuest: () => {

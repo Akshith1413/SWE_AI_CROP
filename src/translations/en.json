@@ -40,7 +40,11 @@
         "localStorage": "Local Storage",
         "localStorageDesc": "We store crop preferences on your device for a better experience.",
         "privacyNote": "We store plant images and crop preferences only to improve diagnosis accuracy.",
-        "agreeButton": "I Agree & Continue"
+        "agreeButton": "I Agree & Continue",
+        "checkboxLabel": "I have read and agree to the privacy policy and consent to data processing for crop diagnosis purposes.",
+        "mustAgree": "You must agree to continue",
+        "voiceGuide": "This screen explains how we use your data. We analyze plant images to detect diseases and store your preferences locally. Please read the information and check the consent box to continue.",
+        "replayAudio": "Replay Audio"
     },
     "loginScreen": {
         "title": "Farmer Login",
@@ -59,7 +63,24 @@
         "otpFailed": "Failed to send OTP. Please try again.",
         "loginSuccess": "Login successful. Welcome to CropAid.",
         "incorrectOtp": "Incorrect OTP. Please try again.",
-        "requestOtpFirst": "Please request OTP first."
+        "requestOtpFirst": "Please request OTP first.",
+        "otpSentTo": "OTP sent to",
+        "otpExpiresIn": "OTP expires in",
+        "otpExpired": "OTP has expired. Please request a new one.",
+        "resendOtp": "Resend OTP",
+        "resendIn": "Resend available in",
+        "changeNumber": "Change Number",
+        "enterCompleteOtp": "Please enter the complete 6-digit OTP",
+        "invalidOtp": "Invalid OTP code. Please check and try again.",
+        "tooManyRequests": "Too many attempts. Please wait a few minutes and try again.",
+        "invalidPhoneNumber": "Invalid phone number format. Please check and try again.",
+        "quotaExceeded": "Service temporarily unavailable. Please try again later.",
+        "networkError": "Network error. Please check your internet connection.",
+        "firebaseError": "Authentication service unavailable. Please try again later.",
+        "voiceGuidePhone": "Please enter your 10-digit mobile number to receive a verification code.",
+        "voiceGuideOtp": "Please enter the 6-digit OTP code sent to your phone. The code will expire in 2 minutes.",
+        "replayAudio": "Replay Audio",
+        "autoPlayVoice": "Auto-play voice"
     },
     "cropCapture": {
         "appName": "CropDoc",
@@ -176,7 +197,21 @@
         "noDisease": "No Disease Detected",
         "confidence": "Confidence",
         "treatment": "Recommended Treatment",
-        "saveAndContinue": "Save & Continue"
+        "saveAndContinue": "Save & Continue",
+        "photoGuidanceTitle": "Photo Taking Guide",
+        "photoGuidanceStep1": "Hold your phone steady, 15-30 cm from the plant",
+        "photoGuidanceStep2": "Ensure good natural lighting, avoid shadows",
+        "photoGuidanceStep3": "Focus on the affected leaf or area",
+        "photoGuidanceStep4": "Make sure the image is not blurry",
+        "continueToCamera": "Continue to Camera",
+        "blurWarning": "⚠️ Image appears blurry. Please hold steady and retake.",
+        "darkWarning": "⚠️ Image is too dark. Move to a brighter area.",
+        "qualityLow": "Image quality is low. Please retake for better results.",
+        "qualityGood": "Good image quality!",
+        "qualityExcellent": "Excellent image quality!",
+        "retakePhoto": "Retake Photo",
+        "useAnyway": "Use Anyway",
+        "frameGuide": "Position plant within frame"
     },
     "uploadView": {
         "title": "Upload Images",
@@ -215,7 +250,11 @@
         "recordInstructions": "Show the affected plant and describe the symptoms",
         "speakNow": "Speak now to describe the problem",
         "videoSaved": "Video saved successfully",
-        "videoError": "Video recording error"
+        "videoError": "Video recording error",
+        "reRecord": "Re-record",
+        "durationLimit": "Maximum recording duration: 60 seconds",
+        "sizeLimit": "Video size limit: 50MB",
+        "compressing": "Compressing video..."
     },
     "voiceView": {
         "title": "Voice Doctor",
@@ -233,7 +272,10 @@
         "noResponse": "Could not understand. Please try again.",
         "micPermissionDenied": "Microphone permission denied",
         "tryAgain": "Try Again",
-        "history": "Conversation History"
+        "history": "Conversation History",
+        "selectLanguage": "Select Voice Language",
+        "transcription": "Your words",
+        "transcriptionValidation": "Check if the transcription is correct"
     },
     "analysisView": {
         "title": "Analysis History",
@@ -282,7 +324,11 @@
         "chilli": "Chilli",
         "groundnut": "Groundnut",
         "mustard": "Mustard",
-        "loading": "Loading..."
+        "loading": "Loading...",
+        "cropsSelected": "crops selected",
+        "selectAll": "Select All",
+        "clearAll": "Clear All",
+        "saveSuccess": "Crop preferences saved successfully!"
     },
     "audioSettings": {
         "title": "Audio Settings",
@@ -318,5 +364,34 @@
     "settings": {
         "title": "Settings",
         "language": "Language"
+    },
+    "guestBanner": {
+        "title": "Unlock Full Features",
+        "description": "Create an account to save preferences, sync data, and access all features.",
+        "upgradeButton": "Sign Up"
+    },
+    "guestMode": {
+        "restricted": "This feature requires an account",
+        "historyRestricted": "Sign in to save and view analysis history",
+        "profileRestricted": "Sign in to save your crop profile",
+        "syncRestricted": "Sign in to sync your data across devices"
+    },
+    "offlineIndicator": {
+        "offline": "You're offline",
+        "offlineDesc": "Captures will be saved locally and synced when online",
+        "syncing": "Syncing...",
+        "syncComplete": "All data synced!",
+        "pendingCount": "{count} capture(s) pending sync",
+        "syncProgress": "Syncing {synced} of {total}..."
+    },
+    "confirmation": {
+        "photoSaved": "Photo saved successfully!",
+        "videoSaved": "Video saved successfully!",
+        "uploadComplete": "Upload complete!",
+        "preferencesSaved": "Preferences saved!",
+        "profileUpdated": "Profile updated!",
+        "consentRecorded": "Consent recorded!",
+        "cropsSaved": "Crop preferences saved!",
+        "offlineSaved": "Saved offline - will sync when online"
     }
 }

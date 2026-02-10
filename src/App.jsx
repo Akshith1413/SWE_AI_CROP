@@ -10,8 +10,10 @@ import LandingPage from "./components/LandingPage";
 import ConsentScreen from "./components/ConsentScreen";
 import HomePage from "./components/HomePage";
 import LLMAdvicePage from "./pages/LLMAdvicePage";
+import { ToastContainer, showToast } from "./components/ConfirmationToast";
 import { preferencesService } from "./services/preferencesService";
 import { audioService } from "./services/audioService";
+import { consentService } from "./services/consentService";
 
 // Component for the main app flow (previously the default view)
 function MainAppFlow() {
@@ -27,26 +29,29 @@ function MainAppFlow() {
       setUserId(savedUserId);
     }
 
+    // Auto-load preferences during initialization (US7)
+    const savedPrefs = preferencesService.getAllPreferences();
+    console.log('App: Loaded preferences:', savedPrefs);
+
+    // If user has consent and language, go directly to main
+    if (consentService.hasConsent() && preferencesService.getLanguage()) {
+      setView("main");
+      return;
+    }
+
     // Switch from loading to landing after preferences are loaded
     setView("landing");
   }, []);
 
   const handleGuestEntry = () => {
-    // Determine if we need to set guest mode or just proceed
-    // The LandingPage 'Continue as Guest' should enable guest mode
-    import('./services/consentService').then(({ consentService }) => {
-      consentService.setGuestMode(true);
-    });
+    consentService.setGuestMode(true);
     setView("consent");
   };
 
   const handleAccountEntry = () => setView("login");
 
   const handleConsent = () => {
-    // Persist consent so CropDiagnosisApp doesn't show potential duplicate flows
-    import('./services/consentService').then(({ consentService }) => {
-      consentService.giveConsent();
-    });
+    // Consent is already logged with timestamp by ConsentScreen
     setView("main");
   };
 
@@ -54,18 +59,33 @@ function MainAppFlow() {
   const handleLoginCompletion = (user) => {
     if (user && user.id) {
       setUserId(user.id);
+      preferencesService.setUserId(user.id);
+      // Sync preferences with backend when user logs in (US7)
       preferencesService.syncWithServer(user.id);
     }
-    setView("main");
+
+    // After login, show consent if not already given
+    if (!consentService.hasConsent()) {
+      setView("consent");
+    } else {
+      setView("main");
+    }
   };
 
   // Handle language selection from the LanguageScreen
   const handleLanguageSelect = (lang) => {
     setLanguage(lang);
 
-    // Audio confirmation
+    // Audio confirmation (US8)
     audioService.confirmAction('success');
     audioService.speakLocalized('language_selected', lang);
+    showToast('Language selected!', { type: 'success' });
+  };
+
+  // Handle upgrade from guest to account
+  const handleUpgradeFromGuest = () => {
+    consentService.setGuestMode(false);
+    setView("login");
   };
 
   if (view === "loading") {
@@ -105,7 +125,7 @@ function MainAppFlow() {
 
   return (
     <div className="app-container">
-      <CropDiagnosisApp />
+      <CropDiagnosisApp onUpgradeFromGuest={handleUpgradeFromGuest} />
     </div>
   );
 }
@@ -113,6 +133,7 @@ function MainAppFlow() {
 function App() {
   return (
     <LanguageProvider>
+      <ToastContainer />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<MainAppFlow />} />

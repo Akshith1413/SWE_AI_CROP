@@ -27,13 +27,16 @@ import ConsentScreen from './ConsentScreen';
 import UserProfile from './UserProfile';
 import AudioSettingsPanel from './AudioSettingsPanel';
 import SettingsPanel from './SettingsPanel';
+import GuestBanner from './GuestBanner';
+import { showToast } from './ConfirmationToast';
 import { cropService } from '../services/cropService';
 import { consentService } from '../services/consentService';
 import { audioService } from '../services/audioService';
 import { aiService } from '../services/aiService';
+import { offlineStorageService } from '../services/offlineStorageService';
 import { useTranslation } from '../hooks/useTranslation';
 
-const CropDiagnosisApp = ({ onBack }) => {
+const CropDiagnosisApp = ({ onBack, onUpgradeFromGuest }) => {
   const [appState, setAppState] = useState('loading'); // loading, landing, consent, app
   const [view, setView] = useState('home');
   const [capturedImages, setCapturedImages] = useState([]);
@@ -107,6 +110,19 @@ const CropDiagnosisApp = ({ onBack }) => {
 
   return (
     <div className="min-h-screen bg-nature-50">
+      {/* Guest Mode Banner */}
+      {consentService.isGuest() && (
+        <GuestBanner onUpgrade={onUpgradeFromGuest || (() => { })} />
+      )}
+
+      {/* Offline Indicator */}
+      {!isOnline && (
+        <div className="bg-amber-500 text-white text-center py-2 px-4 text-sm font-medium flex items-center justify-center gap-2">
+          <WifiOff className="w-4 h-4" />
+          <span>You're offline - captures will be saved locally</span>
+        </div>
+      )}
+
       {view === 'home' && (
         <HomeView
           setView={setView}
@@ -2497,45 +2513,333 @@ const MultiImageUpload = ({ setView, setCapturedImages, isOnline, addToOfflineQu
   );
 };
 
-const VideoRecorder = ({ setView }) => {
+const VideoRecorder = ({ setView, isOnline, addToOfflineQueue }) => {
   const { t } = useTranslation();
+  const videoRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const chunksRef = useRef([]);
+  const streamRef = useRef(null);
+  const timerRef = useRef(null);
+
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordedUrl, setRecordedUrl] = useState(null);
+  const [recordedBlob, setRecordedBlob] = useState(null);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [cameraReady, setCameraReady] = useState(false);
+  const [error, setError] = useState(null);
+
+  const MAX_DURATION = 60; // 60 seconds max
+
+  useEffect(() => {
+    startCamera();
+    return () => {
+      stopCamera();
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
+  // Auto-stop at max duration
+  useEffect(() => {
+    if (recordingTime >= MAX_DURATION && isRecording) {
+      stopRecording();
+    }
+  }, [recordingTime]);
+
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: true
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.muted = true;
+      }
+      setCameraReady(true);
+    } catch (err) {
+      console.error('Video camera error:', err);
+      setError(t('videoView.videoError'));
+    }
+  };
+
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+    }
+  };
+
+  const startRecording = () => {
+    if (!streamRef.current) return;
+    chunksRef.current = [];
+
+    const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+      ? 'video/webm;codecs=vp9'
+      : 'video/webm';
+
+    try {
+      const recorder = new MediaRecorder(streamRef.current, { mimeType });
+      mediaRecorderRef.current = recorder;
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: mimeType });
+        setRecordedBlob(blob);
+        setRecordedUrl(URL.createObjectURL(blob));
+        audioService.playSuccess();
+      };
+
+      recorder.start(100);
+      setIsRecording(true);
+      setRecordingTime(0);
+      audioService.playClick();
+
+      timerRef.current = setInterval(() => {
+        setRecordingTime(prev => prev + 1);
+      }, 1000);
+    } catch (err) {
+      console.error('Recording error:', err);
+      setError(t('videoView.videoError'));
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      if (timerRef.current) clearInterval(timerRef.current);
+    }
+  };
+
+  const retakeVideo = () => {
+    setRecordedUrl(null);
+    setRecordedBlob(null);
+    setRecordingTime(0);
+    startCamera();
+  };
+
+  const saveVideo = async () => {
+    if (!recordedBlob) return;
+
+    if (!isOnline) {
+      // Save offline
+      try {
+        await offlineStorageService.saveMedia(recordedBlob, 'video', { duration: recordingTime });
+        showToast(t('confirmation.offlineSaved'), { type: 'info', voiceMessage: t('confirmation.offlineSaved') });
+      } catch (e) {
+        console.error('Offline save error:', e);
+      }
+    } else {
+      showToast(t('confirmation.videoSaved'), { type: 'success', voiceMessage: t('confirmation.videoSaved') });
+    }
+
+    audioService.confirmAction('success');
+    setView('home');
+  };
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   return (
-    <div className="min-h-screen bg-nature-50 flex flex-col">
-      <div className="bg-nature-600 p-4 text-white shadow-lg">
-        <div className="max-w-4xl mx-auto flex items-center gap-3">
-          <button onClick={() => setView('home')} className="p-2 hover:bg-white/20 rounded-full transition">
-            <ChevronRight className="w-6 h-6 rotate-180" />
-          </button>
-          <h1 className="text-xl font-bold">{t('videoView.title')}</h1>
-        </div>
+    <div className="min-h-screen bg-black flex flex-col">
+      {/* Header */}
+      <div className="bg-gray-900/80 p-4 text-white flex items-center gap-3 z-10">
+        <button onClick={() => { stopCamera(); setView('home'); }} className="p-2 hover:bg-white/20 rounded-full transition">
+          <ChevronRight className="w-6 h-6 rotate-180" />
+        </button>
+        <h1 className="text-lg font-bold flex-1">{t('videoView.title')}</h1>
+        {isRecording && (
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+            <span className="text-red-400 font-mono text-sm">{formatTime(recordingTime)} / {formatTime(MAX_DURATION)}</span>
+          </div>
+        )}
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-        <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-nature-100">
-          <div className="bg-purple-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Video className="w-10 h-10 text-purple-600" />
+      {/* Video Feed / Preview */}
+      <div className="flex-1 relative flex items-center justify-center bg-black">
+        {error ? (
+          <div className="text-center p-6">
+            <CameraOff className="w-16 h-16 text-gray-500 mx-auto mb-4" />
+            <p className="text-gray-400">{error}</p>
           </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('videoView.title')}</h2>
-          <p className="text-gray-500 mb-8">{t('videoView.recordInstructions')}</p>
+        ) : recordedUrl ? (
+          <video src={recordedUrl} controls className="max-h-full max-w-full" />
+        ) : (
+          <video ref={videoRef} autoPlay playsInline className="max-h-full max-w-full" />
+        )}
 
-          <button className="w-full bg-purple-600 text-white py-4 rounded-xl font-bold hover:bg-purple-700 transition shadow-lg shadow-purple-200 mb-3">
-            {t('videoView.startRecording')}
-          </button>
-          <button onClick={() => setView('home')} className="w-full bg-gray-100 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-200 transition">
-            {t('common.cancel')}
-          </button>
-        </div>
+        {/* Recording Timer Overlay */}
+        {isRecording && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-sm px-4 py-2 rounded-full flex items-center gap-2">
+            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+            <span className="text-white font-mono">{formatTime(recordingTime)}</span>
+          </div>
+        )}
+
+        {/* Duration limit bar */}
+        {isRecording && (
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-700">
+            <div
+              className="h-full bg-red-500 transition-all"
+              style={{ width: `${(recordingTime / MAX_DURATION) * 100}%` }}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Controls */}
+      <div className="bg-gray-900/80 p-6 flex items-center justify-center gap-6">
+        {!recordedUrl ? (
+          <>
+            <button
+              onClick={isRecording ? stopRecording : startRecording}
+              disabled={!cameraReady}
+              className={`w-20 h-20 rounded-full border-4 flex items-center justify-center transition-all ${isRecording
+                  ? 'border-red-500 bg-red-500/20'
+                  : 'border-white bg-white/10 hover:bg-white/20'
+                }`}
+            >
+              {isRecording ? (
+                <div className="w-8 h-8 bg-red-500 rounded-sm" />
+              ) : (
+                <div className="w-12 h-12 bg-red-500 rounded-full" />
+              )}
+            </button>
+          </>
+        ) : (
+          <>
+            <button onClick={retakeVideo} className="px-6 py-3 bg-gray-700 text-white rounded-xl font-semibold hover:bg-gray-600 transition">
+              {t('videoView.retake')}
+            </button>
+            <button onClick={saveVideo} className="px-6 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-500 transition">
+              {t('videoView.save')}
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* Info */}
+      <div className="bg-gray-900 text-center py-2">
+        <span className="text-gray-500 text-xs">{t('videoView.maxDuration')}</span>
       </div>
     </div>
   );
 };
 
-const VoiceInput = ({ setView }) => {
-  const { t } = useTranslation();
+const VoiceInput = ({ setView, isOnline }) => {
+  const { t, language } = useTranslation();
+  const recognitionRef = useRef(null);
+
+  const [isListening, setIsListening] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [finalTranscript, setFinalTranscript] = useState('');
+  const [response, setResponse] = useState('');
+  const [processing, setProcessing] = useState(false);
+  const [history, setHistory] = useState([]);
+
+  // Language code mapping for speech recognition
+  const getLangCode = useCallback(() => {
+    const langMap = {
+      en: 'en-IN', hi: 'hi-IN', ta: 'ta-IN', te: 'te-IN',
+      kn: 'kn-IN', bn: 'bn-IN', mr: 'mr-IN', gu: 'gu-IN',
+      pa: 'pa-IN', ml: 'ml-IN', or: 'or-IN', as: 'as-IN',
+      ur: 'ur-IN', ne: 'ne-NP', sa: 'sa-IN'
+    };
+    return langMap[language] || 'en-IN';
+  }, [language]);
+
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = getLangCode();
+
+      recognition.onresult = (event) => {
+        let interim = '';
+        let final = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            final += event.results[i][0].transcript;
+          } else {
+            interim += event.results[i][0].transcript;
+          }
+        }
+        setTranscript(interim);
+        if (final) setFinalTranscript(prev => prev + ' ' + final);
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+    }
+
+    return () => {
+      if (recognitionRef.current) recognitionRef.current.abort();
+    };
+  }, [getLangCode]);
+
+  const toggleListening = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      audioService.playClick();
+    } else {
+      setTranscript('');
+      setFinalTranscript('');
+      setResponse('');
+      try {
+        recognitionRef.current?.start();
+        setIsListening(true);
+        audioService.playClick();
+      } catch (e) {
+        console.error('Failed to start recognition:', e);
+      }
+    }
+  };
+
+  const submitQuestion = async () => {
+    const question = (finalTranscript + ' ' + transcript).trim();
+    if (!question) return;
+
+    setProcessing(true);
+    audioService.playClick();
+
+    try {
+      // Simulate AI response (replace with actual API call)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      const aiResponse = `Based on your description: "${question}", I recommend checking for fungal infections. Ensure proper spacing between plants and apply neem oil treatment. Monitor for 7 days.`;
+      setResponse(aiResponse);
+      setHistory(prev => [...prev, { question, answer: aiResponse, timestamp: new Date().toISOString() }]);
+
+      // Speak the response
+      audioService.speak(aiResponse);
+      showToast(t('common.success'), { type: 'success' });
+    } catch (err) {
+      console.error('AI query error:', err);
+      setResponse(t('voiceView.noResponse'));
+    }
+
+    setProcessing(false);
+  };
 
   return (
-    <div className="min-h-screen bg-nature-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex flex-col">
       <div className="bg-nature-600 p-4 text-white shadow-lg">
         <div className="max-w-4xl mx-auto flex items-center gap-3">
           <button onClick={() => setView('home')} className="p-2 hover:bg-white/20 rounded-full transition">
@@ -2545,19 +2849,111 @@ const VoiceInput = ({ setView }) => {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-        <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-nature-100">
-          <div className="bg-red-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
-            <Mic className="w-10 h-10 text-red-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('voiceView.listening')}</h2>
-          <p className="text-gray-500 mb-8">{t('voiceView.askQuestion')}</p>
+      <div className="flex-1 flex flex-col items-center p-6">
+        <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-nature-100 mb-6">
+          {/* Mic Button with Animation */}
+          <div className="flex flex-col items-center mb-6">
+            <button
+              onClick={toggleListening}
+              className={`w-24 h-24 rounded-full flex items-center justify-center transition-all shadow-lg ${isListening
+                  ? 'bg-red-500 shadow-red-200 animate-pulse scale-110'
+                  : 'bg-emerald-500 shadow-emerald-200 hover:scale-105'
+                }`}
+            >
+              <Mic className="w-10 h-10 text-white" />
+            </button>
+            <p className="mt-4 text-gray-600 font-medium">
+              {isListening ? t('voiceView.listening') : t('voiceView.tapToSpeak')}
+            </p>
 
-          <button onClick={() => setView('home')} className="w-full bg-gray-100 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-200 transition">
-            {t('common.cancel')}
+            {/* Voice waves animation */}
+            {isListening && (
+              <div className="flex items-center gap-1 mt-3 h-8">
+                {[...Array(5)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-1 bg-red-400 rounded-full"
+                    style={{
+                      animation: `voiceWave 0.6s ease-in-out infinite`,
+                      animationDelay: `${i * 0.1}s`,
+                      height: `${12 + Math.random() * 16}px`
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Transcription */}
+          {(transcript || finalTranscript) && (
+            <div className="bg-gray-50 p-4 rounded-xl mb-4 border border-gray-100">
+              <p className="text-xs text-gray-400 mb-1">{t('voiceView.transcription')}</p>
+              <p className="text-gray-800">{finalTranscript} <span className="text-gray-400">{transcript}</span></p>
+            </div>
+          )}
+
+          {/* Submit Button */}
+          {(finalTranscript || transcript) && !isListening && (
+            <button
+              onClick={submitQuestion}
+              disabled={processing}
+              className="w-full bg-emerald-600 text-white py-3 rounded-xl font-semibold hover:bg-emerald-700 transition mb-3 disabled:opacity-50"
+            >
+              {processing ? t('voiceView.processing') : t('common.submit')}
+            </button>
+          )}
+
+          {/* AI Response */}
+          {response && (
+            <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
+              <p className="text-xs text-emerald-600 font-semibold mb-1">{t('voiceView.response')}</p>
+              <p className="text-gray-800 text-sm leading-relaxed">{response}</p>
+            </div>
+          )}
+
+          {/* Cancel */}
+          <button onClick={() => setView('home')} className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition mt-4">
+            {t('common.back')}
           </button>
         </div>
+
+        {/* Example Questions */}
+        {!transcript && !finalTranscript && !response && (
+          <div className="max-w-md w-full">
+            <p className="text-sm text-gray-500 mb-3 font-medium">{t('voiceView.exampleQuestions')}</p>
+            <div className="space-y-2">
+              {[t('voiceView.example1'), t('voiceView.example2'), t('voiceView.example3')].map((q, i) => (
+                <div key={i} className="bg-white/80 p-3 rounded-xl text-sm text-gray-600 border border-gray-100">
+                  "{q}"
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* History */}
+        {history.length > 0 && (
+          <div className="max-w-md w-full mt-6">
+            <h3 className="text-sm font-bold text-gray-700 mb-3">{t('voiceView.history')}</h3>
+            <div className="space-y-3">
+              {history.slice(-3).reverse().map((item, i) => (
+                <div key={i} className="bg-white p-3 rounded-xl border border-gray-100">
+                  <p className="text-sm text-gray-800 font-medium mb-1">"{item.question}"</p>
+                  <p className="text-xs text-gray-500">{item.answer.substring(0, 100)}...</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* CSS for voice wave animation */}
+      <style>{`
+        @keyframes voiceWave {
+          0%, 100% { transform: scaleY(0.4); }
+          50% { transform: scaleY(1); }
+        }
+      `}</style>
     </div>
   );
 };
