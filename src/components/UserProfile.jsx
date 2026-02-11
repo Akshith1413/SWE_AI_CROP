@@ -15,10 +15,6 @@ const UserProfile = ({ onBack }) => {
     const [saved, setSaved] = useState(false);
     const isGuest = consentService.isGuest();
 
-    useEffect(() => {
-        loadData();
-    }, []);
-
     const loadData = () => {
         const allCrops = cropService.getAllCrops();
         const userCrops = cropService.getCrops();
@@ -27,6 +23,10 @@ const UserProfile = ({ onBack }) => {
         setSelectedCrops(userCrops.map(c => c.id || c));
         setLoading(false);
     };
+
+    useEffect(() => {
+        loadData();
+    }, []);
 
     const toggleCrop = (crop) => {
         setSelectedCrops(prev => {

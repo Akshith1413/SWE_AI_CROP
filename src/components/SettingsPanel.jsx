@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { X, Settings, Globe, ChevronRight, Check } from 'lucide-react';
+import { X, Settings, Globe, ChevronRight, Check, LogOut } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
 import { useLanguage } from '../context/LanguageContext';
 
-const SettingsPanel = ({ onClose }) => {
+const SettingsPanel = ({ onClose, onLogout }) => {
     const { t } = useTranslation();
     const { language, setLanguage, supportedLanguages } = useLanguage();
     const [activeSection, setActiveSection] = useState('main'); // 'main', 'language'
@@ -21,9 +21,9 @@ const SettingsPanel = ({ onClose }) => {
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
                         {activeSection === 'language' ? (
-                             <button onClick={() => setActiveSection('main')} className="p-1 hover:bg-gray-100 rounded-full">
+                            <button onClick={() => setActiveSection('main')} className="p-1 hover:bg-gray-100 rounded-full">
                                 <ChevronRight className="w-6 h-6 rotate-180 text-gray-600" />
-                             </button>
+                            </button>
                         ) : (
                             <Settings className="w-6 h-6 text-gray-700" />
                         )}
@@ -61,9 +61,28 @@ const SettingsPanel = ({ onClose }) => {
                                 </div>
                                 <ChevronRight className="w-5 h-5 text-gray-400" />
                             </button>
-                            
+
+                            {/* Logout Action */}
+                            {onLogout && (
+                                <button
+                                    onClick={() => {
+                                        onLogout();
+                                        onClose();
+                                    }}
+                                    className="w-full flex items-center gap-3 p-4 bg-red-50 hover:bg-red-100 rounded-xl transition border border-red-100 mt-4"
+                                >
+                                    <div className="p-2 bg-red-100 text-red-600 rounded-lg">
+                                        <LogOut className="w-5 h-5 rotate-180" />
+                                    </div>
+                                    <div className="text-left flex-1">
+                                        <div className="font-semibold text-red-700">{t('settings.logout')}</div>
+                                    </div>
+                                    <ChevronRight className="w-5 h-5 text-red-300" />
+                                </button>
+                            )}
+
                             {/* App Version / About (Placeholder) */}
-                            <div className="p-4 rounded-xl border border-gray-100 bg-gray-50/50">
+                            <div className="p-4 rounded-xl border border-gray-100 bg-gray-50/50 mt-4">
                                 <div className="text-xs text-center text-gray-400">
                                     Version 1.0.0
                                 </div>
@@ -71,15 +90,14 @@ const SettingsPanel = ({ onClose }) => {
                         </div>
                     ) : (
                         <div className="space-y-2">
-                             {supportedLanguages.map((lang) => (
+                            {supportedLanguages.map((lang) => (
                                 <button
                                     key={lang.code}
                                     onClick={() => handleLanguageSelect(lang.code)}
-                                    className={`w-full flex items-center justify-between p-3 rounded-xl transition border ${
-                                        language === lang.code 
-                                            ? 'bg-blue-50 border-blue-200 text-blue-700' 
-                                            : 'bg-white hover:bg-gray-50 border-gray-100 text-gray-700'
-                                    }`}
+                                    className={`w-full flex items-center justify-between p-3 rounded-xl transition border ${language === lang.code
+                                        ? 'bg-blue-50 border-blue-200 text-blue-700'
+                                        : 'bg-white hover:bg-gray-50 border-gray-100 text-gray-700'
+                                        }`}
                                 >
                                     <div className="flex flex-col items-start">
                                         <span className="font-medium">{lang.nativeName}</span>

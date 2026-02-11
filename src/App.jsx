@@ -83,11 +83,23 @@ function MainAppFlow() {
     showToast('Language selected!', { type: 'success' });
   };
 
-  // Handle upgrade from guest to account
+  const handleLogout = () => {
+    // Clear user ID in state and preferences
+    setUserId(null);
+    preferencesService.setUserId(null);
+    // Switch to landing view
+    setView("landing");
+    showToast('Logged out successfully', { type: 'success' });
+    audioService.playClick();
+  };
+
   const handleUpgradeFromGuest = () => {
+    // Switch guest mode off and go to login
     consentService.setGuestMode(false);
     setView("login");
   };
+
+  const handleBackToLanding = () => setView("landing");
 
   if (view === "loading") {
     return (
@@ -126,7 +138,11 @@ function MainAppFlow() {
 
   return (
     <div className="app-container">
-      <CropDiagnosisApp onUpgradeFromGuest={handleUpgradeFromGuest} />
+      <CropDiagnosisApp
+        onBack={handleBackToLanding}
+        onUpgradeFromGuest={handleUpgradeFromGuest}
+        onLogout={handleLogout}
+      />
     </div>
   );
 }

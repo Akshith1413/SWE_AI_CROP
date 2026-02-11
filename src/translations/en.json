@@ -79,7 +79,7 @@
         "firebaseError": "Authentication service unavailable. Please try again later.",
         "voiceGuidePhone": "Please enter your 10-digit mobile number to receive a verification code.",
         "voiceGuideOtp": "Please enter the 6-digit OTP code sent to your phone. The code will expire in 2 minutes.",
-        "replayAudio": "Replay Audio",
+        "replayAudio": "Replay",
         "autoPlayVoice": "Auto-play voice"
     },
     "cropCapture": {
@@ -363,7 +363,8 @@
     },
     "settings": {
         "title": "Settings",
-        "language": "Language"
+        "language": "Language",
+        "logout": "Logout"
     },
     "guestBanner": {
         "title": "Unlock Full Features",

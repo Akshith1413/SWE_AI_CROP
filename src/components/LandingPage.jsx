@@ -1,4 +1,4 @@
-import { Leaf, User } from 'lucide-react';
+import { Leaf, User, Download } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
 
 const LandingPage = ({ onGuest, onLogin }) => {
@@ -6,6 +6,16 @@ const LandingPage = ({ onGuest, onLogin }) => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#0f5132] to-[#2d6a4f] text-white flex flex-col items-center justify-center px-6 relative overflow-hidden">
+
+            {/* Download for Android (Top Right) */}
+            <a
+                href="/CropAid.apk"
+                download
+                className="absolute top-6 right-6 z-50 flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full hover:bg-white/20 transition-all duration-300 text-sm font-medium"
+            >
+                <Download size={18} />
+                <span>Android App</span>
+            </a>
 
             {/* Hero Visual */}
             <div className="mb-8 p-6 bg-white/10 backdrop-blur-md rounded-full shadow-lg transform hover:scale-105 transition duration-500 border border-white/20">

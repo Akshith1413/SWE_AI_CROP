@@ -92,7 +92,7 @@ class AudioService {
         try {
             const prefs = {
                 soundEnabled: this.soundEnabled,
-                voiceEnabled: thisVoiceEnabled
+                voiceEnabled: this.voiceEnabled
             };
             localStorage.setItem('cropai_audio_preferences', JSON.stringify(prefs));
             console.log('AudioService: Preferences saved');

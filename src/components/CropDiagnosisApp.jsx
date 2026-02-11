@@ -56,7 +56,7 @@ import { aiService } from '../services/aiService';
 import { offlineStorageService } from '../services/offlineStorageService';
 import { useTranslation } from '../hooks/useTranslation';
 
-const CropDiagnosisApp = ({ onBack, onUpgradeFromGuest }) => {
+const CropDiagnosisApp = ({ onBack, onUpgradeFromGuest, onLogout }) => {
   // App-level state management
   const [appState, setAppState] = useState('loading'); // Tracks: loading, landing, consent, app
   const [view, setView] = useState('home');            // Current view within app
@@ -199,6 +199,7 @@ const CropDiagnosisApp = ({ onBack, onUpgradeFromGuest }) => {
           setShowTutorial={setShowTutorial}
           deviceInfo={deviceInfo}
           onBack={onBack}
+          onLogout={onLogout}
         />
       )}
       {view === 'camera' && (
@@ -248,7 +249,7 @@ const CropDiagnosisApp = ({ onBack, onUpgradeFromGuest }) => {
   );
 };
 
-const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceInfo, onBack }) => {
+const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceInfo, onBack, onLogout }) => {
   const [showAudioSettings, setShowAudioSettings] = React.useState(false);
   const [showSettings, setShowSettings] = React.useState(false);
   const { t } = useTranslation();
@@ -479,7 +480,10 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
         <AudioSettingsPanel onClose={() => setShowAudioSettings(false)} />
       )}
       {showSettings && (
-        <SettingsPanel onClose={() => setShowSettings(false)} />
+        <SettingsPanel
+          onClose={() => setShowSettings(false)}
+          onLogout={onLogout}
+        />
       )}
     </div>
   );
