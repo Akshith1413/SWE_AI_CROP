@@ -48,6 +48,7 @@ import UserProfile from './UserProfile';
 import AudioSettingsPanel from './AudioSettingsPanel';
 import SettingsPanel from './SettingsPanel';
 import GuestBanner from './GuestBanner';
+import FloatingChatbot from './FloatingChatbot';
 import { showToast } from './ConfirmationToast';
 import { cropService } from '../services/cropService';
 import { consentService } from '../services/consentService';
@@ -244,6 +245,9 @@ const CropDiagnosisApp = ({ onBack, onUpgradeFromGuest }) => {
           onBack={() => setView('home')}
         />
       )}
+
+      {/* Floating Chatbot - Available on all views */}
+      <FloatingChatbot />
     </div>
   );
 };
@@ -2181,6 +2185,18 @@ const EnhancedCompleteCameraCapture = ({
                 >
                   <Sparkles className="w-5 h-5" />
                   {t('cropAdvice.getExpertAdvice')}
+                </button>
+
+                {/* Plantix Chatbot Button */}
+                <button
+                  onClick={() => {
+                    // Open Plantix chatbot in phone browser
+                    window.open('https://plantix.net/en/', '_blank');
+                  }}
+                  className="w-full bg-gradient-to-r from-green-600 to-teal-600 text-white py-4 px-6 rounded-xl font-bold hover:shadow-xl transition flex items-center justify-center gap-2"
+                >
+                  <MessageSquare className="w-5 h-5" />
+                  Ask Agriculture Chatbot
                 </button>
 
                 {/* Secondary Buttons */}

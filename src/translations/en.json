@@ -441,5 +441,17 @@
         "consentRecorded": "Consent recorded!",
         "cropsSaved": "Crop preferences saved!",
         "offlineSaved": "Saved offline - will sync when online"
+    },
+    "chatbot": {
+        "title": "CropAID Assistant",
+        "online": "Online",
+        "offline": "Offline",
+        "placeholder": "Ask about crops, pests, diseases...",
+        "send": "Send",
+        "close": "Close chat",
+        "openChat": "Open CropAID Chatbot",
+        "specialization": "CropAID specializes in agriculture support",
+        "welcomeMessage": "Hello! I'm CropAID – your Smart Farming Assistant. I can help you with crop diseases, pest control, soil health, irrigation, and organic farming tips. What can I help you with today?",
+        "askAgricultureChatbot": "Ask Agriculture Chatbot"
     }
 }
