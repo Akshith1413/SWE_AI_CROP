@@ -378,6 +378,7 @@ function LoginScreen({ onLogin, onSkip }) {
                     setError("");
                   }}
                   className="phone-input"
+                  style={{ color: 'black' }}
                 />
               </div>
 
@@ -409,6 +410,7 @@ function LoginScreen({ onLogin, onSkip }) {
                     onChange={(e) => handleOtpDigitChange(index, e.target.value)}
                     onKeyDown={(e) => handleOtpKeyDown(index, e)}
                     className="otp-digit-input"
+                    style={{ color: 'black' }}
                     autoFocus={index === 0}
                   />
                 ))}

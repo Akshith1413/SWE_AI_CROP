@@ -118,6 +118,10 @@
   font-size: 1.1rem;
   outline: none;
   letter-spacing: 1px;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  caret-color: #000000 !important;
+  background-color: #ffffff !important;
 }
 
 /* Login button */
@@ -175,7 +179,10 @@
   font-weight: 700;
   outline: none;
   transition: all 0.2s;
-  color: #1a3a2a;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  caret-color: #000000 !important;
+  background-color: #ffffff !important;
 }
 
 .otp-digit-input:focus {
