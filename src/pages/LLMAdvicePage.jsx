@@ -9,9 +9,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
     ArrowLeft, Loader2, AlertCircle, CheckCircle2, Sparkles,
     Leaf, Bug, Droplet, Shield, FlaskConical, Sprout, AlertTriangle,
-    Edit3, RefreshCw, Save, X, TrendingUp, Award, Zap
+    Edit3, RefreshCw, Save, X, TrendingUp, Award, Zap, WifiOff
 } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
+import { offlineSync } from '../services/offlineSync';
 
 const LLMAdvicePage = () => {
     const navigate = useNavigate();
@@ -46,11 +47,24 @@ const LLMAdvicePage = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [advice, setAdvice] = useState(null);
+    const [isOffline, setIsOffline] = useState(!navigator.onLine);
+
+    useEffect(() => {
+        // Listener for online/offline status
+        const handleOnlineStatus = () => setIsOffline(!navigator.onLine);
+        window.addEventListener('online', handleOnlineStatus);
+        window.addEventListener('offline', handleOnlineStatus);
+
+        return () => {
+            window.removeEventListener('online', handleOnlineStatus);
+            window.removeEventListener('offline', handleOnlineStatus);
+        };
+    }, []);
 
     useEffect(() => {
         // If no data provided, show error
         if (!cropType || !disease) {
-            setError('Missing crop or disease information. Please edit the fields below.');
+            setError(t('llmAdvice.missingInfo'));
             return;
         }
 
@@ -60,12 +74,29 @@ const LLMAdvicePage = () => {
 
     const fetchAdvice = async () => {
         if (!cropType || !disease) {
-            setError('Please provide crop type and disease information.');
+            setError(t('llmAdvice.missingInfo'));
             return;
         }
 
         setLoading(true);
         setError(null);
+
+        // Create cache key based on params
+        const cacheKey = `llm_advice_${cropType}_${disease}_${language}`;
+
+        // Check for cached data first if offline
+        if (!navigator.onLine) {
+            const cachedData = offlineSync.getCachedData(cacheKey);
+            if (cachedData) {
+                setAdvice(cachedData);
+                setLoading(false);
+                return;
+            } else {
+                setError(t('common.offline') + ' - ' + t('llmAdvice.errorTitle'));
+                setLoading(false);
+                return;
+            }
+        }
 
         try {
             const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -92,13 +123,22 @@ const LLMAdvicePage = () => {
 
             if (data.success && data.data) {
                 setAdvice(data.data);
+                // Cache successful response
+                offlineSync.cacheData(cacheKey, data.data);
                 setEditMode(false); // Exit edit mode on success
             } else {
                 throw new Error('Invalid response from server');
             }
         } catch (err) {
             console.error('Error fetching advice:', err);
-            setError(err.message || 'Failed to generate advice. Please try again.');
+
+            // Try cache fallback on error even if online
+            const cachedData = offlineSync.getCachedData(cacheKey);
+            if (cachedData) {
+                setAdvice(cachedData);
+            } else {
+                setError(err.message || t('llmAdvice.errorTitle'));
+            }
         } finally {
             setLoading(false);
         }
@@ -165,6 +205,13 @@ const LLMAdvicePage = () => {
                     )}
                 </header>
 
+                {isOffline && (
+                    <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 mb-6 flex items-center gap-3 text-orange-700">
+                        <WifiOff className="w-5 h-5" />
+                        <span className="text-sm font-medium">{t('cropCapture.willSyncOnline')}</span>
+                    </div>
+                )}
+
                 {/* Editable Input Card */}
                 <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 mb-6 shadow-xl border border-white">
                     <div className="flex items-center justify-between mb-4">
@@ -172,7 +219,7 @@ const LLMAdvicePage = () => {
                             <div className="p-3 bg-gradient-to-br from-emerald-100 to-green-100 rounded-xl">
                                 <Leaf className="w-6 h-6 text-emerald-600" />
                             </div>
-                            <h2 className="text-xl font-bold text-gray-800">Diagnosis Information</h2>
+                            <h2 className="text-xl font-bold text-gray-800">{t('llmAdvice.diagnosisInfo')}</h2>
                         </div>
 
                         {editMode && (
@@ -182,7 +229,7 @@ const LLMAdvicePage = () => {
                                     className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-600 rounded-xl font-semibold hover:bg-gray-200 transition-all"
                                 >
                                     <X className="w-4 h-4" />
-                                    Cancel
+                                    {t('llmAdvice.cancel')}
                                 </button>
                                 <button
                                     onClick={handleSaveAndRefresh}
@@ -190,7 +237,7 @@ const LLMAdvicePage = () => {
                                     className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <Save className="w-4 h-4" />
-                                    Save & Generate
+                                    {t('llmAdvice.saveAndGenerate')}
                                 </button>
                             </div>
                         )}
@@ -201,7 +248,7 @@ const LLMAdvicePage = () => {
                         <div className="space-y-2">
                             <label className="text-sm font-semibold text-gray-600 flex items-center gap-2">
                                 <Leaf className="w-4 h-4 text-emerald-500" />
-                                Crop Type
+                                {t('llmAdvice.cropType')}
                             </label>
                             {editMode ? (
                                 <input
@@ -222,7 +269,7 @@ const LLMAdvicePage = () => {
                         <div className="space-y-2">
                             <label className="text-sm font-semibold text-gray-600 flex items-center gap-2">
                                 <Bug className="w-4 h-4 text-red-500" />
-                                Disease
+                                {t('llmAdvice.disease')}
                             </label>
                             {editMode ? (
                                 <input
@@ -243,7 +290,7 @@ const LLMAdvicePage = () => {
                         <div className="space-y-2">
                             <label className="text-sm font-semibold text-gray-600 flex items-center gap-2">
                                 <TrendingUp className="w-4 h-4 text-orange-500" />
-                                Severity
+                                {t('llmAdvice.severity')}
                             </label>
                             {editMode ? (
                                 <select
@@ -251,9 +298,9 @@ const LLMAdvicePage = () => {
                                     onChange={(e) => setSeverity(e.target.value)}
                                     className="w-full px-4 py-3 bg-white border-2 border-orange-200 rounded-xl focus:border-orange-400 focus:outline-none transition-all text-gray-800 font-medium"
                                 >
-                                    <option value="low">Low</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="high">High</option>
+                                    <option value="low">{t('llmAdvice.low')}</option>
+                                    <option value="medium">{t('llmAdvice.medium')}</option>
+                                    <option value="high">{t('llmAdvice.high')}</option>
                                 </select>
                             ) : (
                                 <div className="px-4 py-3 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl border border-orange-100">
@@ -266,7 +313,7 @@ const LLMAdvicePage = () => {
                         <div className="space-y-2">
                             <label className="text-sm font-semibold text-gray-600 flex items-center gap-2">
                                 <Award className="w-4 h-4 text-blue-500" />
-                                Confidence Score
+                                {t('llmAdvice.confidenceScore')}
                             </label>
                             {editMode ? (
                                 <div className="space-y-1">
@@ -304,8 +351,8 @@ const LLMAdvicePage = () => {
                             <Loader2 className="w-20 h-20 text-emerald-500 animate-spin" />
                             <div className="absolute inset-0 w-20 h-20 border-4 border-emerald-200 rounded-full animate-ping"></div>
                         </div>
-                        <p className="text-2xl font-bold text-gray-800 mb-2 mt-6">Generating Expert Advice...</p>
-                        <p className="text-sm text-gray-500">AI is analyzing {cropType} disease patterns</p>
+                        <p className="text-2xl font-bold text-gray-800 mb-2 mt-6">{t('llmAdvice.generating')}</p>
+                        <p className="text-sm text-gray-500">{t('llmAdvice.analyzingPatterns', { crop: cropType })}</p>
                         <div className="mt-4 flex gap-2">
                             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"></div>
                             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
@@ -315,14 +362,14 @@ const LLMAdvicePage = () => {
                 )}
 
                 {/* Error State */}
-                {error && !loading && (
+                {error && !loading && !advice && (
                     <div className="bg-red-50/80 backdrop-blur-sm border-2 border-red-200 rounded-3xl p-8 shadow-xl">
                         <div className="flex items-start gap-4 mb-6">
                             <div className="p-3 bg-red-100 rounded-2xl">
                                 <AlertCircle className="w-8 h-8 text-red-600" />
                             </div>
                             <div className="flex-1">
-                                <h3 className="text-xl font-bold text-red-800 mb-2">Unable to Generate Advice</h3>
+                                <h3 className="text-xl font-bold text-red-800 mb-2">{t('llmAdvice.errorTitle')}</h3>
                                 <p className="text-red-600">{error}</p>
                             </div>
                         </div>
@@ -332,7 +379,7 @@ const LLMAdvicePage = () => {
                             className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-red-500 to-red-600 text-white py-3 px-6 rounded-2xl font-semibold hover:shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <RefreshCw className="w-5 h-5" />
-                            Try Again
+                            {t('llmAdvice.tryAgain')}
                         </button>
                     </div>
                 )}
@@ -343,7 +390,7 @@ const LLMAdvicePage = () => {
                         {/* Cause */}
                         <AdviceCard
                             icon={<Bug className="w-6 h-6" />}
-                            title="Root Cause"
+                            title={t('llmAdvice.cause')}
                             content={advice.cause}
                             color="red"
                             index={0}
@@ -352,7 +399,7 @@ const LLMAdvicePage = () => {
                         {/* Symptoms */}
                         <AdviceCard
                             icon={<AlertTriangle className="w-6 h-6" />}
-                            title="Symptoms to Watch"
+                            title={t('llmAdvice.symptoms')}
                             content={advice.symptoms}
                             color="orange"
                             index={1}
@@ -361,7 +408,7 @@ const LLMAdvicePage = () => {
                         {/* Immediate Treatment */}
                         <AdviceCard
                             icon={<Shield className="w-6 h-6" />}
-                            title="Immediate Action Required"
+                            title={t('llmAdvice.immediateAction')}
                             content={advice.immediate}
                             color="blue"
                             index={2}
@@ -370,7 +417,7 @@ const LLMAdvicePage = () => {
                         {/* Chemical Solution */}
                         <AdviceCard
                             icon={<FlaskConical className="w-6 h-6" />}
-                            title="Chemical Treatment"
+                            title={t('llmAdvice.chemicalTreatment')}
                             content={advice.chemical}
                             color="purple"
                             index={3}
@@ -379,7 +426,7 @@ const LLMAdvicePage = () => {
                         {/* Organic Solution */}
                         <AdviceCard
                             icon={<Sprout className="w-6 h-6" />}
-                            title="Organic Alternative"
+                            title={t('llmAdvice.organicAlternative')}
                             content={advice.organic}
                             color="green"
                             index={4}
@@ -388,7 +435,7 @@ const LLMAdvicePage = () => {
                         {/* Prevention */}
                         <AdviceCard
                             icon={<CheckCircle2 className="w-6 h-6" />}
-                            title="Future Prevention"
+                            title={t('llmAdvice.futurePrevention')}
                             content={advice.prevention}
                             color="teal"
                             index={5}
@@ -398,8 +445,8 @@ const LLMAdvicePage = () => {
                         {advice.metadata && (
                             <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-2xl p-4 mt-8 border border-gray-200">
                                 <p className="text-xs font-medium text-center text-gray-500">
-                                    ✨ Generated on {new Date(advice.metadata.generatedAt).toLocaleString()}
-                                    {advice.metadata.source === 'fallback' && ' • Using expert database'}
+                                    ✨ {t('llmAdvice.generatedOn')} {new Date(advice.metadata.generatedAt).toLocaleString()}
+                                    {advice.metadata.source === 'fallback' && ' • ' + t('llmAdvice.usingDatabase')}
                                 </p>
                             </div>
                         )}
@@ -414,7 +461,7 @@ const LLMAdvicePage = () => {
                             className="w-full bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 text-white py-4 px-6 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all active:scale-98 shadow-lg flex items-center justify-center gap-2 group"
                         >
                             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                            Back to Home
+                            {t('llmAdvice.backToHome')}
                         </button>
                     </div>
                 )}
@@ -449,7 +496,7 @@ const LLMAdvicePage = () => {
                     animation: fadeIn 0.6s ease-out;
                 }
                 
-                .active\:scale-98:active {
+                .active\\:scale-98:active {
                     transform: scale(0.98);
                 }
             `}</style>

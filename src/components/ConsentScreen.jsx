@@ -4,8 +4,9 @@ import { ShieldCheck, Cloud, Database, Check, Volume2 } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
 import { audioService } from '../services/audioService';
 import { consentService } from '../services/consentService';
+import { api } from '../services/api';
 
-const ConsentScreen = ({ onConsent }) => {
+const ConsentScreen = ({ onConsent, userId }) => {
     const { t } = useTranslation();
     const [agreed, setAgreed] = useState(false);
     const [voiceAutoPlay, setVoiceAutoPlay] = useState(true);
@@ -25,10 +26,19 @@ const ConsentScreen = ({ onConsent }) => {
     }, [t, voiceAutoPlay]);
 
     // Handle user consent submission
-    const handleConsent = () => {
+    const handleConsent = async () => {
         if (!agreed) return; // Require checkbox to be checked
 
-        // Log timestamped consent
+        // Log timestamped consent to backend
+        try {
+            if (userId) {
+                await api.consent.log(userId, true);
+            }
+        } catch (error) {
+            console.error('Failed to log consent to backend', error);
+        }
+
+        // Log locally
         consentService.giveConsent();
         audioService.confirmAction('success');
 

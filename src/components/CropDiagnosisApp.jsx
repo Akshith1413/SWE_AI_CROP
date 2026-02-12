@@ -38,13 +38,15 @@ import {
   CloudRain, CloudSnow, Wind as WindIcon, Sunrise,
   Droplet, Thermometer as ThermometerIcon, UserCheck,
   BellRing, BatteryCharging, Layers, Activity,
-  History, AlertOctagon, ArrowRight
+  History, AlertOctagon, ArrowRight, Calendar as CalendarIcon
 } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
 import { Camera as CapacitorCamera, CameraResultType } from '@capacitor/camera';
 import LandingPage from './LandingPage';
 import ConsentScreen from './ConsentScreen';
 import UserProfile from './UserProfile';
+import CommunityScreen from './CommunityScreen';
+import CalendarScreen from './CalendarScreen';
 import AudioSettingsPanel from './AudioSettingsPanel';
 import SettingsPanel from './SettingsPanel';
 import GuestBanner from './GuestBanner';
@@ -245,6 +247,16 @@ const CropDiagnosisApp = ({ onBack, onUpgradeFromGuest, onLogout }) => {
           onBack={() => setView('home')}
         />
       )}
+      {view === 'community' && (
+        <CommunityScreen
+          onBack={() => setView('home')}
+        />
+      )}
+      {view === 'calendar' && (
+        <CalendarScreen
+          onBack={() => setView('home')}
+        />
+      )}
     </div>
   );
 };
@@ -407,6 +419,34 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
             <Sparkles className="w-8 h-8 text-emerald-600" />
           </div>
           <span className="font-semibold text-gray-700 text-base">{t('cropAdvice.llmAdvice')}</span>
+        </button>
+
+        {/* Community - FarmConnect */}
+        <button
+          onClick={() => {
+            audioService.playClick();
+            setView('community');
+          }}
+          className="bg-white p-5 rounded-2xl flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all shadow-md group border border-gray-100"
+        >
+          <div className="p-4 bg-gradient-to-br from-orange-100 to-orange-50 rounded-2xl group-hover:from-orange-200 group-hover:to-orange-100 transition">
+            <MessageSquare className="w-8 h-8 text-orange-500" />
+          </div>
+          <span className="font-semibold text-gray-700 text-base">{t('homeView.community')}</span>
+        </button>
+
+        {/* Calendar - CropCalendar */}
+        <button
+          onClick={() => {
+            audioService.playClick();
+            setView('calendar');
+          }}
+          className="bg-white p-5 rounded-2xl flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all shadow-md group border border-gray-100"
+        >
+          <div className="p-4 bg-gradient-to-br from-blue-100 to-indigo-50 rounded-2xl group-hover:from-blue-200 group-hover:to-indigo-100 transition">
+            <CalendarIcon className="w-8 h-8 text-blue-500" />
+          </div>
+          <span className="font-semibold text-gray-700 text-base">{t('homeView.calendar')}</span>
         </button>
       </div>
 

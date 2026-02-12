@@ -15,6 +15,7 @@ import { ToastContainer, showToast } from "./components/ConfirmationToast";
 import { preferencesService } from "./services/preferencesService";
 import { audioService } from "./services/audioService";
 import { consentService } from "./services/consentService";
+import { initOfflineSync } from "./services/offlineSync";
 
 // Component managing the main app flow after landing page
 function MainAppFlow() {
@@ -42,6 +43,9 @@ function MainAppFlow() {
 
     // Switch from loading to landing after preferences are loaded
     setView("landing");
+
+    // Initialize offline sync (US27)
+    initOfflineSync();
   }, []);
 
   const handleGuestEntry = () => {
@@ -117,7 +121,7 @@ function MainAppFlow() {
   }
 
   if (view === "consent") {
-    return <ConsentScreen onConsent={handleConsent} />;
+    return <ConsentScreen onConsent={handleConsent} userId={userId} />;
   }
 
   if (view === "login") {
@@ -139,6 +143,7 @@ function MainAppFlow() {
   return (
     <div className="app-container">
       <CropDiagnosisApp
+        userId={userId}
         onBack={handleBackToLanding}
         onUpgradeFromGuest={handleUpgradeFromGuest}
         onLogout={handleLogout}

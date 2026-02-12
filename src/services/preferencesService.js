@@ -1,4 +1,5 @@
 import { consentService } from './consentService';
+import { api } from './api';
 
 /**
  * Preferences Service
@@ -22,13 +23,19 @@ class PreferencesService {
             const stored = localStorage.getItem(PREFERENCES_KEY);
             if (stored) {
                 const parsed = JSON.parse(stored);
+                // Ensure a userId exists (guest or real) - must be 24 char hex for MongoDB
+                let userId = parsed.userId;
+                if (!userId || userId.startsWith('guest_')) {
+                    userId = Array.from({ length: 24 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+                }
+
                 return {
                     version: PREFERENCES_VERSION,
                     language: parsed.language || null,
                     cropType: parsed.cropType || null,
                     voiceInstructions: parsed.voiceInstructions !== undefined ? parsed.voiceInstructions : true,
                     showGrid: parsed.showGrid !== undefined ? parsed.showGrid : true,
-                    userId: parsed.userId || null,
+                    userId: userId,
                     lastSyncedAt: parsed.lastSyncedAt || null,
                     createdAt: parsed.createdAt || new Date().toISOString(),
                     updatedAt: parsed.updatedAt || new Date().toISOString()
@@ -48,7 +55,7 @@ class PreferencesService {
             cropType: null,
             voiceInstructions: true,
             showGrid: true,
-            userId: null,
+            userId: Array.from({ length: 24 }, () => Math.floor(Math.random() * 16).toString(16)).join(''),
             lastSyncedAt: null,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
@@ -58,11 +65,20 @@ class PreferencesService {
     /**
      * Save preferences to localStorage
      */
-    savePreferences() {
+    savePreferences(skipSync = false) {
         try {
             this.preferences.updatedAt = new Date().toISOString();
             localStorage.setItem(PREFERENCES_KEY, JSON.stringify(this.preferences));
             console.log('Preferences saved:', this.preferences);
+
+            // Sync to server if user is logged in
+            if (!skipSync && this.preferences.userId) {
+                api.settings.update(this.preferences.userId, {
+                    language: this.preferences.language,
+                    audioEnabled: this.preferences.voiceInstructions,
+                    guestMode: false // Assuming logged in user is not guest
+                }).catch(err => console.error('Failed to push prefs to server:', err));
+            }
         } catch (error) {
             console.error('Error saving preferences:', error);
         }
@@ -199,12 +215,21 @@ class PreferencesService {
         }
 
         try {
-            // TODO: Implement actual server sync
-            // For now, just mark as synced
             this.preferences.userId = userId;
-            this.preferences.lastSyncedAt = new Date().toISOString();
-            this.savePreferences();
-            console.log('Preferences synced for user:', userId);
+
+            // 1. Fetch settings from server
+            const serverSettings = await api.settings.get(userId);
+
+            if (serverSettings) {
+                // 2. Update local preferences with server data
+                // Map server fields to local fields if names differ
+                if (serverSettings.language) this.preferences.language = serverSettings.language;
+                if (serverSettings.audioEnabled !== undefined) this.preferences.voiceInstructions = serverSettings.audioEnabled;
+                // Add other mappings as needed
+
+                this.savePreferences(false); // Save locally without syncing back immediately
+                console.log('Preferences synced from server:', serverSettings);
+            }
         } catch (error) {
             console.error('Error syncing preferences:', error);
         }

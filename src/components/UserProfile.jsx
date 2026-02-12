@@ -6,7 +6,7 @@ import { audioService } from '../services/audioService';
 import { consentService } from '../services/consentService';
 import { showToast } from './ConfirmationToast';
 
-const UserProfile = ({ onBack }) => {
+const UserProfile = ({ onBack, userId }) => {
     const { t } = useTranslation();
     const [crops, setCrops] = useState([]);
     const [selectedCrops, setSelectedCrops] = useState([]);
@@ -15,7 +15,12 @@ const UserProfile = ({ onBack }) => {
     const [saved, setSaved] = useState(false);
     const isGuest = consentService.isGuest();
 
-    const loadData = () => {
+    const loadData = async () => {
+        // Fetch from server if logged in
+        if (userId) {
+            await cropService.fetchCrops(userId);
+        }
+
         const allCrops = cropService.getAllCrops();
         const userCrops = cropService.getCrops();
 
@@ -26,7 +31,7 @@ const UserProfile = ({ onBack }) => {
 
     useEffect(() => {
         loadData();
-    }, []);
+    }, [userId]);
 
     const toggleCrop = (crop) => {
         setSelectedCrops(prev => {
@@ -52,20 +57,22 @@ const UserProfile = ({ onBack }) => {
         audioService.playClick();
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (isGuest) {
             showToast(t('guestMode.profileRestricted'), { type: 'warning' });
             return;
         }
 
         const cropsToSave = crops.filter(c => selectedCrops.includes(c.id));
-        cropService.saveCrops(cropsToSave);
+        await cropService.saveCrops(cropsToSave, userId);
         setSaved(true);
         audioService.confirmAction('success', t('confirmation.cropsSaved'));
         showToast(t('confirmation.cropsSaved'), { type: 'success', voiceMessage: t('confirmation.cropsSaved') });
 
-        // Try to sync with server
-        cropService.syncCropsWithServer();
+        // Try to sync with server (Already done in saveCrops if userId passed)
+        if (userId) {
+            console.log('Synced with server');
+        }
 
         setTimeout(() => setSaved(false), 2000);
     };

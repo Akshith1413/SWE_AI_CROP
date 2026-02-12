@@ -154,7 +154,9 @@
         "online": "Online",
         "offline": "Offline",
         "mobile": "Mobile",
-        "desktop": "Desktop"
+        "desktop": "Desktop",
+        "community": "Community",
+        "calendar": "Calendar"
     },
     "cameraView": {
         "title": "Capture Plant",
@@ -442,5 +444,45 @@
         "consentRecorded": "Consent recorded!",
         "cropsSaved": "Crop preferences saved!",
         "offlineSaved": "Saved offline - will sync when online"
+    },
+    "community": {
+        "title": "FarmConnect Community",
+        "newPost": "New Post",
+        "createPost": "Create New Post",
+        "postTitle": "Title",
+        "postTitlePlaceholder": "What's on your mind?",
+        "postType": "Type",
+        "postContent": "Content",
+        "postContentPlaceholder": "Describe your question or story...",
+        "askQuestion": "Ask a Question",
+        "shareTip": "Share a Tip",
+        "successStory": "Success Story",
+        "cancel": "Cancel",
+        "post": "Post",
+        "noPosts": "No posts yet",
+        "beFirst": "Be the first to share a tip, ask a question, or tell your success story!",
+        "createFirst": "Create First Post",
+        "likes": "Likes",
+        "comments": "Comments",
+        "loading": "Loading community..."
+    },
+    "calendar": {
+        "title": "Crop Calendar",
+        "addTask": "Add Task",
+        "createTask": "Add Farm Task",
+        "taskName": "Task Name",
+        "taskNamePlaceholder": "e.g., Water Tomatoes",
+        "type": "Type",
+        "date": "Date",
+        "watering": "Watering",
+        "fertilizer": "Fertilizer",
+        "pesticide": "Pesticide",
+        "harvest": "Harvest",
+        "other": "Other",
+        "cancel": "Cancel",
+        "add": "Add",
+        "noTasks": "No tasks planned yet.",
+        "startPlanning": "Start planning",
+        "loading": "Loading tasks..."
     }
 }

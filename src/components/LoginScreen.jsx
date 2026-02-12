@@ -1,16 +1,10 @@
-// Component for Firebase phone authentication with OTP verification
 import { useState, useEffect, useRef, useCallback } from "react";
 import "./LoginScreen.css";
 
 import { speak } from "../utils/voice";
 import { useTranslation } from "../hooks/useTranslation";
 import { audioService } from "../services/audioService";
-
-import { auth } from "../firebase";
-import {
-  RecaptchaVerifier,
-  signInWithPhoneNumber
-} from "firebase/auth";
+import { api } from "../services/api";
 
 // OTP expiry duration (2 minutes)
 const OTP_EXPIRY_SECONDS = 120;
@@ -22,7 +16,6 @@ function LoginScreen({ onLogin, onSkip }) {
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState("phone");
 
-  const [confirmation, setConfirmation] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -112,7 +105,7 @@ function LoginScreen({ onLogin, onSkip }) {
     audioService.playClick();
   };
 
-  // Send OTP to entered phone number via Firebase
+  // Send OTP to entered phone number via Backend API (Mock)
   const sendOtp = async () => {
     setError("");
 
@@ -128,33 +121,13 @@ function LoginScreen({ onLogin, onSkip }) {
     try {
       setLoading(true);
 
-      // Guard: check if Firebase auth is properly initialized
-      if (!auth || auth._isInitialized === false) {
-        const msg = t('loginScreen.firebaseError');
-        setError(msg);
-        console.warn('Firebase auth not initialized. Auth object:', auth?._error || 'unknown');
-        if (voiceEnabled) speak(msg, getVoiceLang());
-        audioService.playError();
-        setLoading(false);
-        return;
+      const response = await api.auth.login(phone);
+
+      // In a real app, OTP is sent via SMS. Here we might get it back for demo.
+      if (response && response.otp) {
+        console.log("Demo OTP:", response.otp);
       }
 
-      if (!window.recaptchaVerifier) {
-        window.recaptchaVerifier = new RecaptchaVerifier(
-          auth,
-          "recaptcha-container",
-          { size: "invisible" }
-        );
-      }
-
-      const appVerifier = window.recaptchaVerifier;
-      const result = await signInWithPhoneNumber(
-        auth,
-        "+91" + phone,
-        appVerifier
-      );
-
-      setConfirmation(result);
       setStep("otp");
       setOtpTimer(OTP_EXPIRY_SECONDS);
       setCanResend(false);
@@ -170,35 +143,9 @@ function LoginScreen({ onLogin, onSkip }) {
     } catch (err) {
       console.error("OTP Error:", err);
       let errorMsg = t('loginScreen.otpFailed');
-
-      // Enhanced error messages
-      if (err.code === 'auth/too-many-requests') {
-        errorMsg = t('loginScreen.tooManyRequests');
-      } else if (err.code === 'auth/invalid-phone-number') {
-        errorMsg = t('loginScreen.invalidPhoneNumber');
-      } else if (err.code === 'auth/quota-exceeded') {
-        errorMsg = t('loginScreen.quotaExceeded');
-      } else if (err.code === 'auth/network-request-failed') {
-        errorMsg = t('loginScreen.networkError');
-      } else if (err.message && err.message.includes('Firebase')) {
-        // Firebase not configured properly - graceful fallback
-        errorMsg = t('loginScreen.firebaseError');
-        console.warn('Firebase may not be configured properly:', err.message);
-      }
-
       setError(errorMsg);
       if (voiceEnabled) speak(errorMsg, getVoiceLang());
       audioService.playError();
-
-      // Reset recaptcha on error
-      try {
-        if (window.recaptchaVerifier) {
-          window.recaptchaVerifier.clear();
-          window.recaptchaVerifier = null;
-        }
-      } catch (e) {
-        console.warn('Recaptcha cleanup error:', e);
-      }
     }
 
     setLoading(false);
@@ -210,17 +157,6 @@ function LoginScreen({ onLogin, onSkip }) {
     setOtp("");
     setOtpDigits(["", "", "", "", "", ""]);
     setError("");
-
-    // Reset recaptcha
-    try {
-      if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.clear();
-        window.recaptchaVerifier = null;
-      }
-    } catch (e) {
-      console.warn('Recaptcha cleanup error:', e);
-    }
-
     await sendOtp();
   };
 
@@ -277,14 +213,6 @@ function LoginScreen({ onLogin, onSkip }) {
     setError("");
     const fullOtp = otpDigits.join('');
 
-    if (!confirmation) {
-      const msg = t('loginScreen.requestOtpFirst');
-      setError(msg);
-      if (voiceEnabled) speak(msg, getVoiceLang());
-      audioService.playError();
-      return;
-    }
-
     if (fullOtp.length !== 6) {
       const msg = t('loginScreen.enterCompleteOtp');
       setError(msg);
@@ -303,30 +231,27 @@ function LoginScreen({ onLogin, onSkip }) {
 
     try {
       setLoading(true);
-      const result = await confirmation.confirm(fullOtp);
 
-      const msg = t('loginScreen.loginSuccess');
-      if (voiceEnabled) speak(msg, getVoiceLang());
-      audioService.playSuccess();
+      const response = await api.auth.verify(phone, fullOtp);
 
-      onLogin({
-        id: result.user?.uid || 'firebase_user',
-        phone: phone,
-        provider: 'phone'
-      });
+      if (response && response._id) {
+        const msg = t('loginScreen.loginSuccess');
+        if (voiceEnabled) speak(msg, getVoiceLang());
+        audioService.playSuccess();
+
+        onLogin({
+          id: response._id,
+          phone: response.phoneNumber,
+          name: response.name,
+          provider: 'phone'
+        });
+      } else {
+        throw new Error("Invalid response");
+      }
 
     } catch (err) {
       console.error("Verify Error:", err);
       let errorMsg = t('loginScreen.incorrectOtp');
-
-      if (err.code === 'auth/invalid-verification-code') {
-        errorMsg = t('loginScreen.invalidOtp');
-      } else if (err.code === 'auth/code-expired') {
-        errorMsg = t('loginScreen.otpExpired');
-      } else if (err.code === 'auth/network-request-failed') {
-        errorMsg = t('loginScreen.networkError');
-      }
-
       setError(errorMsg);
       if (voiceEnabled) speak(errorMsg, getVoiceLang());
       audioService.playError();
@@ -476,9 +401,6 @@ function LoginScreen({ onLogin, onSkip }) {
           <p className="skip" onClick={onSkip}>
             {t('loginScreen.skipLogin')}
           </p>
-
-          {/* FIREBASE CAPTCHA */}
-          <div id="recaptcha-container"></div>
 
         </div>
       </div>
