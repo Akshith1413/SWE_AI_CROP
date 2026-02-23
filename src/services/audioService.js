@@ -1,5 +1,3 @@
-// Import consent service to check guest mode status
-import { consentService } from './consentService';
 
 /**
  * Audio Service
@@ -53,7 +51,8 @@ class AudioService {
     loadPreferences() {
         // Guest mode: use defaults without loading from storage
         // Guests always start with audio enabled for better accessibility
-        if (consentService.isGuest()) {
+        const isGuest = localStorage.getItem('crop_diagnosis_is_guest') === 'true';
+        if (isGuest) {
             this.soundEnabled = true;
             this.voiceEnabled = true;
             return;
@@ -83,7 +82,8 @@ class AudioService {
      */
     savePreferences() {
         // Don't persist preferences for guests (privacy-first approach)
-        if (consentService.isGuest()) {
+        const isGuest = localStorage.getItem('crop_diagnosis_is_guest') === 'true';
+        if (isGuest) {
             console.log('AudioService: Guest mode - preferences not saved');
             return;
         }

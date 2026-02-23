@@ -18,6 +18,30 @@ export const offlineSync = {
         queue.push(action);
         localStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
 
+        // Optimistically update the cache for Calendar tasks (US27)
+        if (type.endsWith('_TASK') && data.userId) {
+            const cacheKey = `calendar_tasks_${data.userId}`;
+            let cachedTasks = offlineSync.getCachedData(cacheKey) || [];
+
+            if (type === 'CREATE_TASK') {
+                const newTask = {
+                    ...data,
+                    _id: 'temp_' + action.id,
+                    completed: false,
+                    createdAt: action.timestamp
+                };
+                cachedTasks = [newTask, ...cachedTasks];
+            } else if (type === 'TOGGLE_TASK') {
+                cachedTasks = cachedTasks.map(t =>
+                    t._id === data.taskId ? { ...t, completed: !t.completed } : t
+                );
+            } else if (type === 'DELETE_TASK') {
+                cachedTasks = cachedTasks.filter(t => t._id !== data.taskId);
+            }
+
+            offlineSync.cacheData(cacheKey, cachedTasks);
+        }
+
         // Return a mock response so the UI update optimistically
         return { success: true, offline: true, ...data, _id: 'temp_' + action.id, createdAt: new Date().toISOString() };
     },

@@ -25,11 +25,13 @@ class PreferencesService {
                 const parsed = JSON.parse(stored);
                 // Ensure a userId exists (guest or real) - must be 24 char hex for MongoDB
                 let userId = parsed.userId;
+                let needsUpdate = false;
                 if (!userId || userId.startsWith('guest_')) {
                     userId = Array.from({ length: 24 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+                    needsUpdate = true;
                 }
 
-                return {
+                const prefs = {
                     version: PREFERENCES_VERSION,
                     language: parsed.language || null,
                     cropType: parsed.cropType || null,
@@ -40,6 +42,12 @@ class PreferencesService {
                     createdAt: parsed.createdAt || new Date().toISOString(),
                     updatedAt: parsed.updatedAt || new Date().toISOString()
                 };
+
+                if (needsUpdate) {
+                    localStorage.setItem(PREFERENCES_KEY, JSON.stringify(prefs));
+                }
+
+                return prefs;
             }
         } catch (error) {
             console.error('Error loading preferences:', error);
@@ -49,7 +57,7 @@ class PreferencesService {
     }
 
     getDefaultPreferences() {
-        return {
+        const prefs = {
             version: PREFERENCES_VERSION,
             language: null,
             cropType: null,
@@ -60,6 +68,8 @@ class PreferencesService {
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
         };
+        localStorage.setItem(PREFERENCES_KEY, JSON.stringify(prefs));
+        return prefs;
     }
 
     /**
@@ -72,7 +82,8 @@ class PreferencesService {
             console.log('Preferences saved:', this.preferences);
 
             // Sync to server if user is logged in
-            if (!skipSync && this.preferences.userId) {
+            const isGuest = localStorage.getItem('crop_diagnosis_is_guest') === 'true';
+            if (!skipSync && this.preferences.userId && !isGuest) {
                 api.settings.update(this.preferences.userId, {
                     language: this.preferences.language,
                     audioEnabled: this.preferences.voiceInstructions,
@@ -216,6 +227,10 @@ class PreferencesService {
 
         try {
             this.preferences.userId = userId;
+
+            // Don't fetch from server for guests (US6)
+            const isGuest = localStorage.getItem('crop_diagnosis_is_guest') === 'true';
+            if (isGuest) return;
 
             // 1. Fetch settings from server
             const serverSettings = await api.settings.get(userId);

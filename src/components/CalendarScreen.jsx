@@ -54,7 +54,7 @@ const CalendarScreen = ({ onBack }) => {
 
     const toggleTask = async (taskId) => {
         try {
-            await api.calendar.toggleTask(taskId);
+            await api.calendar.toggleTask(taskId, userId);
             setTasks(tasks.map(t =>
                 t._id === taskId ? { ...t, completed: !t.completed } : t
             ));
@@ -67,7 +67,7 @@ const CalendarScreen = ({ onBack }) => {
     const deleteTask = async (taskId) => {
         if (!window.confirm('Delete this task?')) return;
         try {
-            await api.calendar.deleteTask(taskId);
+            await api.calendar.deleteTask(taskId, userId);
             setTasks(tasks.filter(t => t._id !== taskId));
             audioService.playClick();
         } catch (error) {

@@ -35,8 +35,11 @@ function MainAppFlow() {
     const savedPrefs = preferencesService.getAllPreferences();
     console.log('App: Loaded preferences:', savedPrefs);
 
-    // If user has consent and language, go directly to main
-    if (consentService.hasConsent() && preferencesService.getLanguage()) {
+    // If user has consent, language, AND is either a guest or authenticated, go to main
+    const isGuest = consentService.isGuest();
+    const hasToken = !!localStorage.getItem('jwt_token');
+
+    if (consentService.hasConsent() && preferencesService.getLanguage() && (isGuest || hasToken)) {
       setView("main");
       return;
     }
@@ -67,6 +70,9 @@ function MainAppFlow() {
       preferencesService.setUserId(user.id);
       // Sync preferences with backend when user logs in (US7)
       preferencesService.syncWithServer(user.id);
+    } else {
+      // If user skips login, treat as guest (US6)
+      consentService.setGuestMode(true);
     }
 
     // After login, show consent if not already given

@@ -647,7 +647,7 @@ const Landing = () => {
         </div>
       </footer>
 
-      <style jsx>{`
+      <style>{`
         * {
           margin: 0;
           padding: 0;

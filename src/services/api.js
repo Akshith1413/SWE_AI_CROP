@@ -48,6 +48,8 @@ export const api = {
     },
     user: {
         getProfile: async (userId) => {
+            const isGuest = localStorage.getItem('crop_diagnosis_is_guest') === 'true';
+            if (isGuest) return { name: 'Guest User', guest: true };
             const res = await fetchWithAuth(`${API_URL}/user/${userId}`);
             return res.json();
         },
@@ -62,10 +64,14 @@ export const api = {
     },
     crops: {
         get: async (userId) => {
+            const isGuest = localStorage.getItem('crop_diagnosis_is_guest') === 'true';
+            if (isGuest) return [];
             const res = await fetchWithAuth(`${API_URL}/crops/${userId}`);
             return res.json();
         },
         save: async (userId, selectedCrops) => {
+            const isGuest = localStorage.getItem('crop_diagnosis_is_guest') === 'true';
+            if (isGuest) return { success: true, message: 'Saved locally' };
             const res = await fetchWithAuth(`${API_URL}/crops`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -76,6 +82,8 @@ export const api = {
     },
     settings: {
         get: async (userId) => {
+            const isGuest = localStorage.getItem('crop_diagnosis_is_guest') === 'true';
+            if (isGuest) return null;
             const res = await fetchWithAuth(`${API_URL}/settings/${userId}`);
             return res.json();
         },
@@ -91,7 +99,7 @@ export const api = {
     consent: {
         log: async (userId, agreed) => {
             try {
-                const res = await fetchWithAuth(`${API_URL}/consent`, {
+                const res = await fetch(`${API_URL}/consent`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ userId, agreed }),
@@ -105,11 +113,24 @@ export const api = {
     },
     diagnosis: {
         save: async (data) => {
+            const isGuest = localStorage.getItem('crop_diagnosis_is_guest') === 'true';
+            if (isGuest) return { success: true, message: 'Diagnosis saved locally' };
             const res = await fetchWithAuth(`${API_URL}/diagnosis`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
             });
+            return res.json();
+        },
+        analyze: async (file) => {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const res = await fetchWithAuth(`${API_URL}/crop-advice/analyze`, {
+                method: 'POST',
+                body: formData,
+            });
+            if (!res.ok) throw new Error('Analysis failed');
             return res.json();
         },
         analyzeBatch: async (files) => {
@@ -198,7 +219,8 @@ export const api = {
     },
     calendar: {
         getTasks: async (userId) => {
-            if (!navigator.onLine) {
+            const isGuest = localStorage.getItem('crop_diagnosis_is_guest') === 'true';
+            if (!navigator.onLine || isGuest) {
                 const cached = offlineSync.getCachedData(`calendar_tasks_${userId}`);
                 return cached || [];
             }
@@ -212,7 +234,8 @@ export const api = {
             }
         },
         createTask: async (taskData) => {
-            if (!navigator.onLine) {
+            const isGuest = localStorage.getItem('crop_diagnosis_is_guest') === 'true';
+            if (!navigator.onLine || isGuest) {
                 return offlineSync.queueAction('CREATE_TASK', taskData);
             }
             const res = await fetchWithAuth(`${API_URL}/calendar`, {
@@ -222,18 +245,20 @@ export const api = {
             });
             return res.json();
         },
-        toggleTask: async (taskId) => {
-            if (!navigator.onLine) {
-                return offlineSync.queueAction('TOGGLE_TASK', { taskId });
+        toggleTask: async (taskId, userId) => {
+            const isGuest = localStorage.getItem('crop_diagnosis_is_guest') === 'true';
+            if (!navigator.onLine || isGuest) {
+                return offlineSync.queueAction('TOGGLE_TASK', { taskId, userId });
             }
             const res = await fetchWithAuth(`${API_URL}/calendar/${taskId}/toggle`, {
                 method: 'PUT',
             });
             return res.json();
         },
-        deleteTask: async (taskId) => {
-            if (!navigator.onLine) {
-                return offlineSync.queueAction('DELETE_TASK', { taskId });
+        deleteTask: async (taskId, userId) => {
+            const isGuest = localStorage.getItem('crop_diagnosis_is_guest') === 'true';
+            if (!navigator.onLine || isGuest) {
+                return offlineSync.queueAction('DELETE_TASK', { taskId, userId });
             }
             const res = await fetchWithAuth(`${API_URL}/calendar/${taskId}`, {
                 method: 'DELETE',

@@ -57,6 +57,7 @@ import { audioService } from '../services/audioService';
 import { aiService } from '../services/aiService';
 import { offlineStorageService } from '../services/offlineStorageService';
 import { useTranslation } from '../hooks/useTranslation';
+import { api } from '../services/api';
 
 const CropDiagnosisApp = ({ onBack, onUpgradeFromGuest, onLogout }) => {
   // App-level state management
