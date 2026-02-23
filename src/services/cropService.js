@@ -26,11 +26,14 @@ export const cropService = {
             return;
         }
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(crops));
-            console.log('Crops saved:', crops.length, 'crops');
+            // Local storage must save the raw strings rather than objects to be consistent.
+            const rawCropIds = crops.map(c => c.id || c);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(rawCropIds));
+            console.log('Crops saved locally:', rawCropIds.length, 'crops');
 
             if (userId) {
-                await api.crops.save(userId, crops.map(c => c.id || c));
+                await api.crops.save(userId, rawCropIds);
+                console.log('Crops synced to backend for user:', userId);
             }
         } catch (e) {
             console.error('Failed to save crops', e);
@@ -43,17 +46,9 @@ export const cropService = {
         try {
             const serverCrops = await api.crops.get(userId);
             if (serverCrops && Array.isArray(serverCrops)) {
-                // Determine format - if strings, map to objects? getCrops returns stored format.
-                // localStorage stores whatever we pass to saveCrops.
-                // saveCrops receives `cropsToSave` which are objects from `UserProfile`.
-                // But `CropPreference` model stores STRINGS (IDs).
-                // So we need to ensure consistency.
+                // Determine format
                 // The backend returns array of strings.
-                // We should store strings in localStorage or objects?
-                // `UserProfile` expects `cropService.getCrops()` to return something.
-                // `loadData` says: `setSelectedCrops(userCrops.map(c => c.id || c));`
-                // So it handles both objects and strings. Good.
-                // I will store Strings from server to LocalStorage to be safe.
+                // localStorage should store strings to maintain consistency with `getCrops` returning IDs.
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(serverCrops));
                 return serverCrops;
             }
@@ -63,17 +58,44 @@ export const cropService = {
         return [];
     },
 
-    // Sync crops with server (push local to server)
+    // Sync crops with server conflict-free
     syncCropsWithServer: async (userId) => {
         if (!userId) return;
         try {
-            const crops = cropService.getCrops();
-            // crops might be objects or strings.
-            const cropIds = crops.map(c => c.id || c);
-            await api.crops.save(userId, cropIds);
-            console.log('Synced crops to server');
+            // 1. Fetch latest state from server
+            const serverCrops = await api.crops.get(userId) || [];
+
+            // 2. Fetch current local state
+            const localCrops = cropService.getCrops();
+            const localCropIds = localCrops.map(c => c.id || c);
+
+            // 3. Merge both avoiding duplicate overwrite
+            const mergedCropIds = Array.from(new Set([...serverCrops, ...localCropIds]));
+
+            // 4. Save to backend and overwrite local storage natively to stay consistent
+            await api.crops.save(userId, mergedCropIds);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedCropIds));
+
+            console.log('Synced crops to server with conflict resolution');
         } catch (e) {
             console.error('Failed to sync crops with server:', e);
+        }
+    },
+
+    // Migrate guest data to newly logged in user
+    migrateGuestData: async (newUserId) => {
+        try {
+            const localCrops = localStorage.getItem(STORAGE_KEY);
+            if (localCrops) {
+                const parsedCrops = JSON.parse(localCrops);
+                // Just save the accumulated guest data directly to the new user's profile
+                if (parsedCrops.length > 0) {
+                    await api.crops.save(newUserId, parsedCrops);
+                    console.log(`Migrated ${parsedCrops.length} guest crops to user ${newUserId}`);
+                }
+            }
+        } catch (e) {
+            console.error('Failed to migrate guest data:', e);
         }
     },
 

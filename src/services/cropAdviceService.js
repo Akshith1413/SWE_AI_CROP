@@ -1,11 +1,9 @@
 /**
  * Crop Advice API Service
  * Service for communicating with backend API to get crop disease treatment advice
- * Handles API calls to the LLM backend for generating crop treatment recommendations
+ * Handles API calls to the LLM
  */
-
-// Backend API base URL - uses environment variable or defaults to production server
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://swe-ai-crop-back.onrender.com';
+import { API_URL, API_BASE_URL } from './api';
 
 // Singleton service for managing crop advice API calls
 class CropAdviceService {

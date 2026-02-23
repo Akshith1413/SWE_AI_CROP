@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
 import { offlineSync } from '../services/offlineSync';
+import { API_URL } from '../services/api';
 
 const LLMAdvicePage = () => {
     const navigate = useNavigate();
@@ -99,9 +100,7 @@ const LLMAdvicePage = () => {
         }
 
         try {
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
-            const response = await fetch(`${apiUrl}/api/crop-advice`, {
+            const response = await fetch(`${API_URL}/crop-advice`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

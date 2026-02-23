@@ -5,6 +5,8 @@ import { speak } from "../utils/voice";
 import { useTranslation } from "../hooks/useTranslation";
 import { audioService } from "../services/audioService";
 import { api } from "../services/api";
+import { cropService } from "../services/cropService";
+import { consentService } from "../services/consentService";
 
 // OTP expiry duration (2 minutes)
 const OTP_EXPIRY_SECONDS = 120;
@@ -123,11 +125,6 @@ function LoginScreen({ onLogin, onSkip }) {
 
       const response = await api.auth.login(phone);
 
-      // In a real app, OTP is sent via SMS. Here we might get it back for demo.
-      if (response && response.otp) {
-        console.log("Demo OTP:", response.otp);
-      }
-
       setStep("otp");
       setOtpTimer(OTP_EXPIRY_SECONDS);
       setCanResend(false);
@@ -235,9 +232,20 @@ function LoginScreen({ onLogin, onSkip }) {
       const response = await api.auth.verify(phone, fullOtp);
 
       if (response && response._id) {
+        // Save the JWT Token for future authenticated requests
+        if (response.token) {
+          localStorage.setItem('jwt_token', response.token);
+        }
+
         const msg = t('loginScreen.loginSuccess');
         if (voiceEnabled) speak(msg, getVoiceLang());
         audioService.playSuccess();
+
+        // Migrate guest data to this new auth session if previously in guest mode
+        if (consentService.isGuest()) {
+          await cropService.migrateGuestData(response._id);
+          consentService.setGuestMode(false);
+        }
 
         onLogin({
           id: response._id,

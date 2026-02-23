@@ -88,9 +88,11 @@ function MainAppFlow() {
   };
 
   const handleLogout = () => {
-    // Clear user ID in state and preferences
+    // Clear user ID in state, preferences, and remove JWT token
     setUserId(null);
     preferencesService.setUserId(null);
+    localStorage.removeItem('jwt_token');
+
     // Switch to landing view
     setView("landing");
     showToast('Logged out successfully', { type: 'success' });

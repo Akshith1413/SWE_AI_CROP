@@ -1,5 +1,7 @@
 // Service for managing user consent and guest mode status
 // Handles consent tracking, revocation, and guest mode storage
+// Handles consent tracking, revocation, and guest mode storage
+import { api } from './api';
 
 const CONSENT_KEY = 'crop_diagnosis_consent';
 const CONSENT_RECORD_KEY = 'crop_diagnosis_consent_record';
@@ -12,7 +14,7 @@ export const consentService = {
     },
 
     // Record user consent with timestamp and metadata
-    giveConsent: () => {
+    giveConsent: async (userId = null) => {
         try {
             localStorage.setItem(CONSENT_KEY, 'true');
             // Log timestamped consent record
@@ -26,6 +28,9 @@ export const consentService = {
             existingRecords.push(record);
             localStorage.setItem(CONSENT_RECORD_KEY, JSON.stringify(existingRecords));
             console.log('Consent recorded at:', record.timestamp);
+
+            // Notify Backend
+            await api.consent.log(userId, true);
         } catch (e) {
             console.error('Failed to save consent:', e);
         }

@@ -31,9 +31,7 @@ const ConsentScreen = ({ onConsent, userId }) => {
 
         // Log timestamped consent to backend
         try {
-            if (userId) {
-                await api.consent.log(userId, true);
-            }
+            await api.consent.log(userId || null, true);
         } catch (error) {
             console.error('Failed to log consent to backend', error);
         }

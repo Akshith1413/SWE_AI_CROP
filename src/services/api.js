@@ -1,4 +1,5 @@
 import { offlineSync } from './offlineSync';
+import { logger } from '../utils/logger';
 
 const getApiUrl = () => {
     let url = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -13,7 +14,17 @@ const getApiUrl = () => {
     return url;
 };
 
-const API_URL = getApiUrl();
+export const API_URL = getApiUrl();
+export const API_BASE_URL = API_URL.replace(/\/api$/, '');
+
+const fetchWithAuth = async (url, options = {}) => {
+    const token = localStorage.getItem('jwt_token');
+    const headers = { ...options.headers };
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    return fetch(url, { ...options, headers });
+};
 
 export const api = {
     auth: {
@@ -37,11 +48,11 @@ export const api = {
     },
     user: {
         getProfile: async (userId) => {
-            const res = await fetch(`${API_URL}/user/${userId}`);
+            const res = await fetchWithAuth(`${API_URL}/user/${userId}`);
             return res.json();
         },
         updateProfile: async (userId, data) => {
-            const res = await fetch(`${API_URL}/user/${userId}`, {
+            const res = await fetchWithAuth(`${API_URL}/user/${userId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
@@ -51,11 +62,11 @@ export const api = {
     },
     crops: {
         get: async (userId) => {
-            const res = await fetch(`${API_URL}/crops/${userId}`);
+            const res = await fetchWithAuth(`${API_URL}/crops/${userId}`);
             return res.json();
         },
         save: async (userId, selectedCrops) => {
-            const res = await fetch(`${API_URL}/crops`, {
+            const res = await fetchWithAuth(`${API_URL}/crops`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId, selectedCrops }),
@@ -65,11 +76,11 @@ export const api = {
     },
     settings: {
         get: async (userId) => {
-            const res = await fetch(`${API_URL}/settings/${userId}`);
+            const res = await fetchWithAuth(`${API_URL}/settings/${userId}`);
             return res.json();
         },
         update: async (userId, settings) => {
-            const res = await fetch(`${API_URL}/settings`, {
+            const res = await fetchWithAuth(`${API_URL}/settings`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId, ...settings }),
@@ -79,22 +90,62 @@ export const api = {
     },
     consent: {
         log: async (userId, agreed) => {
-            const res = await fetch(`${API_URL}/consent`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId, agreed }),
-            });
-            return res.json();
+            try {
+                const res = await fetchWithAuth(`${API_URL}/consent`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, agreed }),
+                });
+                return await res.json();
+            } catch (e) {
+                logger.error("Consent log failed locally/network", e);
+                return { success: false, error: e.message };
+            }
         }
     },
     diagnosis: {
         save: async (data) => {
-            const res = await fetch(`${API_URL}/diagnosis`, {
+            const res = await fetchWithAuth(`${API_URL}/diagnosis`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
             });
             return res.json();
+        },
+        analyzeBatch: async (files) => {
+            const formData = new FormData();
+            files.forEach((file) => formData.append('files', file));
+
+            const res = await fetchWithAuth(`${API_URL}/crop-advice/analyze/batch`, {
+                method: 'POST',
+                body: formData,
+            });
+            if (!res.ok) throw new Error('Batch analysis failed');
+            return res.json();
+        }
+    },
+    speech: {
+        transcribe: async (audioBlob) => {
+            const formData = new FormData();
+            formData.append('audio', audioBlob, 'voice_command.webm');
+
+            const res = await fetchWithAuth(`${API_URL}/speech/transcribe`, {
+                method: 'POST',
+                body: formData,
+            });
+            if (!res.ok) throw new Error('Speech transcription failed');
+            return res.json();
+        }
+    },
+    logs: {
+        save: async (logPayload) => {
+            const res = await fetch(`${API_URL}/logs`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(logPayload),
+            });
+            // Don't throw if log fails to prevent retry loops
+            return res.ok;
         }
     },
     community: {
@@ -104,7 +155,7 @@ export const api = {
                 return cached || [];
             }
             try {
-                const res = await fetch(`${API_URL}/community`);
+                const res = await fetchWithAuth(`${API_URL}/community`);
                 const data = await res.json();
                 offlineSync.cacheData('community_posts', data);
                 return data;
@@ -117,7 +168,7 @@ export const api = {
             if (!navigator.onLine) {
                 return offlineSync.queueAction('CREATE_POST', postData);
             }
-            const res = await fetch(`${API_URL}/community`, {
+            const res = await fetchWithAuth(`${API_URL}/community`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(postData),
@@ -128,7 +179,7 @@ export const api = {
             // Likes are less critical, maybe just skip offline or optimistic allow?
             // For simplicity, skip offline for now or just throw error caught by UI
             if (!navigator.onLine) return [];
-            const res = await fetch(`${API_URL}/community/${postId}/like`, {
+            const res = await fetchWithAuth(`${API_URL}/community/${postId}/like`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId }),
@@ -137,7 +188,7 @@ export const api = {
         },
         commentPost: async (postId, userId, text) => {
             if (!navigator.onLine) return null; // Comments complex to sync offline
-            const res = await fetch(`${API_URL}/community/${postId}/comment`, {
+            const res = await fetchWithAuth(`${API_URL}/community/${postId}/comment`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId, text }),
@@ -152,7 +203,7 @@ export const api = {
                 return cached || [];
             }
             try {
-                const res = await fetch(`${API_URL}/calendar/${userId}`);
+                const res = await fetchWithAuth(`${API_URL}/calendar/${userId}`);
                 const data = await res.json();
                 offlineSync.cacheData(`calendar_tasks_${userId}`, data);
                 return data;
@@ -164,7 +215,7 @@ export const api = {
             if (!navigator.onLine) {
                 return offlineSync.queueAction('CREATE_TASK', taskData);
             }
-            const res = await fetch(`${API_URL}/calendar`, {
+            const res = await fetchWithAuth(`${API_URL}/calendar`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(taskData),
@@ -175,7 +226,7 @@ export const api = {
             if (!navigator.onLine) {
                 return offlineSync.queueAction('TOGGLE_TASK', { taskId });
             }
-            const res = await fetch(`${API_URL}/calendar/${taskId}/toggle`, {
+            const res = await fetchWithAuth(`${API_URL}/calendar/${taskId}/toggle`, {
                 method: 'PUT',
             });
             return res.json();
@@ -184,7 +235,7 @@ export const api = {
             if (!navigator.onLine) {
                 return offlineSync.queueAction('DELETE_TASK', { taskId });
             }
-            const res = await fetch(`${API_URL}/calendar/${taskId}`, {
+            const res = await fetchWithAuth(`${API_URL}/calendar/${taskId}`, {
                 method: 'DELETE',
             });
             return res.json();

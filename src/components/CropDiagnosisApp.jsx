@@ -515,10 +515,7 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
         </div>
       </div>
 
-      {/* Audio Settings Modal */}
-      {showAudioSettings && (
-        <AudioSettingsPanel onClose={() => setShowAudioSettings(false)} />
-      )}
+      {/* Settings Modal */}
       {showSettings && (
         <SettingsPanel
           onClose={() => setShowSettings(false)}
@@ -528,6 +525,8 @@ const HomeView = ({ setView, isOnline, capturedImages, setShowTutorial, deviceIn
     </div>
   );
 };
+
+import { logger } from '../utils/logger';
 
 const EnhancedCompleteCameraCapture = ({
   setView,
@@ -578,7 +577,8 @@ const EnhancedCompleteCameraCapture = ({
   const [cropType, setCropType] = useState('');
   const [diseaseSymptoms, setDiseaseSymptoms] = useState([]);
   const [environmentalData, setEnvironmentalData] = useState(null);
-  const [voiceInstructions, setVoiceInstructions] = useState(true);
+  const [guidanceMode, setGuidanceMode] = useState('strict'); // 'strict', 'relaxed', 'off'
+  const [enforceQuality, setEnforceQuality] = useState(true);
   const [cameraSupported, setCameraSupported] = useState(true);
   const [photoTipsShown, setPhotoTipsShown] = useState(false);
   const [qualityHistory, setQualityHistory] = useState([]);
@@ -636,17 +636,21 @@ const EnhancedCompleteCameraCapture = ({
 
   // Voice guidance with delay to avoid spam
   useEffect(() => {
-    if (voiceInstructions && liveQuality.message && voiceGuidance !== liveQuality.message && !isSpeaking) {
+    if (guidanceMode !== 'off' && liveQuality.message && voiceGuidance !== liveQuality.message && !isSpeaking) {
+      if (guidanceMode === 'relaxed' && liveQuality.status !== 'good' && liveQuality.score >= 50) {
+        // Skip minor warnings in relaxed mode
+        return;
+      }
       voiceTimeoutRef.current = setTimeout(() => {
         speakGuidance(liveQuality.message);
         setVoiceGuidance(liveQuality.message);
-      }, 2000); // 2 second delay between voice messages
+      }, guidanceMode === 'strict' ? 2000 : 4000); // 2 second delay between voice messages
     }
 
     return () => {
       if (voiceTimeoutRef.current) clearTimeout(voiceTimeoutRef.current);
     };
-  }, [liveQuality.message, voiceInstructions, isSpeaking]);
+  }, [liveQuality.message, guidanceMode, isSpeaking]);
 
   // NEW: Check for quality issues and show warnings separately
   useEffect(() => {
@@ -656,7 +660,7 @@ const EnhancedCompleteCameraCapture = ({
       setWarningMessage(liveQuality.message);
 
       // Speak warning if voice is enabled
-      if (voiceInstructions && !isSpeaking) {
+      if (guidanceMode !== 'off' && !isSpeaking) {
         const warningText = `Warning: ${liveQuality.message}`;
         speakWarning(warningText);
       }
@@ -705,7 +709,7 @@ const EnhancedCompleteCameraCapture = ({
         videoRef.current.srcObject = mediaStream;
         videoRef.current.onloadedmetadata = () => {
           setCameraReady(true);
-          if (voiceInstructions) {
+          if (guidanceMode !== 'off') {
             speakGuidance("Camera ready. Please aim at the plant for analysis.");
           }
           // Show initial photo tips
@@ -727,10 +731,10 @@ const EnhancedCompleteCameraCapture = ({
   };
 
   const showCameraError = () => {
-    if (voiceInstructions) {
+    if (guidanceMode !== 'off') {
       speakGuidance("Unable to access camera. Please check permissions and try again.");
     }
-    alert('Unable to access camera. Please check permissions and try again.');
+    showToast('Unable to access camera. Please check permissions and try again.', { type: 'error' });
   };
 
   const stopCamera = () => {
@@ -741,7 +745,7 @@ const EnhancedCompleteCameraCapture = ({
 
   const switchCamera = () => {
     setCameraFacing(prev => prev === 'environment' ? 'user' : 'environment');
-    if (voiceInstructions) {
+    if (guidanceMode !== 'off') {
       speakGuidance(`Switching to ${cameraFacing === 'environment' ? 'front' : 'rear'} camera`);
     }
   };
@@ -919,7 +923,7 @@ const EnhancedCompleteCameraCapture = ({
     setShowDetailedTips(true);
 
     // Speak first tip
-    if (voiceInstructions) {
+    if (guidanceMode !== 'off') {
       speakGuidance("Here are some photo tips: " + tips[0]);
     }
 
@@ -982,7 +986,7 @@ const EnhancedCompleteCameraCapture = ({
 
   // NEW: Separate function to speak warnings
   const speakWarning = (message) => {
-    if ('speechSynthesis' in window && voiceInstructions && !isSpeaking) {
+    if ('speechSynthesis' in window && guidanceMode !== 'off' && !isSpeaking) {
       speechSynthesis.cancel();
       setIsSpeaking(true);
 
@@ -1005,10 +1009,19 @@ const EnhancedCompleteCameraCapture = ({
   };
 
   const capturePhoto = () => {
-    // Start countdown immediately - no blocking quality checks
+    if (enforceQuality && liveQuality.score < 50 && liveQuality.status !== 'good') {
+      setShowWarningAlert(true);
+      setWarningMessage(`Image quality too low (${liveQuality.score}%). ` + liveQuality.message);
+      if (guidanceMode !== 'off') {
+        speakWarning("Image quality too low. " + liveQuality.message);
+      }
+      return; // Block capture
+    }
+
+    // Start countdown
     setCaptureCountdown(3);
 
-    if (voiceInstructions) {
+    if (guidanceMode !== 'off') {
       speakGuidance("Starting countdown. Get ready... 3... 2... 1...");
     }
 
@@ -1038,7 +1051,7 @@ const EnhancedCompleteCameraCapture = ({
       // Stop any existing stream
       stopCamera();
 
-      if (voiceInstructions) {
+      if (guidanceMode !== 'off') {
         audioService.speak("Analyzing crop health. Please wait...", { rate: 1.0 });
       }
 
@@ -1049,7 +1062,7 @@ const EnhancedCompleteCameraCapture = ({
         setShowConfirmation(true);
         setTimeout(() => setShowConfirmation(false), 3000);
 
-        if (voiceInstructions) {
+        if (guidanceMode !== 'off') {
           const severe = aiResult.severity === 'severe';
           const msg = `Analysis complete. ${aiResult.diagnosis} detected with ${aiResult.confidence * 100} percent confidence. ${severe ? 'Immediate action required.' : aiResult.explanation}`;
           audioService.speak(msg);
@@ -1099,7 +1112,7 @@ const EnhancedCompleteCameraCapture = ({
       stopCamera();
 
       // Speak analyzing
-      if (voiceInstructions) {
+      if (guidanceMode !== 'off') {
         audioService.speak("Analyzing crop health. Please wait...", { rate: 1.0 });
       }
 
@@ -1113,7 +1126,7 @@ const EnhancedCompleteCameraCapture = ({
         setTimeout(() => setShowConfirmation(false), 3000);
 
         // Speak result
-        if (voiceInstructions) {
+        if (guidanceMode !== 'off') {
           const severe = aiResult.severity === 'severe';
           const msg = `Analysis complete. ${aiResult.diagnosis} detected with ${aiResult.confidence * 100} percent confidence. ${severe ? 'Immediate action required.' : aiResult.explanation}`;
           audioService.speak(msg);
@@ -1233,7 +1246,7 @@ const EnhancedCompleteCameraCapture = ({
       setShowAnalysis(true);
       setShowSaveConsent(false);
 
-      if (voiceInstructions) {
+      if (guidanceMode !== 'off') {
         speakGuidance("Capture saved successfully. Viewing analysis results.");
       }
     }
@@ -1248,7 +1261,7 @@ const EnhancedCompleteCameraCapture = ({
     setCaptureCountdown(null);
     startCamera();
 
-    if (voiceInstructions) {
+    if (guidanceMode !== 'off') {
       speakGuidance("Retaking photo. Please position your camera.");
     }
   };
@@ -1272,7 +1285,7 @@ const EnhancedCompleteCameraCapture = ({
   };
 
   const speakGuidance = (message) => {
-    if ('speechSynthesis' in window && voiceInstructions) {
+    if ('speechSynthesis' in window && guidanceMode !== 'off') {
       speechSynthesis.cancel(); // Cancel any ongoing speech
       setIsSpeaking(true);
 
@@ -1294,12 +1307,7 @@ const EnhancedCompleteCameraCapture = ({
     }
   };
 
-  const toggleVoiceInstructions = () => {
-    setVoiceInstructions(!voiceInstructions);
-    if (!voiceInstructions) {
-      speakGuidance("Voice instructions enabled");
-    }
-  };
+  // Voice toggle is replaced by guidanceMode selection
 
   const getEnvironmentalData = () => {
     // Simulate environmental data
@@ -1314,7 +1322,7 @@ const EnhancedCompleteCameraCapture = ({
     };
     setEnvironmentalData(mockData);
 
-    if (voiceInstructions) {
+    if (guidanceMode !== 'off') {
       speakGuidance(`Environmental data collected. Temperature is ${mockData.temperature} degrees, humidity ${mockData.humidity} percent.`);
     }
   };
@@ -2037,24 +2045,51 @@ const EnhancedCompleteCameraCapture = ({
                 )}
               </div>
 
-              {/* Voice Instructions Toggle */}
-              <div className="flex items-center justify-between p-4 bg-gray-100 rounded-xl">
+              {/* Guidance Mode Selection */}
+              <div className="p-4 bg-gray-100 rounded-xl space-y-3">
                 <div className="flex items-center gap-3">
                   <Volume2 className="w-5 h-5 text-gray-600" />
                   <div>
-                    <p className="font-medium text-gray-800">Voice Instructions</p>
-                    <p className="text-sm text-gray-600">Audio guidance for analysis</p>
+                    <p className="font-medium text-gray-800">Camera Guidance</p>
+                    <p className="text-sm text-gray-600">Choose how much help you need</p>
+                  </div>
+                </div>
+                <div className="flex bg-gray-200 p-1 rounded-lg">
+                  <button
+                    onClick={() => setGuidanceMode('strict')}
+                    className={`flex-1 py-1.5 text-sm font-medium rounded-md transition ${guidanceMode === 'strict' ? 'bg-white shadow text-emerald-700' : 'text-gray-600 hover:text-gray-800'}`}
+                  >
+                    Strict
+                  </button>
+                  <button
+                    onClick={() => setGuidanceMode('relaxed')}
+                    className={`flex-1 py-1.5 text-sm font-medium rounded-md transition ${guidanceMode === 'relaxed' ? 'bg-white shadow text-emerald-700' : 'text-gray-600 hover:text-gray-800'}`}
+                  >
+                    Relaxed
+                  </button>
+                  <button
+                    onClick={() => setGuidanceMode('off')}
+                    className={`flex-1 py-1.5 text-sm font-medium rounded-md transition ${guidanceMode === 'off' ? 'bg-white shadow text-emerald-700' : 'text-gray-600 hover:text-gray-800'}`}
+                  >
+                    Off
+                  </button>
+                </div>
+              </div>
+
+              {/* Quality Enforcement Toggle */}
+              <div className="flex items-center justify-between p-4 bg-gray-100 rounded-xl mt-3">
+                <div className="flex items-center gap-3">
+                  <ShieldCheck className="w-5 h-5 text-gray-600" />
+                  <div>
+                    <p className="font-medium text-gray-800">Enforce Quality</p>
+                    <p className="text-sm text-gray-600">Block blurry or dark photos</p>
                   </div>
                 </div>
                 <button
-                  onClick={toggleVoiceInstructions}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full ${voiceInstructions ? 'bg-emerald-500' : 'bg-gray-300'
-                    }`}
+                  onClick={() => setEnforceQuality(!enforceQuality)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full ${enforceQuality ? 'bg-emerald-500' : 'bg-gray-300'}`}
                 >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${voiceInstructions ? 'translate-x-6' : 'translate-x-1'
-                      }`}
-                  />
+                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${enforceQuality ? 'translate-x-6' : 'translate-x-1'}`} />
                 </button>
               </div>
             </div>
@@ -2238,7 +2273,7 @@ const EnhancedCompleteCameraCapture = ({
                   <button
                     onClick={() => {
                       // Speak analysis results
-                      if (voiceInstructions) {
+                      if (guidanceMode !== 'off') {
                         const message = `Analysis complete. Health score is ${analysisResult.healthScore} percent. ` +
                           `Healthy area is ${analysisResult.greenPercentage} percent. ` +
                           `Browning is ${analysisResult.brownPercentage} percent. ` +
@@ -2283,13 +2318,13 @@ const MultiImageUpload = ({ setView, setCapturedImages, isOnline, addToOfflineQu
     const imageFiles = files.filter(file => file.type.startsWith('image/'));
 
     if (imageFiles.length === 0) {
-      alert('Please select image files only');
+      showToast('Please select image files only', { type: 'warning' });
       return;
     }
 
     // Limit to 10 images per batch
     if (selectedImages.length + imageFiles.length > 10) {
-      alert('You can upload up to 10 images at a time');
+      showToast('You can upload up to 10 images at a time', { type: 'warning' });
       return;
     }
 
@@ -2343,7 +2378,7 @@ const MultiImageUpload = ({ setView, setCapturedImages, isOnline, addToOfflineQu
 
   const handleUpload = async () => {
     if (selectedImages.length === 0) {
-      alert('Please select at least one image');
+      showToast('Please select at least one image', { type: 'warning' });
       return;
     }
 
@@ -2361,43 +2396,97 @@ const MultiImageUpload = ({ setView, setCapturedImages, isOnline, addToOfflineQu
       });
     }, 200);
 
-    // Process each image
-    const processedImages = await Promise.all(
-      uploadedPreviewImages.map(async (imgData, index) => {
-        return new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            // Create a simple analysis for each image
-            const analysis = {
-              healthScore: Math.floor(Math.random() * 40) + 60,
-              greenPercentage: Math.floor(Math.random() * 30) + 50,
-              brownPercentage: Math.floor(Math.random() * 20) + 5,
-              yellowPercentage: Math.floor(Math.random() * 15) + 5,
-              diseasePercentage: Math.floor(Math.random() * 10) + 2,
-              spotDensity: Math.floor(Math.random() * 10),
-              issues: ['Sample analysis - upload complete'],
-              recommendations: ['Review each image for detailed diagnosis', 'Consider professional consultation if needed'],
-              timestamp: new Date().toISOString(),
-              qualityScore: 85
-            };
+    // Process images via backend batch endpoint
+    let processedImages = [];
+    try {
+      if (isOnline) {
+        // Send files to backend batch analyzer
+        const filesToUpload = uploadedPreviewImages.map(img => img.file);
+        const batchResponse = await api.diagnosis.analyzeBatch(filesToUpload);
 
-            resolve({
-              data: e.target.result,
+        // Read files as data URL for UI preview consistency
+        const readAsDataURL = (file) => new Promise(resolve => {
+          const reader = new FileReader();
+          reader.onload = e => resolve(e.target.result);
+          reader.readAsDataURL(file);
+        });
+
+        const dataUrls = await Promise.all(filesToUpload.map(readAsDataURL));
+
+        if (batchResponse.success && batchResponse.results) {
+          processedImages = batchResponse.results.map((res, index) => {
+            let analysis;
+            if (res.success) {
+              // Construct standard format based on prediction
+              const score = Math.floor(res.confidence * 100);
+              analysis = {
+                healthScore: score > 80 ? score - 20 : score,
+                greenPercentage: score,
+                brownPercentage: 5,
+                yellowPercentage: 5,
+                diseasePercentage: score < 50 ? 50 : 10,
+                spotDensity: 5,
+                issues: [res.disease],
+                recommendations: [typeof res.advice === 'string' ? res.advice.substring(0, 100) + '...' : 'Follow detailed advice.'],
+                timestamp: new Date().toISOString(),
+                qualityScore: 85,
+
+                fullDisease: res.disease,
+                fullAdvice: res.advice,
+                confidence: res.confidence
+              };
+            } else {
+              // fallback on error
+              analysis = {
+                healthScore: 50, greenPercentage: 50, brownPercentage: 10, yellowPercentage: 10, diseasePercentage: 30, spotDensity: 0,
+                issues: [`Analysis error: ${res.error}`],
+                recommendations: ['Review manually'],
+                timestamp: new Date().toISOString(),
+                qualityScore: 50,
+              };
+            }
+
+            return {
+              data: dataUrls[index],
               analysis,
               metadata: {
-                filename: imgData.file.name,
-                filesize: imgData.file.size,
+                filename: res.filename || filesToUpload[index].name,
+                filesize: filesToUpload[index].size,
                 timestamp: Date.now(),
                 batchUpload: true,
                 batchIndex: index,
-                batchTotal: uploadedPreviewImages.length
+                batchTotal: filesToUpload.length
               }
+            };
+          });
+        }
+      } else {
+        // Offline fallback mock
+        processedImages = await Promise.all(
+          uploadedPreviewImages.map(async (imgData, index) => {
+            return new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onload = (e) => {
+                const analysis = {
+                  healthScore: 60, greenPercentage: 50, brownPercentage: 5, yellowPercentage: 5, diseasePercentage: 2, spotDensity: 0,
+                  issues: ['Offline mode - Sync when online'], recommendations: ['Review image'], timestamp: new Date().toISOString(), qualityScore: 85
+                };
+                resolve({
+                  data: e.target.result, analysis, metadata: { filename: imgData.file.name, filesize: imgData.file.size, timestamp: Date.now(), batchUpload: true, batchIndex: index, batchTotal: uploadedPreviewImages.length }
+                });
+              };
+              reader.readAsDataURL(imgData.file);
             });
-          };
-          reader.readAsDataURL(imgData.file);
-        });
-      })
-    );
+          })
+        );
+      }
+    } catch (err) {
+      logger.error("Batch upload mechanism failed", err);
+      showToast("Batch processing failed. Check network or try again.", { type: 'error' });
+      setIsUploading(false);
+      clearInterval(progressInterval);
+      return;
+    }
 
     clearInterval(progressInterval);
     setUploadProgress(100);
@@ -2659,7 +2748,7 @@ const VideoRecorder = ({ setView, isOnline, addToOfflineQueue }) => {
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+        video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 24 } },
         audio: true
       });
       streamRef.current = stream;
@@ -2689,7 +2778,13 @@ const VideoRecorder = ({ setView, isOnline, addToOfflineQueue }) => {
       : 'video/webm';
 
     try {
-      const recorder = new MediaRecorder(streamRef.current, { mimeType });
+      // Initialize with hardware-level compression parameters (approx 500kbps)
+      const options = {
+        mimeType,
+        videoBitsPerSecond: 500000
+      };
+
+      const recorder = new MediaRecorder(streamRef.current, options);
       mediaRecorderRef.current = recorder;
 
       recorder.ondataavailable = (e) => {
@@ -2846,7 +2941,9 @@ const VideoRecorder = ({ setView, isOnline, addToOfflineQueue }) => {
 
 const VoiceInput = ({ setView, isOnline }) => {
   const { t, language } = useTranslation();
-  const recognitionRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const streamRef = useRef(null);
 
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -2855,59 +2952,25 @@ const VoiceInput = ({ setView, isOnline }) => {
   const [processing, setProcessing] = useState(false);
   const [history, setHistory] = useState([]);
 
-  // Language code mapping for speech recognition
-  const getLangCode = useCallback(() => {
-    const langMap = {
-      en: 'en-IN', hi: 'hi-IN', ta: 'ta-IN', te: 'te-IN',
-      kn: 'kn-IN', bn: 'bn-IN', mr: 'mr-IN', gu: 'gu-IN',
-      pa: 'pa-IN', ml: 'ml-IN', or: 'or-IN', as: 'as-IN',
-      ur: 'ur-IN', ne: 'ne-NP', sa: 'sa-IN'
-    };
-    return langMap[language] || 'en-IN';
-  }, [language]);
-
   useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = getLangCode();
-
-      recognition.onresult = (event) => {
-        let interim = '';
-        let final = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          if (event.results[i].isFinal) {
-            final += event.results[i][0].transcript;
-          } else {
-            interim += event.results[i][0].transcript;
-          }
-        }
-        setTranscript(interim);
-        if (final) setFinalTranscript(prev => prev + ' ' + final);
-      };
-
-      recognition.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
-        setIsListening(false);
-      };
-
-      recognition.onend = () => {
-        setIsListening(false);
-      };
-
-      recognitionRef.current = recognition;
-    }
-
     return () => {
-      if (recognitionRef.current) recognitionRef.current.abort();
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+        mediaRecorderRef.current.stop();
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
     };
-  }, [getLangCode]);
+  }, []);
 
-  const toggleListening = () => {
+  const toggleListening = async () => {
     if (isListening) {
-      recognitionRef.current?.stop();
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+        mediaRecorderRef.current.stop();
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
       setIsListening(false);
       audioService.playClick();
     } else {
@@ -2915,12 +2978,55 @@ const VoiceInput = ({ setView, isOnline }) => {
       setFinalTranscript('');
       setResponse('');
       try {
-        recognitionRef.current?.start();
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        streamRef.current = stream;
+
+        const mimeType = MediaRecorder.isTypeSupported('audio/webm')
+          ? 'audio/webm'
+          : 'audio/mp4';
+
+        const recorder = new MediaRecorder(stream, { mimeType, audioBitsPerSecond: 128000 });
+        mediaRecorderRef.current = recorder;
+        audioChunksRef.current = [];
+
+        recorder.ondataavailable = (e) => {
+          if (e.data.size > 0) audioChunksRef.current.push(e.data);
+        };
+
+        recorder.onstop = async () => {
+          const blob = new Blob(audioChunksRef.current, { type: mimeType });
+          await processAudio(blob);
+        };
+
+        recorder.start(100);
         setIsListening(true);
         audioService.playClick();
       } catch (e) {
-        console.error('Failed to start recognition:', e);
+        logger.error('Audio recording init failed', e);
+        showToast("Microphone access denied or unavailable.", { type: 'error' });
       }
+    }
+  };
+
+  const processAudio = async (blob) => {
+    setProcessing(true);
+    setTranscript('Processing audio via backend...');
+
+    try {
+      // Pipe to backend transcribe
+      const result = await api.speech.transcribe(blob);
+      if (result.success) {
+        setFinalTranscript(result.text);
+        processCommand(result.text);
+      } else {
+        setResponse('Could not understand. Please try again.');
+      }
+    } catch (err) {
+      setResponse('Transcription failed natively.');
+      console.error(err);
+    } finally {
+      setProcessing(false);
+      setTranscript('');
     }
   };
 
