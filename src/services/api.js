@@ -265,5 +265,127 @@ export const api = {
             });
             return res.json();
         }
+    },
+    farmTasks: {
+        getTasks: async (userId) => {
+            try {
+                const res = await fetch(`${API_URL}/farm-tasks/${userId}`);
+                return await res.json();
+            } catch (e) {
+                console.error('Failed to fetch farm tasks', e);
+                return [];
+            }
+        },
+        getTodayTasks: async (userId) => {
+            try {
+                const res = await fetch(`${API_URL}/farm-tasks/${userId}/today`);
+                return await res.json();
+            } catch (e) {
+                return [];
+            }
+        },
+        getUpcomingTasks: async (userId) => {
+            try {
+                const res = await fetch(`${API_URL}/farm-tasks/${userId}/upcoming`);
+                return await res.json();
+            } catch (e) {
+                return [];
+            }
+        },
+        createTask: async (taskData) => {
+            const res = await fetch(`${API_URL}/farm-tasks`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(taskData),
+            });
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.message || 'Failed to create farm task');
+            }
+            return res.json();
+        },
+        updateStatus: async (taskId, status) => {
+            const res = await fetch(`${API_URL}/farm-tasks/${taskId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status }),
+            });
+            return res.json();
+        },
+        updateTask: async (taskId, data) => {
+            const res = await fetch(`${API_URL}/farm-tasks/${taskId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+            return res.json();
+        },
+        deleteTask: async (taskId, deleteAll = false) => {
+            const res = await fetch(`${API_URL}/farm-tasks/${taskId}?deleteAll=${deleteAll}`, {
+                method: 'DELETE',
+            });
+            return res.json();
+        }
+    },
+    taskReminders: {
+        getReminders: async (userId) => {
+            try {
+                const res = await fetchWithAuth(`${API_URL}/task-reminders/${userId}`);
+                return await res.json();
+            } catch (e) {
+                console.error('Failed to fetch task reminders', e);
+                return [];
+            }
+        },
+        getTodayReminders: async (userId) => {
+            try {
+                const res = await fetchWithAuth(`${API_URL}/task-reminders/${userId}/today`);
+                return await res.json();
+            } catch (e) {
+                return [];
+            }
+        },
+        getUpcomingReminders: async (userId) => {
+            try {
+                const res = await fetchWithAuth(`${API_URL}/task-reminders/${userId}/upcoming`);
+                return await res.json();
+            } catch (e) {
+                return [];
+            }
+        },
+        createReminder: async (data) => {
+            const res = await fetchWithAuth(`${API_URL}/task-reminders`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.message || 'Failed to create reminder');
+            }
+            return res.json();
+        },
+        updateStatus: async (reminderId, status, completedFrom = 'web') => {
+            const res = await fetchWithAuth(`${API_URL}/task-reminders/${reminderId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status, completedFrom }),
+            });
+            return res.json();
+        },
+        updateReminder: async (reminderId, data) => {
+            const res = await fetchWithAuth(`${API_URL}/task-reminders/${reminderId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+            return res.json();
+        },
+        deleteReminder: async (reminderId, deleteAll = false) => {
+            const res = await fetchWithAuth(`${API_URL}/task-reminders/${reminderId}?deleteAll=${deleteAll}`, {
+                method: 'DELETE',
+            });
+            return res.json();
+        }
     }
 };
